@@ -583,7 +583,7 @@ reach your phone or laptop when the site isn't open.
   email only — you still see it in the app. Every email says what happened and links to it — session
   descriptions and comment text stay on the site rather than going out to your email provider.
 - **1-on-1s** — one panel per event you're attending that offers them, with the switch and the slots
-  you're keeping free. See [1-on-1s](#1-on-1s).
+  you're keeping free. Not shown when none of your events offers them. See [1-on-1s](#1-on-1s).
 - **Account security** — where you protect your name, change your password or turn protection off,
   and sign out other browsers. See [Protect your name](#protect-your-name).
 - **Appearance** — System, Light or Dark, also available at the very bottom of every page.

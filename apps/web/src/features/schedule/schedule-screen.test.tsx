@@ -776,6 +776,29 @@ describe("clashes in your schedule", { tags: ["007-US11"] }, () => {
     );
   });
 
+  it(
+    "names 1-on-1s in the Clashes hint only where the event offers them",
+    { tags: ["012-US1"] },
+    async () => {
+      screenAt("view=agenda", { snapshot: clashing });
+      await userEvent.hover(chip()!);
+      expect((await screen.findByRole("tooltip")).textContent).not.toMatch(
+        /1-on-1/
+      );
+      cleanup();
+      screenAt("view=agenda", {
+        snapshot: {
+          ...clashing,
+          event: { ...clashing.event, meetingsEnabled: true },
+        },
+      });
+      await userEvent.hover(chip()!);
+      expect((await screen.findByRole("tooltip")).textContent).toMatch(
+        /1-on-1s/
+      );
+    }
+  );
+
   it("never marks a bookmark, though the chip counts it", () => {
     const bookmarked: Snapshot = {
       ...clashing,

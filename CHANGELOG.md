@@ -42,6 +42,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **1-on-1s are mentioned only where an event offers them**: the phase bar, the Clashes hint and
+  Settings no longer name them for events without 1-on-1s.
 - **Long descriptions are easier to read**: session, proposal and event descriptions use larger text
   with more space between lines, and headings stand out by level.
 - **Sessions, proposals, 1-on-1s, profiles and event details open in a side panel**

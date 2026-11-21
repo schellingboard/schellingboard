@@ -73,11 +73,17 @@ describe("the settings page", { tags: ["013-US5"] }, () => {
     expect(screen.getByRole("group", { name: "Colour theme" })).toBeTruthy();
   });
 
-  it("says when no event offers 1-on-1s", () => {
-    show(readyWith([]));
+  it(
+    "leaves 1-on-1s out when none of the guest's events offers them",
+    { tags: ["012-US1"] },
+    () => {
+      show(readyWith([]));
 
-    expect(screen.getByText(/None of your events offers 1-on-1s/)).toBeTruthy();
-  });
+      expect(screen.queryByRole("heading", { name: "1-on-1s" })).toBeNull();
+      expect(screen.getByText(/Email me when/)).toBeTruthy();
+      expect(screen.queryByText(/1-on-1/)).toBeNull();
+    }
+  );
 
   it("shows no settings while loading or when they could not be loaded", () => {
     show({ status: "loading" });

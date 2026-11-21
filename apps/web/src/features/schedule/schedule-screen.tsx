@@ -274,7 +274,10 @@ export function ScheduleScreen({
       }
       clashes={
         data.guestId && (data.hasClashes || filters.clashes)
-          ? { active: !!filters.clashes }
+          ? {
+              active: !!filters.clashes,
+              meetings: snapshot.event.meetingsEnabled,
+            }
           : null
       }
       onToggleClashes={() =>

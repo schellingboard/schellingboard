@@ -40,7 +40,7 @@ export function ScheduleFilters({
   hidden: { active: boolean } | null;
   onToggleHidden: () => void;
   /** Null while the viewer has no clash and the chip is off. */
-  clashes: { active: boolean } | null;
+  clashes: { active: boolean; meetings: boolean } | null;
   onToggleClashes: () => void;
   /** How many entries match out of how many, or null when nothing narrows them. */
   count: { matching: number; total: number } | null;
@@ -106,7 +106,7 @@ export function ScheduleFilters({
                   active={clashes.active}
                   onClick={onToggleClashes}
                   label="Clashes"
-                  hint="Show only your sessions and 1-on-1s that overlap in time with another of yours, bookmarks included."
+                  hint={`Show only your ${clashes.meetings ? "sessions and 1-on-1s" : "sessions"} that overlap in time with another of yours, bookmarks included.`}
                 />
               )}
               {hidden && (
