@@ -16,7 +16,11 @@ vote on the ones they want, and place them on a shared schedule.
 - [Attendee guide](attendee-guide.md) — pick your name, propose, vote, RSVP, and protect your name
   so nobody else can act as you.
 
-:::note "Organizers" The attendee guide is the page worth sharing with your attendees. :::
+:::note "Organizers"
+
+The attendee guide is the page worth sharing with your attendees.
+
+:::
 
 ## For organizers
 
