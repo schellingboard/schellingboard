@@ -86,9 +86,18 @@ export function openPanel(
   }
 }
 
+/** Back to the page, carrying over what was changed on it while the panel was open. */
 export function closePanel(history: RouterHistory) {
   const current = panelOf(history.location);
-  if (current) history.go(-current.depth);
+  if (!current) return;
+  const { search } = backgroundOf(history.location);
+  const off = history.subscribe(() => {
+    if (panelOf(history.location)) return;
+    off();
+    const { pathname, search: left, hash } = history.location;
+    if (left !== search) history.replace(`${pathname}${search}${hash}`);
+  });
+  history.go(-current.depth);
 }
 
 /** Puts the page behind the panel on `search`, keeping the panel and its entry. */
