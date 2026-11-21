@@ -19,9 +19,7 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
    redirect.
 7. Done: schedule search (`q`) and unfolded days (`unfold`) in search params.
 8. Done: proposals list search (`q`), filter and sort in search params; the default sort is omitted.
-9. **Scroll per history entry.** Replace `use-scroll-restoration.ts`' one position per `event:view`
-   (`sessionStorage`) with one per history entry, for the schedule, the proposals list and the
-   directory.
+9. Done: scroll kept per history entry for the schedule, the proposals list and the directory.
 10. **Docs and release.** Rewrite `docs/dev/web-app.md` "Opening a modal and closing it" (anchor
     MnpjIo7Y stays) and the AGENTS.md "Misc" note; one release-notes highlight; ADR status Accepted.
 

@@ -8,10 +8,12 @@ import { ProposalsScreen } from "../features/proposals/proposals-screen";
 import { QuickVotingScreen } from "../features/proposals/quick-voting-screen";
 import { useStandings } from "../features/proposals/use-standings";
 import { createStandingsQuery } from "../queries/proposal-standings";
+import { useScrollRestoration } from "../ui/use-scroll-restoration";
 import { type EventView, useEventView } from "./event-page";
 import { LOCAL_ZONE } from "./local-zone";
 import { landOnPanel } from "./panel-history";
 import { likerFrom, useCommentSource } from "./use-comment-actions";
+import { useHistoryEntry } from "./use-history-entry";
 import { useVoting } from "./use-proposal-actions";
 import { useUrlSearchParams } from "./use-url-search-params";
 
@@ -34,6 +36,7 @@ function List(view: EventView) {
   const vote = useVoting(view);
   useViewProposalRedirect(slug, links.proposals);
   const { params, change } = useUrlSearchParams();
+  useScrollRestoration(null, useHistoryEntry());
 
   return (
     <>
