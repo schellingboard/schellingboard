@@ -199,8 +199,8 @@ IMAGE=schellingboard/schellingboard:v3.1.0 \
 bun set-env.ts test bash scripts/e2e-docker.sh tests/e2e/proposals.spec.ts
 ```
 
-It is not part of `make precommit` — it builds an image and takes a few minutes. The release
-workflow runs it against the image it is about to publish and refuses to publish if it fails (see
+It is not part of `make prepush` — it builds an image and takes a few minutes. The release workflow
+runs it against the image it is about to publish and refuses to publish if it fails (see
 [Releasing a New Version](releasing.md)), so the reason to run it by hand is a change to the
 `Dockerfile`, the server bundle, or anything touching paths, uploads or migrations — well before a
 release rather than at one.

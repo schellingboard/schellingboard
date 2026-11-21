@@ -8,7 +8,10 @@
 - `make commit-check` verifies the commits since `origin/main`, or `trunk()..@` in a jj repo
   (`RANGE=a..b`, or a jj revset, for another range); CI runs it on pull requests. Check a draft
   first with `echo "<message>" | bun scripts/check-commit-messages.ts --stdin`
-- Before committing, run `make precommit`
+- Before committing, run `make precommit`: it formats and lints the last change's files (jj `@`, or
+  `@-` when `@` is empty; git's uncommitted changes, or `HEAD` when there are none), type checks,
+  and runs the tests related to them and the E2E specs it changed. A change to tooling or test setup
+  runs everything. Before pushing, run `make prepush` for the full suite
 - When working on a GitHub issue, add a footer: `issue #123` (partial work) or `fixes #123` (fully
   resolves it)
 

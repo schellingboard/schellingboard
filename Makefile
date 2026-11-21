@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -7,7 +7,8 @@ help:
 	@printf "\nDevelopment:\n"
 	@printf "  %-28s %s\n" "make dev"                "Start development server (Vite on PORT in front of the server)"
 	@printf "  %-28s %s\n" "make mailpit"            "Start local mail server (for email in dev and tests)"
-	@printf "  %-28s %s\n" "make precommit"          "Format, lint, typecheck, and run all tests (incl. e2e)"
+	@printf "  %-28s %s\n" "make precommit"          "Check the last change: its files, related tests and changed specs"
+	@printf "  %-28s %s\n" "make prepush"            "Format, lint, typecheck, and run all tests (incl. e2e)"
 	@printf "\nBuilding:\n"
 	@printf "  %-28s %s\n" "make build"              "Build for production"
 	@printf "  %-28s %s\n" "make start"              "Start production server"
@@ -160,12 +161,15 @@ test-e2e-docker: install-playwright
 	bun set-env.ts test bash scripts/e2e-docker.sh
 
 format: install
-	bun x prettier --write .
+	bun x prettier --cache --write .
 
 format-check: install
-	bun x prettier --check .
+	bun x prettier --cache --check .
 
-precommit: format lint arch openapi-check typecheck test-coverage test-e2e
+prepush: format lint arch openapi-check typecheck test-coverage test-e2e
+
+precommit: install-playwright
+	bun scripts/precommit.ts
 
 clean:
 	rm -rf dist
@@ -274,8 +278,8 @@ docker-build:
 # Deprecated aliases (hidden from help) — remove after a deprecation period.
 # They print a warning pointing to the new name, then run it.
 check-and-format:
-	@echo "⚠️  'make check-and-format' is deprecated; use 'make precommit'" >&2
-	@$(MAKE) precommit
+	@echo "⚠️  'make check-and-format' is deprecated; use 'make prepush'" >&2
+	@$(MAKE) prepush
 
 dev-db-reset:
 	@echo "⚠️  'make dev-db-reset' is deprecated; use 'make dev-db-seed'" >&2

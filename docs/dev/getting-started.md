@@ -85,10 +85,11 @@ make lint     # Lint code
 make format   # Format code
 ```
 
-Before committing or pushing, run:
+Before committing, and before pushing, run:
 
 ```bash
-make precommit  # Format, lint, type check, and run all tests (incl. e2e)
+make precommit  # Format and lint the last change, run its tests and changed E2E specs
+make prepush    # Format, lint, type check, and run all tests (incl. e2e)
 ```
 
 ## Admin UI

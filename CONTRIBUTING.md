@@ -15,7 +15,8 @@ To get going:
 ```bash
 make install       # Install dependencies
 make dev           # Start the dev server on http://localhost:3000
-make precommit     # Format, lint, type check, run all tests — before every commit
+make precommit     # Check the last change's files and tests — before every commit
+make prepush       # Format, lint, type check, run all tests — before every push
 ```
 
 Full setup, including the optional `.env.dev.local` and seeding a database, is in

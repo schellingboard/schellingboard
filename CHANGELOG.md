@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Internal
+
+- **Faster `make precommit`**: checks only the last change's files, related tests and changed E2E
+  specs; the full suite is now `make prepush`.
+
 ## [5.2.0] - 2026-11-20
 
 ### Added
