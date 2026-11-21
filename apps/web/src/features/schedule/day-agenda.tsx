@@ -1,3 +1,4 @@
+import type { SharedMoment } from "@schellingboard/domain/event";
 import type { Location } from "@schellingboard/domain/location";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import type { Session } from "@schellingboard/domain/session";
@@ -14,6 +15,7 @@ import {
   AcademicCapIcon,
   BookmarkSolidIcon,
   CheckCircleIcon,
+  ClockIcon,
   LockIcon,
   UserIcon,
 } from "../../ui/icons";
@@ -39,6 +41,7 @@ export function DayAgenda({
   day,
   sessions,
   meetings,
+  moments,
   locations,
   filtering,
   stickyTop,
@@ -47,6 +50,7 @@ export function DayAgenda({
   /** The day's sessions and 1-on-1s left after the location filter and search. */
   sessions: Session[];
   meetings: MeetingView[];
+  moments: SharedMoment[];
   locations: Location[];
   filtering: boolean;
   /** Where the time headings stick: below whatever is pinned above them. */
@@ -56,13 +60,17 @@ export function DayAgenda({
   const { now } = data;
   const groups = useMemo(
     () =>
-      agendaGroups({ sessions, meetings, locations, breakMinutes }).map(
-        (group) => ({
-          ...group,
-          label: formatSlotLabel(group.start, day.start, timezone),
-        })
-      ),
-    [day, sessions, meetings, locations, breakMinutes, timezone]
+      agendaGroups({
+        sessions,
+        meetings,
+        moments,
+        locations,
+        breakMinutes,
+      }).map((group) => ({
+        ...group,
+        label: formatSlotLabel(group.start, day.start, timezone),
+      })),
+    [day, sessions, meetings, moments, locations, breakMinutes, timezone]
   );
   // Same condition as the grid's now line, so "Now" in the toolbar always has
   // something to jump to when it is offered.
@@ -100,6 +108,13 @@ export function DayAgenda({
                 <MeetingRow
                   key={meeting.id}
                   meeting={meeting}
+                  timezone={timezone}
+                />
+              ))}
+              {group.moments.map((moment) => (
+                <MomentRow
+                  key={moment.id}
+                  moment={moment}
                   timezone={timezone}
                 />
               ))}
@@ -298,6 +313,37 @@ function SessionRow({
           {session.capacity > 0 && `/${session.capacity}`}
         </>
       }
+    />
+  );
+}
+
+// No link and no RSVP: a moment is only something to plan around.
+function MomentRow({
+  moment,
+  timezone,
+}: {
+  moment: SharedMoment;
+  timezone: string;
+}) {
+  const { data } = useSchedule();
+  const time = (at: Date) => formatOptionalTime(at, timezone, TIME_FORMAT);
+  return (
+    <AgendaRow
+      state={timeState(moment.start, moment.end, data.now)}
+      swatchClass="bg-warning"
+      title={
+        <>
+          <ClockIcon
+            aria-hidden
+            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning-fg"
+          />
+          <span className="sr-only">Shared moment: </span>
+          <span className="line-clamp-2">{moment.title}</span>
+        </>
+      }
+      details={[`${time(moment.start)}–${time(moment.end)}`, moment.description]
+        .filter(Boolean)
+        .join(" · ")}
     />
   );
 }

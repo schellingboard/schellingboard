@@ -1,4 +1,5 @@
 // @module-tag 007-US3
+import type { SharedMoment } from "@schellingboard/domain/event";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { newEmptySession } from "@schellingboard/domain/session";
@@ -30,7 +31,21 @@ const session = (id: string, patch: Partial<Session>): Session => ({
 });
 
 const locations = [a, b] as unknown as Location[];
-const day = (id: string, sessions: Session[], date = "2026-06-15") => ({
+const lunch = {
+  id: "lunch",
+  dayId: "d1",
+  title: "Lunch",
+  description: "",
+  start: new Date("2026-06-15T12:00:00Z"),
+  end: new Date("2026-06-15T13:00:00Z"),
+};
+
+const day = (
+  id: string,
+  sessions: Session[],
+  date = "2026-06-15",
+  moments: SharedMoment[] = []
+) => ({
   id,
   eventId: "e",
   start: new Date(`${date}T08:00:00Z`),
@@ -39,7 +54,7 @@ const day = (id: string, sessions: Session[], date = "2026-06-15") => ({
   endBookings: new Date(),
   version: 1,
   sessions,
-  moments: [],
+  moments,
 });
 const meeting = { id: "m", otherName: "Kai", meetingPoint: "", message: "" };
 
@@ -271,6 +286,46 @@ describe("scheduleEntries", () => {
     expect(countMatches(entries, m)).toEqual({ matching: 1, total: 2 });
     expect(countMatches(entries, none)).toBeNull();
   });
+
+  it(
+    "lists shared moments unless a search, Hidden or Clashes narrows",
+    { tags: ["007-US15"] },
+    () => {
+      const withLunch = [day("d1", [], "2026-06-15", [lunch])];
+      const entriesFor = (match: ReturnType<typeof createScheduleMatch>) =>
+        scheduleEntries({
+          days: withLunch,
+          locations,
+          locParams: [],
+          meetings: [],
+          match,
+        })[0].moments;
+      const matching = (
+        patch: Partial<Parameters<typeof createScheduleMatch>[0]>
+      ) =>
+        createScheduleMatch({
+          search: "",
+          filters: { mine: null },
+          guestId: "mia",
+          rsvpd: () => false,
+          bookmarked: () => false,
+          hidden: () => false,
+          clashing: () => false,
+          ...patch,
+        });
+      expect(entriesFor(none)).toEqual([lunch]);
+      expect(entriesFor(matching({ filters: { mine: ["rsvpd"] } }))).toEqual([
+        lunch,
+      ]);
+      expect(entriesFor(matching({ search: "x" }))).toEqual([]);
+      expect(
+        entriesFor(matching({ filters: { mine: null, clashes: true } }))
+      ).toEqual([]);
+      expect(
+        entriesFor(matching({ filters: { mine: null, hidden: true } }))
+      ).toEqual([]);
+    }
+  );
 
   it("puts a meeting on the day it starts, whatever the filters", () => {
     const m = {
