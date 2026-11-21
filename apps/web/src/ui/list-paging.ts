@@ -7,6 +7,10 @@ export type OnParams = (
   options: { push: boolean }
 ) => void;
 
+/** The page the address asks for, before it is clamped to the rows. */
+export const requestedPage = (params: URLSearchParams) =>
+  Math.max(1, Math.trunc(Number(params.get("page"))) || 1);
+
 const pageSizeOf = (params: URLSearchParams): PageSize => {
   const asked = params.get("pageSize");
   if (asked === "all") return "all";
@@ -14,21 +18,43 @@ const pageSizeOf = (params: URLSearchParams): PageSize => {
   return size ?? DEFAULT_PAGE_SIZE;
 };
 
+/** `change` as a function of updates to `params`: null removes a key. */
+export const paramsUpdater =
+  (
+    params: URLSearchParams,
+    change: (next: URLSearchParams, options: { push: boolean }) => void
+  ): OnParams =>
+  (updates, options) => {
+    const next = new URLSearchParams(params);
+    for (const [key, value] of Object.entries(updates))
+      if (value === null) next.delete(key);
+      else next.set(key, value);
+    change(next, options);
+  };
+
 /** The requested page, clamped into range, its size and its rows. */
 export function pageOf<T>(rows: T[], params: URLSearchParams) {
   const pageSize = pageSizeOf(params);
   const size = pageSize === "all" ? Math.max(1, rows.length) : pageSize;
   const lastPage = Math.max(1, Math.ceil(rows.length / size));
-  const page = Math.min(
-    Math.max(1, Math.trunc(Number(params.get("page"))) || 1),
-    lastPage
-  );
+  const page = Math.min(requestedPage(params), lastPage);
   return {
     page,
     pageSize,
+    first: (page - 1) * size,
+    lastPage,
+    total: rows.length,
     visible: rows.slice((page - 1) * size, page * size),
   };
 }
+
+/** Whether a list has anything to page: more than one page, or a size the reader chose. */
+export const showsPager = ({
+  total,
+  lastPage,
+  pageSize,
+}: Pick<ReturnType<typeof pageOf>, "total" | "lastPage" | "pageSize">) =>
+  total > 0 && (lastPage > 1 || pageSize !== DEFAULT_PAGE_SIZE);
 
 /** What a table's search box and pager do to the address. */
 export const tableHandlers = (onParams: OnParams) => ({
