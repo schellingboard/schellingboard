@@ -549,6 +549,12 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US8: {
+        title:
+          "Attendee formats a description or comment, code blocks included",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "015": {

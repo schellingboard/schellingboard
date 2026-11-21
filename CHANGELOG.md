@@ -80,6 +80,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Ctrl+Z undoes Markdown toolbar formatting**
   ([#1145](https://github.com/schellingboard/schellingboard/issues/1145)): after clicking Bold, a
   link or a list button, undo used to leave the text as it was.
+- **Code blocks show as code**: text between ``` lines in descriptions, profiles and comments now
+  shows as a code block with a copy button. It used to fall apart into ordinary paragraphs.
 
 ### Internal
 

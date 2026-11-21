@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { Markdown } from "./markdown";
 
-describe("Markdown", () => {
+describe("Markdown", { tags: ["014-US8"] }, () => {
   it("renders paragraphs, lists and inline spans", () => {
     render(
       <Markdown>
@@ -83,6 +84,36 @@ describe("Markdown", () => {
     expect(screen.getByRole("link", { name: "x" }).parentElement?.tagName).toBe(
       "STRONG"
     );
+  });
+
+  it("renders a fenced code block verbatim, blank lines and markup included", () => {
+    const { container } = render(
+      <Markdown>
+        {"Run:\n```sh\nmake **all**\n\n  - not a list\n```\nDone"}
+      </Markdown>
+    );
+    const pre = container.querySelector("pre");
+    expect(pre?.textContent).toBe("make **all**\n\n  - not a list");
+    expect(screen.queryByRole("list")).toBeNull();
+    expect(screen.getByText("Run:").tagName).toBe("P");
+    expect(screen.getByText("Done").tagName).toBe("P");
+  });
+
+  it("runs an unclosed code fence to the end", () => {
+    const { container } = render(<Markdown>{"```\na\n\nb"}</Markdown>);
+    expect(container.querySelector("pre")?.textContent).toBe("a\n\nb");
+  });
+
+  it("copies a code block", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    render(<Markdown>{"```\nmake all\n```"}</Markdown>);
+
+    await userEvent.click(screen.getByRole("button", { name: "Copy code" }));
+
+    expect(writeText).toHaveBeenCalledWith("make all");
+    expect(await screen.findByRole("button", { name: "Copied" })).toBeTruthy();
+    vi.unstubAllGlobals();
   });
 
   it("renders a heading line as bold text, even straight after a paragraph", () => {
