@@ -6,11 +6,13 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { adminLocationCalls } from "../../commands/admin-locations";
 import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminLocation } from "../../queries/admin-locations";
+import { paramsUpdater } from "../../ui/list-paging";
 import { NoticeProvider } from "../../ui/notices";
 import { LocationsScreen } from "./locations-screen";
 
@@ -43,19 +45,28 @@ const events = [
 const setup = (
   locations: AdminLocation[],
   handler: (call: FakeCall) => Response = () =>
-    Response.json(location("l9", "x"))
+    Response.json(location("l9", "x")),
+  start = ""
 ) => {
   const { api, calls } = fakeApi(handler);
   const onChanged = vi.fn();
-  render(
-    <NoticeProvider>
+  function Page() {
+    const [params, setParams] = useState(new URLSearchParams(start));
+    return (
       <LocationsScreen
         status="ready"
         locations={locations}
         events={events}
         calls={adminLocationCalls(api)}
         onChanged={onChanged}
+        params={params}
+        onParams={paramsUpdater(params, (next) => setParams(next))}
       />
+    );
+  }
+  render(
+    <NoticeProvider>
+      <Page />
     </NoticeProvider>
   );
   return {
@@ -308,6 +319,8 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
     render(
       <LocationsScreen
         status="error"
+        params={new URLSearchParams()}
+        onParams={vi.fn()}
         locations={[]}
         events={[]}
         calls={adminLocationCalls(api)}
@@ -318,5 +331,42 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
     expect(screen.getByRole("alert").textContent).toContain(
       "Could not load the locations"
     );
+  });
+});
+
+describe("paging the admin locations", { tags: ["017-US1"] }, () => {
+  const many = Array.from({ length: 120 }, (_, i) =>
+    location(`l${i}`, `Room ${String(i).padStart(3, "0")}`)
+  );
+
+  it("shows 50 a page, scrolls up on a change and moves rows across the page boundary", async () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    const { region } = setup(many);
+
+    expect(within(region).getAllByRole("listitem").length).toBeGreaterThan(0);
+    expect(screen.getByText("120 results")).toBeTruthy();
+
+    await userEvent.click(screen.getByRole("button", { name: "Last page" }));
+
+    expect(screen.getByText(/Room 100/)).toBeTruthy();
+    expect(screen.queryByText(/Room 099/)).toBeNull();
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+    expect(
+      screen.getByRole("button", { name: "Move Room 100 up" })
+    ).toHaveProperty("disabled", false);
+    expect(
+      screen.getByRole("button", { name: "Move Room 119 down" })
+    ).toHaveProperty("disabled", true);
+  });
+
+  it("opens the last page for a page past the end, whose last row cannot move down", () => {
+    setup(many, undefined, "page=99");
+
+    expect(screen.getByText(/Room 119/)).toBeTruthy();
+    expect(screen.queryByText(/Room 099/)).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Move Room 119 down" })
+    ).toHaveProperty("disabled", true);
   });
 });
