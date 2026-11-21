@@ -9,8 +9,8 @@ import {
   type StatsFilter,
 } from "../../queries/admin-stats";
 import { cx } from "../../ui/cx";
+import type { OnParams } from "../../ui/list-paging";
 import { PeoplePicker } from "../../ui/people-picker";
-import type { OnParams } from "./list-paging";
 import { FigureCard, figureHeadingId, figureTitle } from "./stats-figure-card";
 import { figuresFor } from "./stats-figures";
 

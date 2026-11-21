@@ -20,6 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ([#1337](https://github.com/schellingboard/schellingboard/issues/1337)): a button on the proposals
   page and the new-proposal form opens prompts to start from. Organizers can replace the text for
   each event.
+- **"My comments" lists everything you wrote**
+  ([#993](https://github.com/schellingboard/schellingboard/issues/993)): open it from your name
+  menu, filter and search it, and click a comment to jump to it.
 
 ### Changed
 

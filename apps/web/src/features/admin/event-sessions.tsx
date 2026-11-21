@@ -21,6 +21,13 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import {
+  type OnParams,
+  pageOf,
+  plural,
+  searchByTitleOrHost,
+  tableHandlers,
+} from "../../ui/list-paging";
 import type { Person } from "../../ui/people-picker";
 import {
   type DayOption,
@@ -31,13 +38,6 @@ import {
   startInstant,
 } from "./admin-session-model";
 import { ConfirmByTyping } from "./confirm-by-typing";
-import {
-  type OnParams,
-  pageOf,
-  plural,
-  searchByTitleOrHost,
-  tableHandlers,
-} from "./list-paging";
 import { RoomCheckboxes } from "./room-checkboxes";
 import { shown, useJumpWithin } from "./use-section-save";
 

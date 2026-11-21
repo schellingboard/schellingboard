@@ -23,9 +23,9 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { plural } from "../../ui/list-paging";
 import { LocationPlaceholder } from "../../ui/location-placeholder";
 import { ConfirmByTyping } from "./confirm-by-typing";
-import { plural } from "./list-paging";
 import { shown, useJumpWithin } from "./use-section-save";
 
 export type EventOption = { id: string; name: string };

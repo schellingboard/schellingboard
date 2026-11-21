@@ -1,8 +1,8 @@
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminGuest } from "../../queries/admin-guests";
+import type { OnParams } from "../../ui/list-paging";
 import { AssignmentManager } from "./assignment-manager";
 import { MailLinks, NewLink } from "./join-links";
-import type { OnParams } from "./list-paging";
 
 export function EventGuestsManager({
   eventId,
