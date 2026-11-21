@@ -29,7 +29,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
 13. DONE **#683** Combobox closes on an outside tap (document `pointerdown`, click swallowed).
 14. DONE **#754** Warning icon on field errors, failure toasts and the form error summary.
 15. DONE **#1145** Toolbar edits use `execCommand` on the changed range (undoable).
-16. **#969** List and remove push devices.
+16. DONE **#969** Settings lists push devices (`/me/push-devices`) with Turn off.
 17. **#684** Admin table pager: numbers, page size.
 18. **#380** ESLint 10.
 19. **#1169** Property-based tests for domain.
