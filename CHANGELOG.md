@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **"My comments" lists everything you wrote**
   ([#993](https://github.com/schellingboard/schellingboard/issues/993)): open it from your name
   menu, filter and search it, and click a comment to jump to it.
+- **Shared moments on the schedule**
+  ([#861](https://github.com/schellingboard/schellingboard/issues/861)): organizers mark lunch or a
+  keynote as a striped band across every room. Sessions can still be booked inside it; hosts are
+  told and can go ahead.
 
 ### Changed
 

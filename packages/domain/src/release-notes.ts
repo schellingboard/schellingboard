@@ -49,6 +49,7 @@ export const releaseNotes: ReleaseNote[] = [
   {
     version: "Unreleased",
     highlights: [
+      "**Shared moments**: organizers mark lunch or a keynote as a striped band across every room, so hosts see when most people are away, and can still book there.",
       "**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position.",
     ],
   },
