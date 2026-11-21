@@ -49,6 +49,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ([#831](https://github.com/schellingboard/schellingboard/issues/831)): proposals, attendees,
   notifications, events and the admin lists show 50 at a time, with page numbers and a choice of 25,
   50 or 100; the page stays in the address, except in the statistics tables.
+- **Form errors and failure messages carry a warning icon**
+  ([#754](https://github.com/schellingboard/schellingboard/issues/754)): they no longer rely on red
+  alone, which was easy to mistake for the rose accent colour.
 
 ### Fixed
 

@@ -1,4 +1,5 @@
 import type { FieldErrors } from "../commands/mutation";
+import { ExclamationTriangleIcon } from "./icons";
 
 /**
  * Every outstanding error, repeated next to the submit button: on a long form
@@ -24,7 +25,8 @@ export function FormErrorSummary({
       role="alert"
       className="rounded-md border border-danger-border bg-danger-tint px-4 py-3 text-danger-fg"
     >
-      <p className="text-sm font-medium">
+      <p className="flex items-center gap-1.5 text-sm font-medium">
+        <ExclamationTriangleIcon className="h-5 w-5 shrink-0" />
         There {problems}
         {entries.length > 0 ? " to fix:" : ":"}
       </p>

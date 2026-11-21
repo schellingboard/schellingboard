@@ -1,6 +1,7 @@
 import { type ReactNode, useId, useLayoutEffect, useRef } from "react";
 
 import { Combobox } from "./combobox";
+import { ExclamationTriangleIcon } from "./icons";
 import { MarkdownTextarea } from "./markdown-textarea";
 import { PeoplePicker, type Person } from "./people-picker";
 
@@ -80,7 +81,12 @@ export function FieldError({
 }) {
   if (!message) return null;
   return (
-    <p id={id} role="alert" className="text-sm text-danger-fg">
+    <p
+      id={id}
+      role="alert"
+      className="flex items-start gap-1 text-sm text-danger-fg"
+    >
+      <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" />
       {message}
     </p>
   );
