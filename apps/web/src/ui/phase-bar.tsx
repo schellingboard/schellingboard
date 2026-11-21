@@ -14,10 +14,10 @@ const NAMES = {
 };
 
 const WHAT = {
-  [EventPhase.PROPOSAL]: "Attendees propose sessions and comment on them.",
-  [EventPhase.VOTING]: "Attendees vote on the proposals.",
+  [EventPhase.PROPOSAL]: "Attendees propose sessions and comment on them",
+  [EventPhase.VOTING]: "Attendees vote on the proposals",
   [EventPhase.SCHEDULING]:
-    "Vote counts show, sessions are scheduled, and attendees RSVP and book 1-on-1s.",
+    "Vote counts show, sessions are scheduled, and attendees RSVP",
 };
 
 const ARROW =
@@ -52,7 +52,7 @@ export function PhaseBar({
         const when = (date: Date) =>
           formatInLocalZone(date, event.timezone, localZone);
         const explain = [
-          `${NAMES[phase]} phase${state === "skipped" ? " (skipped)" : ""}: ${WHAT[phase]}`,
+          `${NAMES[phase]} phase${state === "skipped" ? " (skipped)" : ""}: ${WHAT[phase]}${phase === EventPhase.SCHEDULING && event.meetingsEnabled ? " and book 1-on-1s" : ""}.`,
           start && `${start <= now ? "Started" : "Starts"} ${when(start)}.`,
           end && `${end <= now ? "Ended" : "Ends"} ${when(end)}.`,
         ]

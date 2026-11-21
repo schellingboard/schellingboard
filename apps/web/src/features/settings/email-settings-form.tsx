@@ -50,12 +50,16 @@ const OPTIONS: { name: keyof EmailSettingsBody; label: string }[] = [
   },
 ];
 
+const MEETING_OPTIONS = new Set(["meetingRequest", "meetingResponse"]);
+
 export function EmailSettingsForm({
   initial,
   calls,
+  meetings = true,
 }: {
   initial: EmailSettingsBody;
   calls: Pick<ReturnType<typeof settingsCalls>, "saveEmailSettings">;
+  meetings?: boolean;
 }) {
   const [values, setValues] = useState(initial);
   const [saved, setSaved] = useState<EmailSettingsBody>();
@@ -88,7 +92,9 @@ export function EmailSettingsForm({
           Notifications go to the email address the organizers have for you.
           Contact an organizer to change it.
         </p>
-        {OPTIONS.map(({ name, label }) => (
+        {OPTIONS.filter(
+          ({ name }) => meetings || !MEETING_OPTIONS.has(name)
+        ).map(({ name, label }) => (
           <CheckboxField
             key={name}
             name={name}

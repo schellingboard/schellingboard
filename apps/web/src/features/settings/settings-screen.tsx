@@ -56,13 +56,19 @@ export function SettingsScreen({
               is edited separately.
             </p>
             {state.emailEnabled && (
-              <EmailSettingsForm initial={state.emailSettings} calls={calls} />
+              <EmailSettingsForm
+                initial={state.emailSettings}
+                calls={calls}
+                meetings={state.forms.length > 0}
+              />
             )}
           </div>
           <div className={SECTION}>
             <PushNotifications publicKey={state.publicKey} calls={calls} />
           </div>
-          <OneOnOnes forms={state.forms} calls={availability} />
+          {state.forms.length > 0 && (
+            <OneOnOnes forms={state.forms} calls={availability} />
+          )}
           {security}
         </>
       )}
@@ -89,26 +95,20 @@ function OneOnOnes({
         When you&apos;re free to meet other attendees, event by event. Only the
         events you&apos;re attending that offer 1-on-1s are listed.
       </p>
-      {forms.length === 0 ? (
-        <p className="text-sm text-fg-muted">
-          None of your events offers 1-on-1s at the moment.
-        </p>
-      ) : (
-        forms.map((form) => (
-          <details
-            key={form.eventId}
-            open={forms.length === 1}
-            className="rounded-md border border-line-subtle"
-          >
-            <summary className="cursor-pointer px-4 py-3 font-medium text-fg">
-              {form.eventName}
-            </summary>
-            <div className="px-4 pb-4">
-              <AvailabilityForm {...form} calls={calls} />
-            </div>
-          </details>
-        ))
-      )}
+      {forms.map((form) => (
+        <details
+          key={form.eventId}
+          open={forms.length === 1}
+          className="rounded-md border border-line-subtle"
+        >
+          <summary className="cursor-pointer px-4 py-3 font-medium text-fg">
+            {form.eventName}
+          </summary>
+          <div className="px-4 pb-4">
+            <AvailabilityForm {...form} calls={calls} />
+          </div>
+        </details>
+      ))}
     </section>
   );
 }
