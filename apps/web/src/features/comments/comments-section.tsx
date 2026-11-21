@@ -315,22 +315,22 @@ function Thread({
                   </button>
                 )}
                 {isAuthor && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setEditing(true)}
-                      className={action}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmingDelete(true)}
-                      className="cursor-pointer hover:text-danger-fg hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    onClick={() => setEditing(true)}
+                    className={action}
+                  >
+                    Edit
+                  </button>
+                )}
+                {node.canDelete && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingDelete(true)}
+                    className="cursor-pointer hover:text-danger-fg hover:underline"
+                  >
+                    Delete
+                  </button>
                 )}
               </div>
             )}
@@ -370,7 +370,11 @@ function Thread({
       <ConfirmDialog
         open={confirmingDelete}
         title="Delete comment"
-        message="Delete this comment? This cannot be undone."
+        message={
+          isAuthor
+            ? "Delete this comment? This cannot be undone."
+            : "Remove this comment? Its author is not notified."
+        }
         confirmLabel="Delete"
         onConfirm={() => {
           setConfirmingDelete(false);

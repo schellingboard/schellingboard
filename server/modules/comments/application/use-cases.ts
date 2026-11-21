@@ -4,12 +4,14 @@ import {
   deleteComment,
   editComment,
   listComments,
+  removableBy,
   setCommentLike,
 } from "./comments";
 
 export function createCommentUseCases(deps: CommentDeps) {
   return {
     listComments: listComments(deps),
+    removableBy: removableBy(deps),
     createComment: createComment(deps),
     editComment: editComment(deps),
     deleteComment: deleteComment(deps),

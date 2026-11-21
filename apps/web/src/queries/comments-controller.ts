@@ -59,6 +59,7 @@ export function createCommentsController({
           query.update(commentId, (c) => ({
             ...c,
             deleted: true,
+            canDelete: false,
             body: "",
             author: null,
             likes: [],
