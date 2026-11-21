@@ -173,9 +173,7 @@ export function SidePanel({
             <span aria-hidden>←</span>
           </button>
         )}
-        <h2 className="min-w-0 flex-1 text-lg font-semibold text-fg">
-          {title}
-        </h2>
+        <h2 className="min-w-0 flex-1 text-xl font-bold text-fg">{title}</h2>
         {titleAction}
         <button
           type="button"

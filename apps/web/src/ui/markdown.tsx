@@ -64,14 +64,19 @@ export function Markdown({
     .split(/\n{2,}/)
     .filter(Boolean);
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-[0.75em] ${className}`}>
       {blocks.flatMap((block, i) => blockNodes(block, i))}
     </div>
   );
 }
 
 const BULLET = /^\s*[-*+]\s+/;
-const HEADING = /^#{1,6}\s+(.*)$/;
+const HEADING = /^(#{1,6})\s+(.*)$/;
+const HEADING_SIZE = [
+  "pt-[0.5em] text-[1.125em] leading-snug",
+  "pt-[0.25em]",
+  "",
+];
 const NUMBERED = /^\s*\d+[.)]\s+/;
 
 function blockNodes(block: string, key: number): ReactNode[] {
@@ -101,8 +106,11 @@ function blockNodes(block: string, key: number): ReactNode[] {
     const heading = HEADING.exec(lines[start]);
     if (heading) {
       out.push(
-        <p key={`${key}h${start}`} className="font-bold">
-          {inline(heading[1])}
+        <p
+          key={`${key}h${start}`}
+          className={`font-bold text-fg ${HEADING_SIZE[Math.min(heading[1].length, 3) - 1]}`}
+        >
+          {inline(heading[2])}
         </p>
       );
       start++;
@@ -116,7 +124,7 @@ function blockNodes(block: string, key: number): ReactNode[] {
       out.push(
         <Tag
           key={`${key}l${start}`}
-          className={`${Tag === "ul" ? "list-disc" : "list-decimal"} space-y-0.5 pl-5`}
+          className={`${Tag === "ul" ? "list-disc" : "list-decimal"} space-y-[0.25em] pl-5`}
         >
           {lines.slice(start, end).map((l, j) => (
             <li key={j}>{inline(l.replace(list, ""))}</li>
