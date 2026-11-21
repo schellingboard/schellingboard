@@ -48,7 +48,9 @@ export const SHOWN_RELEASES = 3;
 export const releaseNotes: ReleaseNote[] = [
   {
     version: "Unreleased",
-    highlights: [],
+    highlights: [
+      "**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position.",
+    ],
   },
   {
     version: "5.2.0",
