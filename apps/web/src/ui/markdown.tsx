@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+
+import { CheckIcon, Square2StackIcon } from "./icons";
 
 const TOKEN =
   /\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(((?:https?:\/\/|mailto:|tel:)[^)\s]+)\)|(?<![\w@])((?:https?:\/\/|www\.)(?:[^\s<()]|\([^\s<()]*\))+(?<![.,;:!?'"])|[\w.+-]+@[\w-]+(?:\.[\w-]+)+)|(?<![\w*])[_*]([^_*]+)[_*](?![\w*])/g;
@@ -49,8 +51,8 @@ export function MarkdownInline({ children }: { children: string }) {
 
 /**
  * The markdown organizers write, as far as an event description needs it:
- * paragraphs, bullet and numbered lists, quotes, bold, italics, code and
- * links. Never raw HTML or images, as on the server's renderer.
+ * paragraphs, bullet and numbered lists, quotes, bold, italics, code, code
+ * blocks and links. Never raw HTML or images.
  */
 export function Markdown({
   children,
@@ -59,15 +61,69 @@ export function Markdown({
   children: string;
   className?: string;
 }) {
-  const blocks = children
-    .trim()
-    .split(/\n{2,}/)
-    .filter(Boolean);
+  let key = 0;
+  const nodes = fenced(children.trim()).flatMap((part): ReactNode[] =>
+    typeof part === "string"
+      ? part
+          .split(/\n{2,}/)
+          .filter((block) => block.trim())
+          .flatMap((block) => blockNodes(block, key++))
+      : [<CodeBlock key={key++} code={part.code} />]
+  );
+  return <div className={`space-y-[0.75em] ${className}`}>{nodes}</div>;
+}
+
+function CodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+  const Icon = copied ? CheckIcon : Square2StackIcon;
   return (
-    <div className={`space-y-[0.75em] ${className}`}>
-      {blocks.flatMap((block, i) => blockNodes(block, i))}
+    <div className="group relative">
+      <pre className="overflow-x-auto rounded bg-surface-muted p-3 font-mono text-[0.875em] leading-normal">
+        <code>{code}</code>
+      </pre>
+      <button
+        type="button"
+        aria-label={copied ? "Copied" : "Copy code"}
+        title={copied ? "Copied" : "Copy code"}
+        onClick={() => void copy()}
+        className="absolute right-1.5 top-1.5 rounded border border-line bg-surface p-1 text-fg-muted opacity-0 transition-opacity hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+      >
+        <Icon className="h-4 w-4" />
+      </button>
     </div>
   );
+}
+
+const FENCE = /^ {0,3}(`{3,})[^`]*$/;
+
+function fenced(text: string): (string | { code: string })[] {
+  const lines = text.split("\n");
+  const parts: (string | { code: string })[] = [];
+  let prose: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const open = FENCE.exec(lines[i]);
+    if (!open) {
+      prose.push(lines[i]);
+      continue;
+    }
+    const close = new RegExp(`^ {0,3}\`{${open[1].length},}\\s*$`);
+    let end = i + 1;
+    while (end < lines.length && !close.test(lines[end])) end++;
+    parts.push(prose.join("\n"), { code: lines.slice(i + 1, end).join("\n") });
+    prose = [];
+    i = end;
+  }
+  parts.push(prose.join("\n"));
+  return parts;
 }
 
 const BULLET = /^\s*[-*+]\s+/;

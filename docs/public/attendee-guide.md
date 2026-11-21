@@ -64,7 +64,8 @@ puts it on the schedule.
 - **Want to host something?** The **Host wanted** filter lists the proposals with no host and those
   asking for a co-host.
 - **Descriptions accept Markdown.** The toolbar above the box adds bold, italics, links, lists,
-  quotes and code; the **Preview** tab shows how it will look.
+  quotes, code and code blocks; the **Preview** tab shows how it will look. Each code block has a
+  copy button.
 - **You can browse, search and sort proposals in any phase.** Search covers titles, hosts and full
   descriptions, so a tool or prerequisite mentioned deep in a proposal is enough to find it. While
   you search, results stay ordered by how well they match.
