@@ -47,7 +47,10 @@ describe("spearman", { tags: ["021-US1"] }, () => {
         const ys = list.map(([, y]) => y);
         const a = spearman(xs, ys).rho;
         const b = spearman(ys, xs).rho;
-        if (a === null) return expect(b).toBeNull();
+        if (a === null) {
+          expect(b).toBeNull();
+          return;
+        }
         expect(Math.abs(a)).toBeLessThanOrEqual(1 + 1e-9);
         expect(a).toBeCloseTo(b as number, 9);
       })
