@@ -13,7 +13,7 @@ export type Notification = {
   type: NotificationType;
   /** One line, in the past tense: "Anna commented on your session". */
   text: string;
-  /** Site-relative path to whatever happened, e.g. `/eventslug?viewSession=x`. */
+  /** Site-relative path to whatever happened, e.g. `/eventslug/sessions/x`. */
   url: string;
   createdAt: Date;
   /** Unset while unread. */

@@ -398,9 +398,7 @@ describe("dispatchReminders", () => {
         expect(notice.text).toContain("Fun Workshop");
         // A path, not an absolute URL: notifications must work on an instance
         // with no SITE_URL at all.
-        expect(notice.url).toBe(
-          `/${event.slug}/schedule?viewSession=${session.id}`
-        );
+        expect(notice.url).toBe(`/${event.slug}/sessions/${session.id}`);
       }
     });
 
@@ -413,7 +411,7 @@ describe("dispatchReminders", () => {
       expect(notice.type).toBe("attendeeCountReminder");
       expect(notice.text).toContain("Fun Workshop");
       expect(notice.url).toBe(
-        `/${event.slug}/schedule?viewSession=${session.id}&record=count`
+        `/${event.slug}/sessions/${session.id}?record=count`
       );
     });
 
