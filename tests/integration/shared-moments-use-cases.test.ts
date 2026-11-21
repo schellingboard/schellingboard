@@ -51,20 +51,28 @@ describe("shared moments", () => {
   it("refuses everyone but an organizer", { tags: ["015-US9"] }, async () => {
     const { event, first } = await twoDays();
     const moment = value(
-      await events().createMoments(ADMIN, {
-        eventId: event.id,
-        dayIds: [first.id],
-        ...lunch,
-      })
+      await events().createMoments(
+        ADMIN,
+        {
+          eventId: event.id,
+          dayIds: [first.id],
+          ...lunch,
+        },
+        NOW
+      )
     )[0];
     const refusals = [
-      await events().createMoments(NOBODY, {
-        eventId: event.id,
-        dayIds: [first.id],
-        ...lunch,
-      }),
-      await events().updateMoment(NOBODY, { id: moment.id, ...lunch }),
-      await events().deleteMoment(NOBODY, { id: moment.id }),
+      await events().createMoments(
+        NOBODY,
+        {
+          eventId: event.id,
+          dayIds: [first.id],
+          ...lunch,
+        },
+        NOW
+      ),
+      await events().updateMoment(NOBODY, { id: moment.id, ...lunch }, NOW),
+      await events().deleteMoment(NOBODY, { id: moment.id }, NOW),
     ];
     expect(refusals.map(code)).toEqual(Array(3).fill("admin.required"));
   });
@@ -75,11 +83,15 @@ describe("shared moments", () => {
     async () => {
       const { event, first, second } = await twoDays();
       const created = value(
-        await events().createMoments(ADMIN, {
-          eventId: event.id,
-          dayIds: [first.id, second.id],
-          ...lunch,
-        })
+        await events().createMoments(
+          ADMIN,
+          {
+            eventId: event.id,
+            dayIds: [first.id, second.id],
+            ...lunch,
+          },
+          NOW
+        )
       );
       expect(created.map((m) => m.dayId)).toEqual([first.id, second.id]);
       expect(created[0]).toMatchObject({
@@ -103,13 +115,17 @@ describe("shared moments", () => {
         timezone: "Asia/Tokyo",
       });
       const [moment] = value(
-        await events().createMoments(ADMIN, {
-          eventId: event.id,
-          dayIds: [first.id],
-          ...lunch,
-          startTime: "18:00",
-          endTime: "19:00",
-        })
+        await events().createMoments(
+          ADMIN,
+          {
+            eventId: event.id,
+            dayIds: [first.id],
+            ...lunch,
+            startTime: "18:00",
+            endTime: "19:00",
+          },
+          NOW
+        )
       );
       expect(moment.start).toEqual(new Date(`${isoDay(30)}T09:00:00Z`));
       expect(moment.end).toEqual(new Date(`${isoDay(30)}T10:00:00Z`));
@@ -124,12 +140,16 @@ describe("shared moments", () => {
       const other = await createEvent();
       const foreign = await createDay(other.id);
       const create = (over: Partial<typeof lunch>, dayId = first.id) =>
-        events().createMoments(ADMIN, {
-          eventId: event.id,
-          dayIds: [dayId],
-          ...lunch,
-          ...over,
-        });
+        events().createMoments(
+          ADMIN,
+          {
+            eventId: event.id,
+            dayIds: [dayId],
+            ...lunch,
+            ...over,
+          },
+          NOW
+        );
       expect(code(await create({ endTime: "12:30" }))).toBe(
         "moment.windowInvalid"
       );
@@ -143,11 +163,15 @@ describe("shared moments", () => {
       expect(code(await create({}, foreign.id))).toBe("day.notFound");
       expect(
         code(
-          await events().createMoments(ADMIN, {
-            eventId: event.id,
-            dayIds: [],
-            ...lunch,
-          })
+          await events().createMoments(
+            ADMIN,
+            {
+              eventId: event.id,
+              dayIds: [],
+              ...lunch,
+            },
+            NOW
+          )
         )
       ).toBe("moment.daysRequired");
       expect(
@@ -167,11 +191,15 @@ describe("shared moments", () => {
         startBookings: new Date(`${isoDay(40)}T08:00:00Z`),
         endBookings: new Date(`${isoDay(40)}T13:00:00Z`),
       });
-      const result = await events().createMoments(ADMIN, {
-        eventId: event.id,
-        dayIds: [first.id, short.id],
-        ...lunch,
-      });
+      const result = await events().createMoments(
+        ADMIN,
+        {
+          eventId: event.id,
+          dayIds: [first.id, short.id],
+          ...lunch,
+        },
+        NOW
+      );
       expect(code(result)).toBe("moment.outsideDay");
       expect(
         await getRepositories().sharedMoments.listByEvent(event.id)
@@ -182,20 +210,28 @@ describe("shared moments", () => {
   it("edits and deletes one moment", { tags: ["015-US9"] }, async () => {
     const { event, first, second } = await twoDays();
     const [one, two] = value(
-      await events().createMoments(ADMIN, {
-        eventId: event.id,
-        dayIds: [first.id, second.id],
-        ...lunch,
-      })
+      await events().createMoments(
+        ADMIN,
+        {
+          eventId: event.id,
+          dayIds: [first.id, second.id],
+          ...lunch,
+        },
+        NOW
+      )
     );
     const edited = value(
-      await events().updateMoment(ADMIN, {
-        id: one.id,
-        title: "Brunch",
-        description: "",
-        startTime: "11:00",
-        endTime: "12:00",
-      })
+      await events().updateMoment(
+        ADMIN,
+        {
+          id: one.id,
+          title: "Brunch",
+          description: "",
+          startTime: "11:00",
+          endTime: "12:00",
+        },
+        NOW
+      )
     );
     expect(edited).toMatchObject({
       id: one.id,
@@ -206,19 +242,23 @@ describe("shared moments", () => {
     });
     expect(
       code(
-        await events().updateMoment(ADMIN, {
-          id: one.id,
-          ...lunch,
-          endTime: "19:00",
-        })
+        await events().updateMoment(
+          ADMIN,
+          {
+            id: one.id,
+            ...lunch,
+            endTime: "19:00",
+          },
+          NOW
+        )
       )
     ).toBe("moment.outsideDay");
     expect(
-      code(await events().updateMoment(ADMIN, { id: "nope", ...lunch }))
+      code(await events().updateMoment(ADMIN, { id: "nope", ...lunch }, NOW))
     ).toBe("moment.notFound");
 
-    value(await events().deleteMoment(ADMIN, { id: one.id }));
-    expect(code(await events().deleteMoment(ADMIN, { id: one.id }))).toBe(
+    value(await events().deleteMoment(ADMIN, { id: one.id }, NOW));
+    expect(code(await events().deleteMoment(ADMIN, { id: one.id }, NOW))).toBe(
       "moment.notFound"
     );
     expect(
@@ -233,11 +273,15 @@ describe("shared moments", () => {
     { tags: ["015-US9"] },
     async () => {
       const { event, first } = await twoDays();
-      await events().createMoments(ADMIN, {
-        eventId: event.id,
-        dayIds: [first.id],
-        ...lunch,
-      });
+      await events().createMoments(
+        ADMIN,
+        {
+          eventId: event.id,
+          dayIds: [first.id],
+          ...lunch,
+        },
+        NOW
+      );
       const resize = (end: string) =>
         events().updateDay(
           ADMIN,
@@ -261,12 +305,16 @@ describe("shared moments", () => {
     { tags: ["015-US9"] },
     async () => {
       const { event, first } = await twoDays();
-      const result = await events().createMoments(ADMIN, {
-        eventId: event.id,
-        dayIds: [first.id],
-        ...lunch,
-        endTime: "18:30",
-      });
+      const result = await events().createMoments(
+        ADMIN,
+        {
+          eventId: event.id,
+          dayIds: [first.id],
+          ...lunch,
+          endTime: "18:30",
+        },
+        NOW
+      );
       expect(!result.ok && result.error.errors?.[0].path).toBe("endTime");
     }
   );
@@ -276,11 +324,15 @@ describe("shared moments", () => {
     { tags: ["015-US9"] },
     async () => {
       const { event, first, second } = await twoDays();
-      await events().createMoments(ADMIN, {
-        eventId: event.id,
-        dayIds: [first.id, second.id],
-        ...lunch,
-      });
+      await events().createMoments(
+        ADMIN,
+        {
+          eventId: event.id,
+          dayIds: [first.id, second.id],
+          ...lunch,
+        },
+        NOW
+      );
       value(await events().deleteDay(ADMIN, { id: first.id }, NOW));
       expect(
         (await getRepositories().sharedMoments.listByEvent(event.id)).map(

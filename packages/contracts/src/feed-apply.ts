@@ -130,6 +130,21 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
     case "day.deleted":
       next.days = next.days.filter((d) => d.id !== message.dayId);
       return next;
+    case "moment.changed": {
+      const { moment } = message;
+      next.moments = [
+        ...next.moments.filter((m) => m.id !== moment.id),
+        moment,
+      ].sort(
+        (a, b) =>
+          (a.start < b.start ? -1 : a.start > b.start ? 1 : 0) ||
+          (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+      );
+      return next;
+    }
+    case "moment.deleted":
+      next.moments = next.moments.filter((m) => m.id !== message.momentId);
+      return next;
     case "proposal.created":
     case "proposal.changed": {
       const { proposal } = message;
