@@ -272,6 +272,7 @@ function ConfigTab({
     <EventConfigTab
       event={state.event}
       days={state.days}
+      moments={state.moments}
       points={points.points}
       sessions={scheduledOf(sessions.sessions)}
       calls={calls}

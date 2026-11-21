@@ -44,7 +44,8 @@ Both need the same login as the rest of `/api/v1` (see below). To stop serving t
   header today and never reads `Basic`, so a reverse proxy with basic authentication may forward it.
 - **Cookie names and values are not part of the API.** Use a cookie jar.
 - **Finding an event's ID.** Endpoints that take an `eventId` need it. `GET /api/v1/events` lists
-  the events and `GET /api/v1/events/{id}` reads one with its days; neither needs a site admin.
+  the events and `GET /api/v1/events/{id}` reads one with its days and shared moments; neither needs
+  a site admin.
 
 ## Signing in
 

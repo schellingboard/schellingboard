@@ -6,6 +6,7 @@ import {
   updateEvent,
   updateEventPhases,
 } from "./events";
+import { createMoments, deleteMoment, updateMoment } from "./moments";
 import { getEvent, listEvents } from "./queries";
 
 export function createEventUseCases(deps: EventDeps) {
@@ -19,6 +20,9 @@ export function createEventUseCases(deps: EventDeps) {
     createDay: createDay(deps),
     updateDay: updateDay(deps),
     deleteDay: deleteDay(deps),
+    createMoments: createMoments(deps),
+    updateMoment: updateMoment(deps),
+    deleteMoment: deleteMoment(deps),
   };
 }
 

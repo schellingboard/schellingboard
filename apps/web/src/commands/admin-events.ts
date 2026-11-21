@@ -3,6 +3,8 @@ import type {
   dayBodySchema,
   eventPhasesBodySchema,
   eventSettingsBodySchema,
+  momentBodySchema,
+  momentCreateBodySchema,
 } from "@schellingboard/contracts/event";
 import type { adminSessionUpdateSchema } from "@schellingboard/contracts/session";
 
@@ -10,6 +12,8 @@ import { fetchEmailEnabled } from "../queries/email-enabled";
 
 export type EventSettingsBody = (typeof eventSettingsBodySchema)["_input"];
 export type DayBody = (typeof dayBodySchema)["_input"];
+export type MomentBody = (typeof momentBodySchema)["_input"];
+export type MomentCreateBody = (typeof momentCreateBodySchema)["_input"];
 export type AdminSessionBody = Omit<
   (typeof adminSessionUpdateSchema)["_input"],
   "expectedVersion"
@@ -208,6 +212,23 @@ export function adminEventCalls(api: ApiClient) {
     removeRsvp: (sessionId: string, guestId: string, key: string) =>
       api.DELETE("/api/v1/admin/sessions/{id}/rsvps/{guestId}", {
         params: { path: { id: sessionId, guestId } },
+        headers: { "Idempotency-Key": key },
+      }),
+    createMoments: (eventId: string, body: MomentCreateBody, key: string) =>
+      api.POST("/api/v1/admin/events/{id}/moments", {
+        params: { path: { id: eventId } },
+        body,
+        headers: { "Idempotency-Key": key },
+      }),
+    updateMoment: (id: string, body: MomentBody, key: string) =>
+      api.PUT("/api/v1/admin/moments/{id}", {
+        params: { path: { id } },
+        body,
+        headers: { "Idempotency-Key": key },
+      }),
+    deleteMoment: (id: string, key: string) =>
+      api.DELETE("/api/v1/admin/moments/{id}", {
+        params: { path: { id } },
         headers: { "Idempotency-Key": key },
       }),
     deleteDay: (id: string, key: string) =>

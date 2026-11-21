@@ -5,6 +5,6 @@ export interface EventDeps {
   uow: UnitOfWork;
   repos: Pick<
     Repositories,
-    "events" | "days" | "sessions" | "meetingAvailability"
+    "events" | "days" | "sessions" | "meetingAvailability" | "sharedMoments"
   >;
 }
