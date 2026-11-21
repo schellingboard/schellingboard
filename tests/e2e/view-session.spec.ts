@@ -26,9 +26,8 @@ test("hard-navigating to a session URL renders the modal without hydration error
   // in its place both flaked under parallel load.
   await page.waitForLoadState("networkidle");
 
-  // Reload with viewSession now in the URL. This is the "paste link" /
-  // "refresh while modal is open" scenario — the page is server-rendered
-  // with viewSession in the URL and then hydrated on the client.
+  // Reload with the session's own address in the URL: the "paste link" /
+  // "refresh while the panel is open" scenario.
   await page.reload();
 
   // Modal should be visible. The consoleGuard fixture (auto) will fail the
@@ -40,6 +39,31 @@ test("hard-navigating to a session URL renders the modal without hydration error
   // Settle again so async hydration warnings have time to fire before the
   // console guard checks.
   await page.waitForLoadState("networkidle");
+});
+
+test("the session panel keeps its address, and Close and Back return to the schedule @007-US5", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await page.getByRole("link", { name: KEYNOTE }).first().click();
+  const panel = page.getByRole("dialog", { name: "Session details" });
+  await expect(panel).toBeVisible();
+  await expect(page).toHaveURL(/\/Conference-Gamma\/sessions\/[^/?#]+$/);
+
+  await page.reload();
+  await expect(panel).toBeVisible();
+  await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+
+  await panel.getByRole("button", { name: "Close" }).click();
+  await expect(panel).toBeHidden();
+  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule/);
+
+  await page.getByRole("link", { name: KEYNOTE }).first().click();
+  await expect(panel).toBeVisible();
+  await page.goBack();
+  await expect(panel).toBeHidden();
+  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule/);
 });
 
 test("an opened session link brings the session into view @007-US12", async ({

@@ -24,8 +24,7 @@ export const profileLinks: ProfileLinks = {
   edit: "/guests/edit",
   guest: (id) => `/guests/${id}`,
   list: (listQuery) => (listQuery ? `/guests?${listQuery}` : "/guests"),
-  session: (slug, id) =>
-    `/${slug}/schedule?${new URLSearchParams({ viewSession: id })}`,
+  session: (slug, id) => `/${slug}/sessions/${encodeURIComponent(id)}`,
   proposal: (slug, id) =>
     `/${slug}/proposals?${new URLSearchParams({ viewProposal: id })}`,
 };

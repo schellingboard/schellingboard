@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Session details open in a side panel**: the schedule stays usable beside it, you can drag its
+  edge to resize it, and each session has its own shareable link.
+
 ### Internal
 
 - **Faster `make precommit`**: checks only the last change's files, related tests and changed E2E

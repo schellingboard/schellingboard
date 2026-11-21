@@ -10,7 +10,7 @@ import {
   type AttendeesQuery,
   type AttendeesState,
 } from "../../queries/attendees";
-import { Dialog } from "../../ui/dialog";
+import { CopyLinkButton } from "../../ui/copy-link-button";
 import {
   AcademicCapIcon,
   BookmarkIcon,
@@ -20,6 +20,7 @@ import {
   LockIcon,
 } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
+import { SidePanel } from "../../ui/side-panel";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { AttendeeCountField } from "./attendee-count-field";
@@ -33,27 +34,28 @@ const BOOKMARK_NOTE = "Only you see your bookmarks. This is not an RSVP.";
 const ACTION =
   "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50";
 
-/** A session's details over the schedule, opened by `?viewSession=`. */
-export function SessionModal({
+/** A session's details in the side panel. */
+export function SessionPanel({
   sessionId,
   onClose,
+  onBack,
 }: {
   sessionId: string;
   onClose: () => void;
+  onBack?: () => void;
 }) {
   const { data } = useSchedule();
   const session = data.sessions.find((s) => s.id === sessionId);
   return (
-    <Dialog
-      open
-      wide
-      onClose={onClose}
+    <SidePanel
       label="Session details"
       title={session ? session.title : "Session details"}
       titleAction={session && <BookmarkToggle sessionId={session.id} />}
+      onClose={onClose}
+      onBack={onBack}
     >
       {session ? <Details session={session} /> : <p>Session not found.</p>}
-    </Dialog>
+    </SidePanel>
   );
 }
 
@@ -200,16 +202,14 @@ function Details({ session }: { session: Session }) {
           </a>
         )}
         {isHost && (
-          <Tooltip content="You are hosting this session" toggleable>
+          <span title="You are hosting this session">
             <AcademicCapIcon className="h-5 w-5" />
-            <span className="sr-only">You are hosting this session</span>
-          </Tooltip>
+          </span>
         )}
         {rsvpd && (
-          <Tooltip content="You have RSVP'd to this session" toggleable>
+          <span title="You have RSVP'd to this session">
             <CheckCircleIcon className="h-5 w-5" />
-            <span className="sr-only">You have RSVP'd to this session</span>
-          </Tooltip>
+          </span>
         )}
       </div>
       {data.guestId && !isHost && !rsvpd && (
@@ -328,6 +328,7 @@ function Details({ session }: { session: Session }) {
           .
         </p>
       )}
+      <CopyLinkButton className="mt-6" />
       <SessionComments sessionId={session.id} />
     </div>
   );
