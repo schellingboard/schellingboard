@@ -64,6 +64,16 @@ const lastNames = [
   "Weber",
   "Yoon",
   "Zimmermann",
+  "Adeyemi",
+  "Brandt",
+  "Chaudhry",
+  "Delgado",
+  "Eriksen",
+  "Fontaine",
+  "Gallo",
+  "Haddad",
+  "Iwata",
+  "Jovanovic",
 ];
 
 // city → [country, languages spoken there besides English]

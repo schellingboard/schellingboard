@@ -109,3 +109,4 @@ www-site/
 
 # Dependency graph rendered by `make arch-graph`.
 arch-graph.svg
+load-tmp/
