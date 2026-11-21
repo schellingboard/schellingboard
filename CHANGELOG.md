@@ -22,6 +22,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   directory come back at the same place, also after a reload.
 - **A session you add from the schedule is shown after saving**: the schedule scrolls to it, and
   opens its day if that was folded.
+- **Conversation-starter answers can have several lines**
+  ([#1070](https://github.com/schellingboard/schellingboard/issues/1070)): press Enter for a new
+  line, and start lines with `-` for a list.
 
 ### Fixed
 
