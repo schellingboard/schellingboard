@@ -23,10 +23,10 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 });
 
-test("event details open in a popup and the proposals link navigates @007-US6", async ({
+test("event details open in a panel and the proposals link navigates @007-US6", async ({
   page,
 }) => {
-  // The description (here: its "Venue map" link) is hidden until the popup opens.
+  // The description (here: its "Venue map" link) is hidden until the panel opens.
   const venueMapLink = page.getByRole("link", { name: "Venue map" });
   await expect(venueMapLink).not.toBeVisible();
   await page.getByRole("button", { name: "Event details" }).click();

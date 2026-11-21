@@ -439,7 +439,7 @@ describe("ScheduleScreen toolbar", () => {
   });
 
   it(
-    "shows the event's dates, zone and description in a dialog",
+    "shows the event's dates, zone and description in a panel",
     { tags: ["007-US6"] },
     async () => {
       const withText: Snapshot = {
@@ -450,7 +450,7 @@ describe("ScheduleScreen toolbar", () => {
       await userEvent.click(
         screen.getByRole("button", { name: "Event details" })
       );
-      const dialog = screen.getByRole("dialog");
+      const dialog = screen.getByRole("dialog", { name: "Event details" });
       expect(within(dialog).getByText(/Jun 15 · UTC/)).toBeTruthy();
       expect(within(dialog).getByText("a mug").tagName).toBe("STRONG");
     }

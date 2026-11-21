@@ -4,7 +4,6 @@ import { formatEventDates } from "@schellingboard/domain/time";
 import { type ReactNode, useState } from "react";
 
 import { cx } from "../../ui/cx";
-import { Dialog } from "../../ui/dialog";
 import {
   CalendarIcon,
   ClockIcon,
@@ -15,13 +14,14 @@ import {
 } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
 import { PhaseBar } from "../../ui/phase-bar";
+import { SidePanel } from "../../ui/side-panel";
 import { Tooltip } from "../../ui/tooltip";
 import { scrollNowLineIntoView } from "./now-line";
 
 const LOCAL_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const ITEM_CLASS =
-  "flex items-center gap-1 rounded-md px-1 py-1.5 text-xs text-fg-subtle hover:text-brand-fg focus:outline-none focus:ring-2 focus:ring-brand-accent sm:text-sm";
+  "flex items-center gap-1 rounded-md px-1 py-1.5 text-xs text-fg-subtle hover:text-brand-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent sm:text-sm";
 
 export type ScheduleView = "grid" | "agenda";
 
@@ -121,13 +121,16 @@ export function ScheduleToolbar({
         </div>
         {sync}
       </div>
-      <Dialog
-        open={detailsOpen}
-        onClose={() => setDetailsOpen(false)}
-        title={event.name}
-      >
-        <EventDetails event={event} />
-      </Dialog>
+      {detailsOpen && (
+        <SidePanel
+          label="Event details"
+          title={event.name}
+          onClose={() => setDetailsOpen(false)}
+          transient
+        >
+          <EventDetails event={event} />
+        </SidePanel>
+      )}
     </div>
   );
 }
@@ -135,7 +138,7 @@ export function ScheduleToolbar({
 function EventDetails({ event }: { event: Event }) {
   const dates = formatEventDates(event);
   return (
-    <div className="max-h-[70dvh] overflow-y-auto">
+    <div>
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-fg-subtle">
         <span className="flex items-center gap-1">
           <CalendarIcon className="h-4 w-4 stroke-2" />
