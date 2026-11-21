@@ -1,11 +1,16 @@
 import type { Location } from "@schellingboard/domain/location";
+import { schedulingEnded } from "@schellingboard/domain/phase";
 import { getNumSlots } from "@schellingboard/domain/slots";
+import { formatInLocalZone } from "@schellingboard/domain/time";
 import { DateTime } from "luxon";
+import type { MouseEvent } from "react";
 
+import { LOCAL_ZONE } from "../../app/local-zone";
 import { useClockStyle } from "../../app/time-format";
 import { cx } from "../../ui/cx";
 import { InformationCircleIcon } from "../../ui/icons";
 import { LocationPlaceholder } from "../../ui/location-placeholder";
+import { useNotify } from "../../ui/notices";
 import { Tooltip } from "../../ui/tooltip";
 import { useSchedule } from "./context";
 import { getNowOffsetPx, GUTTER } from "./grid-layout";
@@ -52,9 +57,26 @@ export function DayGrid({
   // Rows before the body: header, area text, and room photos if any. The
   // bands are absolute, so they must name their row to stay out of auto-placement.
   const bodyRow = firstImageIndex !== -1 ? 4 : 3;
+  const notify = useNotify();
+  const explainReadOnly = (e: MouseEvent) => {
+    if (!data.readOnly) return;
+    if ((e.target as Element).closest("a, button, input, select, textarea"))
+      return;
+    const start = data.event.schedulingPhaseStart;
+    notify({
+      tone: "info",
+      message: schedulingEnded(data.event, data.now)
+        ? "This event is over. You can still browse the schedule."
+        : start && start > data.now
+          ? `Scheduling opens ${formatInLocalZone(start, timezone, LOCAL_ZONE)}. Until then you can only browse the schedule.`
+          : "Scheduling is not open. You can only browse the schedule.",
+      autoDismissMs: 6000,
+    });
+  };
 
   return (
     <div
+      onClick={explainReadOnly}
       className="relative grid bg-surface"
       style={{
         // The grid lays out at these widths and scrolls, so every pixel the

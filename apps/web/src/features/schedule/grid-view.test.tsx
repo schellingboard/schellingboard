@@ -5,6 +5,7 @@ import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 
 import { snapshot } from "../../replica/snapshot-fixture";
+import { NoticeProvider } from "../../ui/notices";
 import { GridView } from "./grid-view";
 import {
   dataOf,
@@ -200,6 +201,55 @@ describe("GridView", () => {
       ).toBeNull();
     }
   );
+
+  describe("a click on the read-only schedule", { tags: ["007-US14"] }, () => {
+    const clickGrid = async (snap: typeof snapshot) => {
+      renderScheduled(
+        <NoticeProvider>
+          <Grid data={dataOf(snap)} />
+        </NoticeProvider>,
+        { snapshot: snap }
+      );
+      await userEvent.setup().click(screen.getAllByText("10:00")[0]);
+    };
+
+    it("says when scheduling opens", async () => {
+      await clickGrid(
+        snapshotWith({
+          event: {
+            ...snapshot.event,
+            proposalPhaseStart: iso(0),
+            schedulingPhaseStart: new Date(
+              Date.UTC(2026, 6, 1, 9)
+            ).toISOString(),
+          },
+        })
+      );
+      expect(screen.getByRole("status").textContent).toMatch(
+        /Scheduling opens .*01 Jul/
+      );
+    });
+
+    it("says when the event is over", async () => {
+      await clickGrid(
+        snapshotWith({
+          event: {
+            ...snapshot.event,
+            schedulingPhaseStart: iso(0),
+            schedulingPhaseEnd: iso(1),
+          },
+        })
+      );
+      expect(screen.getByRole("status").textContent).toMatch(
+        /This event is over/
+      );
+    });
+
+    it("says nothing while scheduling is open", async () => {
+      await clickGrid(snapshot);
+      expect(screen.queryByRole("status")).toBeNull();
+    });
+  });
 
   it("describes a room by its details", () => {
     renderScheduled(<Grid data={dataOf()} />);
