@@ -1,9 +1,12 @@
 // @module-tag 002-US2
 import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EventSummary } from "../../app/use-events";
 import { snapshot } from "../../replica/snapshot-fixture";
+import { paramsUpdater } from "../../ui/list-paging";
 import { EventListScreen } from "./event-list-screen";
 
 afterEach(cleanup);
@@ -20,6 +23,8 @@ describe("the event list", () => {
     render(
       <EventListScreen
         site={site}
+        params={new URLSearchParams()}
+        onParams={() => {}}
         events={[
           event({ slug: "a", name: "With icon", icon: "RocketLaunchIcon" }),
           event({ slug: "b", name: "No icon", icon: null }),
@@ -36,6 +41,8 @@ describe("the event list", () => {
     render(
       <EventListScreen
         site={site}
+        params={new URLSearchParams()}
+        onParams={vi.fn()}
         events={[
           event({
             slug: "late",
@@ -79,5 +86,47 @@ describe("the event list", () => {
         screen.getByText("Late con").parentElement as HTMLElement
       ).getByText("Sep 10 - Sep 12")
     ).toBeTruthy();
+  });
+});
+
+describe("paging the event list", { tags: ["002-US2"] }, () => {
+  const many = Array.from({ length: 60 }, (_, i) =>
+    event({
+      slug: `e${i}`,
+      name: `Con ${String(i).padStart(2, "0")}`,
+      firstDayStart: new Date(Date.UTC(2026, 5, i + 1, 8)).toISOString(),
+    })
+  );
+  function Page({ start = "" }: { start?: string }) {
+    const [params, setParams] = useState(new URLSearchParams(start));
+    return (
+      <EventListScreen
+        site={site}
+        events={many}
+        params={params}
+        onParams={paramsUpdater(params, setParams)}
+      />
+    );
+  }
+  const names = () =>
+    screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
+
+  it("shows 50 events a page and the rest on the next", async () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    render(<Page />);
+
+    expect(names()).toHaveLength(50);
+    await userEvent.click(screen.getByRole("button", { name: "Next page" }));
+
+    expect(names()).toHaveLength(10);
+    expect(names()[0]).toBe("Con 50");
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+  });
+
+  it("shows the last page for a page past the end", () => {
+    render(<Page start="page=99" />);
+
+    expect(names()).toHaveLength(10);
   });
 });

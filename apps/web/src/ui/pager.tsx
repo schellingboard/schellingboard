@@ -24,6 +24,8 @@ export function Pager({
   onPage,
   onPageSize,
   showTotal = true,
+  more = false,
+  disabled = false,
   listTop,
 }: {
   page: number;
@@ -34,6 +36,10 @@ export function Pager({
   onPageSize?: (size: PageSize) => void;
   /** False where the list already shows its count above. */
   showTotal?: boolean;
+  /** More rows exist than are counted, so the totals read "50+". */
+  more?: boolean;
+  /** Locks every control, e.g. while the next rows load. */
+  disabled?: boolean;
   /** Scrolled into view on a page change, as the list is above this pager. */
   listTop?: RefObject<HTMLElement | null>;
 }) {
@@ -50,7 +56,7 @@ export function Pager({
         <span>
           {total === 0
             ? "0 results"
-            : `${total} result${total === 1 ? "" : "s"}`}
+            : `${total}${more ? "+" : ""} result${total === 1 ? "" : "s"}`}
         </span>
       )}
       {onPageSize && (
@@ -58,6 +64,7 @@ export function Pager({
           Rows per page
           <select
             value={String(pageSize)}
+            disabled={disabled}
             onChange={(e) =>
               onPageSize(
                 e.target.value === "all" ? "all" : Number(e.target.value)
@@ -78,7 +85,7 @@ export function Pager({
         <button
           type="button"
           onClick={() => goTo(1)}
-          disabled={page <= 1}
+          disabled={disabled || page <= 1}
           aria-label="First page"
           className={BUTTON}
         >
@@ -87,7 +94,7 @@ export function Pager({
         <button
           type="button"
           onClick={() => goTo(page - 1)}
-          disabled={page <= 1}
+          disabled={disabled || page <= 1}
           aria-label="Previous page"
           className={BUTTON}
         >
@@ -95,6 +102,7 @@ export function Pager({
         </button>
         <span className="sm:hidden">
           Page {page} of {totalPages}
+          {more && "+"}
         </span>
         <span className="hidden items-center gap-1 sm:flex">
           {pageWindow(page, totalPages).map((entry, i) =>
@@ -109,7 +117,7 @@ export function Pager({
                 onClick={() => goTo(entry)}
                 aria-label={`Page ${entry}`}
                 aria-current={entry === page ? "page" : undefined}
-                disabled={entry === page}
+                disabled={disabled || entry === page}
                 className={`${BUTTON} ${entry === page ? "bg-surface-sunken font-semibold" : ""}`}
               >
                 {entry}
@@ -120,7 +128,7 @@ export function Pager({
         <button
           type="button"
           onClick={() => goTo(page + 1)}
-          disabled={page >= totalPages}
+          disabled={disabled || page >= totalPages}
           aria-label="Next page"
           className={BUTTON}
         >
@@ -129,7 +137,7 @@ export function Pager({
         <button
           type="button"
           onClick={() => goTo(totalPages)}
-          disabled={page >= totalPages}
+          disabled={disabled || page >= totalPages}
           aria-label="Last page"
           className={BUTTON}
         >

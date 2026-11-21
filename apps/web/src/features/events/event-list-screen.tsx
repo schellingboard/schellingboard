@@ -5,7 +5,9 @@ import type { EventSummary } from "../../app/use-events";
 import { toEvent } from "../../replica/selectors";
 import { EventIcon } from "../../ui/event-icon";
 import { CalendarIcon, ChevronRightIcon, LinkIcon } from "../../ui/icons";
+import type { OnParams } from "../../ui/list-paging";
 import { Markdown } from "../../ui/markdown";
+import { usePaging } from "../../ui/use-paging";
 
 export interface SiteInfo {
   title: string;
@@ -15,21 +17,29 @@ export interface SiteInfo {
 export function EventListScreen({
   site,
   events,
+  params,
+  onParams,
 }: {
   site: SiteInfo;
   events: EventSummary[];
+  params: URLSearchParams;
+  onParams: OnParams;
 }) {
   const sorted = events
     .map((summary) => ({ summary, event: toEvent(summary) }))
     .sort((a, b) => compareEventsByStart(a.event, b.event));
+  const { visible, pager, top } = usePaging<
+    (typeof sorted)[number],
+    HTMLDivElement
+  >(sorted, params, onParams);
   return (
-    <div className="mx-auto max-w-2xl">
+    <div ref={top} className="mx-auto max-w-2xl">
       <h1 className="text-4xl font-bold mt-5">{site.title}</h1>
       <div className="mt-3">
         <Markdown>{site.description}</Markdown>
       </div>
       <div className="flex flex-col gap-8 sm:pl-5 mt-10">
-        {sorted.map(({ summary: event, event: domain }) => (
+        {visible.map(({ summary: event, event: domain }) => (
           <div key={event.id}>
             <h2 className="flex items-center gap-2 sm:text-2xl text-xl font-bold">
               <EventIcon name={event.icon} className="h-6 w-6 shrink-0" />
@@ -65,6 +75,7 @@ export function EventListScreen({
           </div>
         ))}
       </div>
+      {pager && <div className="mt-8">{pager}</div>}
     </div>
   );
 }
