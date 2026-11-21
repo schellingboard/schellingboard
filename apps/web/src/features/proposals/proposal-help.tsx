@@ -22,7 +22,9 @@ export function ProposalHelp({ event }: { event: { proposalHelp: string } }) {
           onClose={() => setOpen(false)}
           transient
         >
-          <Markdown className="text-sm">{proposalHelpOf(event)}</Markdown>
+          <Markdown className="text-base leading-relaxed">
+            {proposalHelpOf(event)}
+          </Markdown>
         </SidePanel>
       )}
     </>

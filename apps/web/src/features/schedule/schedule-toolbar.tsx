@@ -154,7 +154,9 @@ function EventDetails({ event }: { event: Event }) {
         )}
       </div>
       <div className="mt-3 text-fg">
-        <Markdown>{event.description}</Markdown>
+        <Markdown className="text-base leading-relaxed">
+          {event.description}
+        </Markdown>
       </div>
     </div>
   );

@@ -333,7 +333,9 @@ function Details({ session }: { session: Session }) {
       )}
       <div className="mb-6">
         <h3 className="mb-2 font-semibold">Description</h3>
-        <Markdown>{session.description}</Markdown>
+        <Markdown className="text-base leading-relaxed">
+          {session.description}
+        </Markdown>
       </div>
       {session.proposalId && (
         <p className="text-sm text-fg-muted">

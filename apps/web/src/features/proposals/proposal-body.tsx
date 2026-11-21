@@ -49,7 +49,9 @@ export function ProposalBody({
         </p>
       )}
       <div className="mb-3">
-        <Markdown>{proposal.description ?? ""}</Markdown>
+        <Markdown className="text-base leading-relaxed">
+          {proposal.description ?? ""}
+        </Markdown>
       </div>
       {proposal.durationMinutes && (
         <p className="mb-4 text-sm text-fg-muted">
