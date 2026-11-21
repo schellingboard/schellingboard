@@ -3,7 +3,8 @@ export type ScheduleLinks = {
   proposals: string;
   /** A session's own address, which opens its side panel. */
   session: (sessionId: string) => string;
-  meeting: (current: URLSearchParams, meetingId: string) => string;
+  /** A 1-on-1's own address, which opens its side panel. */
+  meeting: (meetingId: string) => string;
   addSession: (slot: { location: string; day: string; time: string }) => string;
   guest: (guestId: string) => string;
   editSession: (sessionId: string) => string;
@@ -12,18 +13,14 @@ export type ScheduleLinks = {
   bookMeeting: (slotStart: string) => string;
 };
 
-/** Every address is the SPA's own; the 1-on-1 modals sit over `/{slug}/schedule`. */
+/** Every address is the SPA's own; the booking dialog sits over `/{slug}/schedule`. */
 export function scheduleLinks(eventSlug: string): ScheduleLinks {
   const schedule = `/${eventSlug}/schedule`;
   return {
     schedule,
     proposals: `/${eventSlug}/proposals`,
     session: (id) => `/${eventSlug}/sessions/${encodeURIComponent(id)}`,
-    meeting: (current, id) => {
-      const params = new URLSearchParams(current);
-      params.set("viewMeeting", id);
-      return `${schedule}?${params.toString()}`;
-    },
+    meeting: (id) => `/${eventSlug}/meetings/${encodeURIComponent(id)}`,
     guest: (guestId) => `/guests/${guestId}`,
     editSession: (sessionId) =>
       `/${eventSlug}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,

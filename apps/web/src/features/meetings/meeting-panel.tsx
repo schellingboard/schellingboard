@@ -1,14 +1,16 @@
+import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "../../ui/button";
-import { Dialog } from "../../ui/dialog";
+import { CopyLinkButton } from "../../ui/copy-link-button";
 import { TextField } from "../../ui/form";
+import { SidePanel } from "../../ui/side-panel";
 import { canCancel, statusLine } from "../schedule/meeting-rules";
 import type { MeetingView } from "../schedule/meeting-view";
 
 /** One 1-on-1 in full and, for the person asked, Accept and Decline. */
-export function MeetingModal({
+export function MeetingPanel({
   meeting,
   now,
   readOnly,
@@ -16,6 +18,7 @@ export function MeetingModal({
   onAnswer,
   onCancel,
   onClose,
+  onBack,
 }: {
   /** Undefined once it is not among the viewer's own. */
   meeting: MeetingView | undefined;
@@ -25,14 +28,16 @@ export function MeetingModal({
   onAnswer: (response: "accept" | "decline") => void;
   onCancel: (note: string) => void;
   onClose: () => void;
+  onBack?: () => void;
 }) {
   const [confirming, setConfirming] = useState(false);
   const [note, setNote] = useState("");
 
   return (
-    <Dialog
-      open
+    <SidePanel
+      label="1-on-1 details"
       onClose={onClose}
+      onBack={onBack}
       title={
         meeting ? (
           <>
@@ -48,7 +53,6 @@ export function MeetingModal({
           "1-on-1"
         )
       }
-      label="1-on-1 details"
     >
       {!meeting ? (
         <p className="text-fg-muted">1-on-1 not found.</p>
@@ -68,6 +72,13 @@ export function MeetingModal({
           </dl>
 
           <p className="text-sm text-fg-muted">{statusLine(meeting)}</p>
+
+          {readOnly && (
+            <p className="text-sm text-fg-muted">
+              1-on-1s can only be answered or canceled during the scheduling
+              phase.
+            </p>
+          )}
 
           {meeting.message && (
             <p className="rounded-md bg-surface-sunken p-3 text-sm text-fg">
@@ -139,8 +150,42 @@ export function MeetingModal({
             Nothing is reserved — the meeting point is just where to find each
             other.
           </p>
+          <CopyLinkButton />
         </div>
       )}
-    </Dialog>
+    </SidePanel>
+  );
+}
+
+/** Stands in for a 1-on-1 when the reader has no name chosen or a locked one. */
+export function MeetingNeedsName({
+  awaitingLogin,
+  onClose,
+  onBack,
+}: {
+  awaitingLogin: () => Promise<boolean>;
+  onClose: () => void;
+  onBack?: () => void;
+}) {
+  const [protectedName, setProtectedName] = useState<boolean>();
+  useEffect(() => {
+    void awaitingLogin().then(setProtectedName);
+  }, [awaitingLogin]);
+  return (
+    <SidePanel
+      label="1-on-1 details"
+      title="1-on-1"
+      onClose={onClose}
+      onBack={onBack}
+    >
+      {protectedName !== undefined && (
+        <p className="text-fg-muted">
+          {actingGuestRefusalMessage(
+            protectedName ? "guest.protected" : "guest.unselected",
+            "opening your 1-on-1s"
+          )}
+        </p>
+      )}
+    </SidePanel>
   );
 }

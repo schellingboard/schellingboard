@@ -1,5 +1,9 @@
 import { useMemo } from "react";
 
+import {
+  MeetingNeedsName,
+  MeetingPanel,
+} from "../features/meetings/meeting-panel";
 import { proposalLinks } from "../features/proposals/links";
 import { ProposalPanel } from "../features/proposals/proposal-panel";
 import { ScheduleProvider } from "../features/schedule/context";
@@ -20,10 +24,49 @@ export function PanelHost() {
   if (!panel || panel.item.kind === "profile" || panel.item.slug !== slug)
     return null;
   const key = `${panel.item.kind}:${panel.item.id}:${panel.depth}`;
-  return panel.item.kind === "session" ? (
-    <SessionHost key={key} item={panel.item} depth={panel.depth} />
-  ) : (
-    <ProposalHost key={key} item={panel.item} depth={panel.depth} />
+  if (panel.item.kind === "session")
+    return <SessionHost key={key} item={panel.item} depth={panel.depth} />;
+  if (panel.item.kind === "meeting")
+    return <MeetingHost key={key} item={panel.item} depth={panel.depth} />;
+  return <ProposalHost key={key} item={panel.item} depth={panel.depth} />;
+}
+
+function MeetingHost({
+  item,
+  depth,
+}: {
+  item: Extract<PanelItem, { kind: "meeting" }>;
+  depth: number;
+}) {
+  const view = useEventView();
+  const { close, back } = usePanel();
+  const { snapshot, now, slug } = view;
+  const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
+  const links = useMemo(() => scheduleLinks(slug), [slug]);
+  const { actions, picker } = useScheduleActions(view);
+  const onBack = depth > 1 ? back : undefined;
+  if (!data.guestId)
+    return (
+      <MeetingNeedsName
+        awaitingLogin={actions.awaitingLogin}
+        onClose={close}
+        onBack={onBack}
+      />
+    );
+  return (
+    <>
+      {picker}
+      <MeetingPanel
+        meeting={data.meetings.find((m) => m.id === item.id)}
+        now={now}
+        readOnly={data.readOnly}
+        profileHref={links.guest}
+        onAnswer={(response) => void actions.answerMeeting(item.id, response)}
+        onCancel={(note) => void actions.cancelMeeting(item.id, note)}
+        onClose={close}
+        onBack={onBack}
+      />
+    </>
   );
 }
 
