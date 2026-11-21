@@ -4,6 +4,10 @@ import {
 } from "@schellingboard/domain/admin-datetime";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
+import {
+  DEFAULT_PROPOSAL_HELP,
+  proposalHelpOf,
+} from "@schellingboard/domain/proposal-help";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import { useMemo, useState } from "react";
 
@@ -57,6 +61,7 @@ const DETAIL_FIELDS = [
   "name",
   "description",
   "website",
+  "proposalHelp",
   "timezone",
   "maxSessionDuration",
   "breakMinutes",
@@ -69,6 +74,7 @@ const detailsOf = (event: AdminEvent) => ({
   name: event.name,
   description: event.description,
   website: event.website,
+  proposalHelp: proposalHelpOf(event),
   timezone: event.timezone,
   maxSessionDuration: String(event.maxSessionDuration),
   breakMinutes: String(event.breakMinutes),
@@ -100,6 +106,10 @@ function DetailsForm({
     breakMinutes: Number(form.breakMinutes),
     slotIncrementMinutes: Number(form.slotIncrementMinutes),
     icon: isEventIconName(form.icon) ? form.icon : null,
+    proposalHelp:
+      form.proposalHelp.trim() === DEFAULT_PROPOSAL_HELP
+        ? ""
+        : form.proposalHelp,
   };
   const section = useSectionSave({
     call: (key) => calls.update(event.id, body, version, key),
@@ -144,6 +154,23 @@ function DetailsForm({
         onChange={set("website")}
         error={fields.website}
       />
+      <div className="space-y-2">
+        <MarkdownField
+          label="Help for proposers"
+          name="proposalHelp"
+          hint="Opens from the Need ideas? button. Markdown supported."
+          value={form.proposalHelp}
+          onChange={set("proposalHelp")}
+          error={fields.proposalHelp}
+        />
+        <Button
+          type="button"
+          variant="quiet"
+          onClick={() => set("proposalHelp")(DEFAULT_PROPOSAL_HELP)}
+        >
+          Reset to default
+        </Button>
+      </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ComboboxField
           label="Timezone"

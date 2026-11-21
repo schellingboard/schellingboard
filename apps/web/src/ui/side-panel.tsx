@@ -30,13 +30,19 @@ function storedWidth() {
   }
 }
 
-/** A non-modal view over the right of the page, which stays usable behind it. */
+const openPanels = new Set<{ transient: boolean; close: () => void }>();
+
+/**
+ * A non-modal view beside the page, one at a time: a `transient` one, with no
+ * address of its own, closes the open panel and gives way to the next one.
+ */
 export function SidePanel({
   label,
   title,
   titleAction,
   onClose,
   onBack,
+  transient = false,
   children,
 }: {
   label: string;
@@ -45,6 +51,7 @@ export function SidePanel({
   onClose: () => void;
   /** Present from the second entry of a stack. */
   onBack?: () => void;
+  transient?: boolean;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -65,6 +72,20 @@ export function SidePanel({
     setWidth(clamped);
     if (persist) remember(clamped);
   };
+
+  const requestClose = useRef(closeGuard.requestClose);
+  useEffect(() => {
+    requestClose.current = closeGuard.requestClose;
+  });
+  useEffect(() => {
+    const self = { transient, close: () => requestClose.current() };
+    for (const other of openPanels)
+      if (transient || other.transient) other.close();
+    openPanels.add(self);
+    return () => {
+      openPanels.delete(self);
+    };
+  }, [transient]);
 
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
@@ -97,7 +118,8 @@ export function SidePanel({
     window.addEventListener("resize", apply);
     return () => {
       window.removeEventListener("resize", apply);
-      root.style.removeProperty("--side-panel-inset");
+      if (openPanels.size === 0)
+        root.style.removeProperty("--side-panel-inset");
     };
   }, [width]);
 

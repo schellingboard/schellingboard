@@ -11,6 +11,7 @@ export type Event = {
   slug: string;
   description: string;
   website: string;
+  proposalHelp: string;
   /** The event's dates are those of its first and last days, unset without days. */
   firstDayStart?: Date;
   lastDayStart?: Date;
