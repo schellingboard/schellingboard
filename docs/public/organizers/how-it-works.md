@@ -8,18 +8,25 @@ type: concept
 
 ## Attendee identity
 
-By default there is no per-attendee login. After entering the site password (if set), attendees pick
-their own name from the guest list assigned to that event.
+Each event sets its **Identity** in the admin UI (see the [admin guide](admin-guide.md#events)). In
+a _Verified_ event, the default for new events, everyone taking part proves who they are with their
+personal join link, an emailed code or a password. In an _Open_ event there is no per-attendee
+login: after entering the site password (if set), attendees pick their own name from the guest list
+assigned to that event.
 
-:::warning "The name picker is not authentication" Anyone who knows the site password can select any
-attendee's name and vote, RSVP, or edit proposals as them. :::
+:::warning "In an open event, the name picker is not authentication"
 
-Any attendee who wants more can **protect their name** from their own settings page (see the
-[attendee guide](../attendee-guide.md#protect-your-name)). Protection is opt-in and per-person;
-there is no way to require it event-wide. Once a name is protected, picking it asks for a password
-or an emailed code, and acting as that person needs that verified browser session. Turning
-protection off or changing the password needs either the current password or a fresh code, so a
-forgotten password is never a dead end.
+Anyone who knows the site password can select any attendee's name and vote, RSVP, or edit proposals
+as them.
+
+:::
+
+In an open event, any attendee who wants more can **protect their name** from their own settings
+page (see the [attendee guide](../attendee-guide.md#protect-your-name)). Protection is opt-in and
+per-person; to require it for everyone, make the event _Verified_. Once a name is protected, picking
+it asks for a password or an emailed code, and acting as that person needs that verified browser
+session. Turning protection off or changing the password needs either the current password or a
+fresh code, so a forgotten password is never a dead end.
 
 Protection needs `AUTH_SECRET` and working email
 ([SMTP settings](../self-hosting/configuration.md#environment-variables)), so the attendee can
@@ -81,8 +88,11 @@ attendees, the split across the three choices, and a predicted range of attendee
 10% turnout, or with no ❤️ votes). Proposals with no host show the breakdown to everybody during
 scheduling, since anyone may still take them on.
 
-:::warning "Treat the prediction as a very rough guess, and say so if attendees ask" It rests on one
-event where thirteen hosts recalled roughly how many people came, and it can be well out either way.
+:::warning "Treat the prediction as a very rough guess, and say so if attendees ask"
+
+It rests on one event where thirteen hosts recalled roughly how many people came, and it can be well
+out either way.
+
 :::
 
 The formula will be reworked as more events are recorded, and its assumptions — today a fixed nine
@@ -116,15 +126,21 @@ there's no cross-event attendee state beyond the shared guest pool and the picke
 Email is optional. With SMTP unconfigured, SchellingBoard sends nothing at all and the features
 below are simply unavailable. When it is configured, these are the only messages ever sent:
 
-| Email                | Sent to                                                               | Opt-out                         |
-| -------------------- | --------------------------------------------------------------------- | ------------------------------- |
-| **Login code**       | An attendee who asked to protect or unlock their name                 | None — it's requested on demand |
-| **Session moved**    | Hosts and RSVP'd attendees, when a session's time or location changes | Per-attendee, in their settings |
-| **Session deleted**  | Hosts and RSVP'd attendees, when their session is deleted             | Per-attendee, in their settings |
-| **Added as co-host** | Attendees newly added as a co-host of a session                       | Per-attendee, in their settings |
-| **Co-host joined**   | A proposal's hosts, when someone joins it as a co-host                | Per-attendee, in their settings |
-| **New comment**      | A proposal's hosts, and earlier commenters who opted in               | Per-attendee, in their settings |
-| **Test email**       | One guest, from the admin Users page                                  | n/a                             |
+| Email                 | Sent to                                                                  | Opt-out                         |
+| --------------------- | ------------------------------------------------------------------------ | ------------------------------- |
+| **Login code**        | Someone protecting their name or signing in with a code                  | None — it's requested on demand |
+| **Set your password** | Someone who asked to set or reset their password                         | None — it's requested on demand |
+| **Security changed**  | A protected attendee whose password changed or protection was turned off | None                            |
+| **Join link**         | Guests an organizer mails links to, or makes a new link for              | None                            |
+| **Session moved**     | Hosts and RSVP'd attendees, when a session's time or location changes    | Per-attendee, in their settings |
+| **Session deleted**   | Hosts and RSVP'd attendees, when their session is deleted                | Per-attendee, in their settings |
+| **No host**           | RSVP'd attendees, when a session loses its last host                     | Per-attendee, in their settings |
+| **Added as co-host**  | Attendees newly added as a co-host of a session                          | Per-attendee, in their settings |
+| **Co-host joined**    | A proposal's hosts, when someone joins it as a co-host                   | Per-attendee, in their settings |
+| **New comment**       | Hosts, a profile's owner, and earlier commenters who opted in            | Per-attendee, in their settings |
+| **1-on-1s**           | Requests, answers, cancellations, and asks to open up to 1-on-1s         | Per-attendee, in their settings |
+| **Session reminders** | Hosts, an hour before their session and after it ends                    | Per-attendee, in their settings |
+| **Test email**        | One guest, from the admin Users page                                     | n/a                             |
 
 Nothing is emailed on votes, RSVPs, phase transitions, or edits to a session's title or description.
 Whoever made a change is never emailed about their own change.

@@ -10,9 +10,12 @@ Everything SchellingBoard stores lives in one Docker volume, mounted at `/data`:
 (`/data/data.db`) and any files uploaded through the admin UI, such as guest avatars and the venue
 map (`/data/uploads`).
 
-:::warning "Back up your `.env` separately" It is **not** in that volume, and it holds
-`AUTH_SECRET`, `SITE_PASSWORD` and your SMTP credentials. Restoring the data without the same
-`AUTH_SECRET` logs out the site gate (attendees stay signed in). :::
+:::warning "Back up your `.env` separately"
+
+It is **not** in that volume, and it holds `AUTH_SECRET`, `SITE_PASSWORD` and your SMTP credentials.
+Restoring the data without the same `AUTH_SECRET` logs out the site gate (attendees stay signed in).
+
+:::
 
 ## Find the volume
 
@@ -27,8 +30,11 @@ VOL=schellingboard_data
 
 ## Back up without stopping the site
 
-:::warning "Never `cp` or `tar` a live `data.db`" A write in progress leaves you with a truncated
-file that looks fine until you try to restore it. :::
+:::warning "Never `cp` or `tar` a live `data.db`"
+
+A write in progress leaves you with a truncated file that looks fine until you try to restore it.
+
+:::
 
 Use SQLite's own backup command instead, which takes a consistent snapshot of a database that is
 being written to:

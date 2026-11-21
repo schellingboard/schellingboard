@@ -161,9 +161,9 @@ ones you ticked; guests without an email are counted and skipped.
 
 ### Attendees who protect their name
 
-Any attendee can opt into [name protection](how-it-works.md#attendee-identity) from their own
-settings. There is no admin control over this: you can't require it, and you can't turn it off for
-someone.
+In an _Open_ event, any attendee can opt into [name protection](how-it-works.md#attendee-identity)
+from their own settings. You can't turn it on or off for someone; to require proof of identity from
+everyone, make the event _Verified_.
 
 The one thing you _can_ do is fix a lockout. Protection is anchored to the guest's email address, so
 an attendee who's lost both their password and their mailbox is stuck until you **change their email

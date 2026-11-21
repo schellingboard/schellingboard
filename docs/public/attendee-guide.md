@@ -26,10 +26,14 @@ scheduling phase.
 
 The schedule can be read in every phase, from **View Schedule** on the proposals page. Before
 scheduling opens, and after it closes, it is read-only: you can look at sessions, bookmark them and
-hide them, but not RSVP or book slots. A note at the top says when scheduling opens.
+hide them, but not RSVP or book slots. The phase bar at the top shows when scheduling opens.
 
-:::info "Only an RSVP commits you to anything" Proposing a session is not a promise to give it, and
-voting is not a promise to attend. [RSVPs are the exception](#rsvp). :::
+:::info "Only an RSVP commits you to anything"
+
+Proposing a session is not a promise to give it, and voting is not a promise to attend.
+[RSVPs are the exception](#rsvp).
+
+:::
 
 ## Pick your name
 
@@ -194,18 +198,18 @@ Two ways, whichever you find first:
 
 - **From the proposal** — click **"Proposals"** at the top of the schedule, then **"Schedule"**,
   either in the table or on the proposal's own page. Pick a room and a time slot, and save.
-- **From the grid** — click an empty slot in a bookable room, then use **"Pre-fill from proposal"**
-  to fill the form from one of your proposals. Or ignore it and book the slot with a brand-new
-  session that was never proposed.
+- **From the grid** — click an empty slot in a bookable room, then pick one of your proposals under
+  **Proposal** to fill the form from it. Or leave it at **[none]** and book the slot with a
+  brand-new session that was never proposed.
 
-![Form for adding a session to the schedule, with a Pre-fill from proposal dropdown](../screenshots/add-session.webp)
+![Form for adding a session to the schedule, with a Proposal dropdown to fill it from a proposal](../screenshots/add-session.webp)
 
 **Max attendees** starts at what the room holds. Cap it lower for a hands-on session, or raise it
 past the room's own maximum for standing room — you'll be warned, but it's your call. **0 means no
 limit.**
 
 Worth knowing: **proposals with no host are up for grabs** — anyone can schedule one, and they
-appear in your "Pre-fill from proposal" dropdown alongside your own. And **the same proposal can be
+appear in the form's **Proposal** dropdown alongside your own. And **the same proposal can be
 scheduled more than once**, for instance twice if interest is high.
 
 **A session is a copy of its proposal.** Editing the proposal later leaves the session as it is, and
@@ -246,10 +250,13 @@ Open your own proposal during voting or scheduling (it opens in a panel beside t
 
 ![Proposal panel in the scheduling phase, showing a vote breakdown with turnout, the split across Interested, Maybe and Skip, and a range of how many people to expect](../screenshots/proposal-vote-breakdown.webp)
 
-:::warning "The range is a very rough guess" It comes from a single event where thirteen hosts
-recalled roughly how many people came to their session, so it can be well out in either direction.
-Use it to pick a room, nothing more. No figure is shown at all if fewer than 10% of attendees voted
-on the proposal, or if nobody voted ❤️. :::
+:::warning "The range is a very rough guess"
+
+It comes from a single event where thirteen hosts recalled roughly how many people came to their
+session, so it can be well out in either direction. Use it to pick a room, nothing more. No figure
+is shown at all if fewer than 10% of attendees voted on the proposal, or if nobody voted ❤️.
+
+:::
 
 **Keep voting ⭐ Maybe.** Today's formula happens not to use ⭐ votes, but that rests on the same
 thirteen sessions — and hosts read your ⭐ as real interest regardless.
@@ -266,8 +273,12 @@ left edge to resize it, or use **Copy link** at its end to copy its link.
 
 ![Session details panel with host, location, time, attendee list, and full description](../screenshots/session-details.webp)
 
-:::warning "An RSVP is a commitment" Unlike votes, hosts plan around it. If you change your mind,
-take it back with "Un-RSVP" — someone else may want the place. :::
+:::warning "An RSVP is a commitment"
+
+Unlike votes, hosts plan around it. If you change your mind, take it back with "Un-RSVP" — someone
+else may want the place.
+
+:::
 
 - You'll be warned if you RSVP to two sessions that overlap, or to one that overlaps a confirmed
   1-on-1. The warning names everything it clashes with.
@@ -393,7 +404,7 @@ You can't change the time or the place — accept it or decline it, and let them
 doesn't suit. Either way they are told. A request nobody answers before its slot begins simply
 lapses; nothing is held against you.
 
-![A 1-on-1 request popup with when, where, the sender's line of context, a warning about a clash, and Accept and Decline buttons](../screenshots/meeting-answer.webp)
+![A 1-on-1 request panel with when, where, the sender's line of context, a warning about a clash, and Accept and Decline buttons](../screenshots/meeting-answer.webp)
 
 ### Your 1-on-1s on the schedule
 
@@ -449,15 +460,14 @@ small card.
 
 ![Searchable attendee directory with avatars, bios, and Session host badges](../screenshots/attendees.webp)
 
-- **Filters** narrow the list to session hosts, to people who have filled in a profile, or to anyone
-  **open to 1-on-1s** — anyone with slots still to come, at any event on the site rather than only
-  this one. The 1-on-1 filter only appears while at least one event is open for 1-on-1s.
 - **Search covers everything on a profile**: names, pronouns, bios, languages, where someone is
   based, prompts and answers, and any contact details they published. A remembered handle, a service
   name like "Signal", or a shared interest is enough to find someone. Your private email address is
   never part of a profile and is never searched.
-- **Two filters, which combine**: **Session host**, and **Has profile** (anyone who filled in a bio,
-  pronouns, location, languages, photo, an answered conversation starter or a contact detail).
+- **Filters, which combine**: **Session host**, **Has profile** (anyone who filled in a bio,
+  pronouns, location, languages, photo, an answered conversation starter or a contact detail), and
+  **Open to 1-on-1s** (anyone with slots still to come, at any event on the site). The last one only
+  appears while at least one event is open for 1-on-1s.
 - **Sort by → Recently updated** is the quick way to see who has filled theirs in since you last
   looked. Each row shows when the profile last changed; empty profiles show no date and come last.
   While searching, results stay ordered by match instead, so the sort choice is unavailable.
