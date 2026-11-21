@@ -77,3 +77,29 @@ test("appearance can also be set from the settings page @014-US1", async ({
     .click();
   await expect(root(page)).toHaveClass(/\bdark\b/);
 });
+
+test("times follow the chosen 12-hour or 24-hour format @014-US7", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/settings");
+
+  const format = page.getByRole("group", { name: "Time format" });
+  await expect(
+    format.getByRole("button", { name: "Automatic" })
+  ).toHaveAttribute("aria-pressed", "true");
+  await format.getByRole("button", { name: "12-hour" }).click();
+
+  await page.goto("/");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await expect(page.getByText("9 AM", { exact: true }).first()).toBeVisible();
+
+  await page.goto("/settings");
+  await page
+    .getByRole("group", { name: "Time format" })
+    .getByRole("button", { name: "24-hour" })
+    .click();
+  await page.goto("/");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await expect(page.getByText("09:00", { exact: true }).first()).toBeVisible();
+});

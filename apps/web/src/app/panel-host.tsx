@@ -17,6 +17,7 @@ import { LOCAL_ZONE } from "./local-zone";
 import { backgroundOf, type PanelItem } from "./panel-history";
 import type { AppServices } from "./services";
 import { SpaLinks } from "./spa-links";
+import { useTimeFormat } from "./time-format";
 import { usePanel } from "./use-panel";
 import { useProposalActions } from "./use-proposal-actions";
 import { useScheduleActions } from "./use-schedule-actions";
@@ -113,7 +114,11 @@ function MeetingHost({
   const view = useEventView();
   const { close, back } = usePanel();
   const { snapshot, now, slug } = view;
-  const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
+  const timeFormat = useTimeFormat();
+  const data = useMemo(
+    () => scheduleDataFrom(snapshot, now, timeFormat),
+    [snapshot, now, timeFormat]
+  );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const { actions, picker } = useScheduleActions(view);
   const onBack = depth > 1 ? back : undefined;
@@ -152,7 +157,11 @@ function SessionHost({
   const view = useEventView();
   const { open, close, back, setHash } = usePanel();
   const { snapshot, now, slug } = view;
-  const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
+  const timeFormat = useTimeFormat();
+  const data = useMemo(
+    () => scheduleDataFrom(snapshot, now, timeFormat),
+    [snapshot, now, timeFormat]
+  );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const { actions, picker } = useScheduleActions(view);
   const params = useMemo(

@@ -4,6 +4,7 @@ import { getNumSlots } from "@schellingboard/domain/slots";
 import { DateTime } from "luxon";
 import { useState } from "react";
 
+import { useTimeFormat } from "../../app/time-format";
 import { cx } from "../../ui/cx";
 import { Dialog } from "../../ui/dialog";
 import { PlusIcon } from "../../ui/icons";
@@ -43,10 +44,15 @@ const stateClasses = (status: MeetingViewStatus) =>
     : "bg-surface-muted border-dashed border-line";
 
 /** "14:40", in the event's zone, for a control's accessible name. */
-function slotLabel(start: string, breakMinutes: number, timezone: string) {
+function slotLabel(
+  start: string,
+  breakMinutes: number,
+  timezone: string,
+  format: string
+) {
   return DateTime.fromJSDate(shownSlotStart(new Date(start), breakMinutes))
     .setZone(timezone)
-    .toFormat("HH:mm");
+    .toFormat(format);
 }
 
 /**
@@ -67,6 +73,7 @@ function SlotCell({
   bookable: boolean;
 }) {
   const { links, breakMinutes, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   const { filtering } = useScheduleMatch();
   const shape = cx(
     "flex h-full w-full items-center justify-center rounded",
@@ -81,7 +88,7 @@ function SlotCell({
       </PositionedBlock>
     );
 
-  const label = slotLabel(start, breakMinutes, timezone);
+  const label = slotLabel(start, breakMinutes, timezone, timeFormat);
   return (
     <PositionedBlock position={position}>
       <a
@@ -131,11 +138,12 @@ function MeetingSummary({ meeting }: { meeting: MeetingView }) {
 /** The slot's 1-on-1s at a glance, for a block with no room to name them. */
 function SlotSummary({ meetings }: { meetings: MeetingView[] }) {
   const { breakMinutes, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   return (
     <div className="space-y-1 p-2">
       <p className="text-sm font-semibold text-fg">
         {meetings.length} 1-on-1s ·{" "}
-        {blockTimeLabel(meetings, breakMinutes, timezone)}
+        {blockTimeLabel(meetings, breakMinutes, timezone, timeFormat)}
       </p>
       <ul className="space-y-0.5">
         {meetings.map((meeting) => (
@@ -171,6 +179,7 @@ function MeetingBlock({
   heightPx: number;
 }) {
   const { links, breakMinutes, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   const { filtering, matchesMeeting, currentMatchId } = useScheduleMatch();
   const ghost = filtering && !matchesMeeting(meeting);
   return (
@@ -183,7 +192,8 @@ function MeetingBlock({
         aria-label={`${meetingTitle(meeting)} at ${slotLabel(
           meeting.slotStart,
           breakMinutes,
-          timezone
+          timezone,
+          timeFormat
         )} · ${meeting.meetingPoint} — ${blockStatus(meeting)}${ghost ? NO_MATCH : ""}`}
         data-match-id={filtering && !ghost ? meeting.id : undefined}
         className={cx(
@@ -232,6 +242,7 @@ function MeetingBlock({
  */
 function StackEntry({ meeting }: { meeting: MeetingView }) {
   const { links, breakMinutes, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   const { filtering, matchesMeeting, currentMatchId } = useScheduleMatch();
   const ghost = filtering && !matchesMeeting(meeting);
   return (
@@ -244,7 +255,8 @@ function StackEntry({ meeting }: { meeting: MeetingView }) {
         aria-label={`${meetingTitle(meeting)} at ${slotLabel(
           meeting.slotStart,
           breakMinutes,
-          timezone
+          timezone,
+          timeFormat
         )} — ${blockStatus(meeting)}${ghost ? NO_MATCH : ""}`}
         data-match-id={filtering && !ghost ? meeting.id : undefined}
         className={cx(
@@ -283,6 +295,7 @@ function SlotBlock({
   onOpen: () => void;
 }) {
   const { breakMinutes, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   const { filtering, matchesMeeting, currentMatchId } = useScheduleMatch();
   const ghost = filtering && !meetings.some(matchesMeeting);
   const matchId = `slot-${meetings[0].slotStart}`;
@@ -297,7 +310,8 @@ function SlotBlock({
         aria-label={`${meetings.length} 1-on-1s, ${blockTimeLabel(
           meetings,
           breakMinutes,
-          timezone
+          timezone,
+          timeFormat
         )} — ${slotSummaryLine(meetings)}${ghost ? NO_MATCH : ""}`}
         data-match-id={filtering && !ghost ? matchId : undefined}
         className={cx(
@@ -330,11 +344,12 @@ function SlotMeetings({
   onClose: () => void;
 }) {
   const { links, breakMinutes, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   return (
     <Dialog
       open
       onClose={onClose}
-      title={`${meetings.length} 1-on-1s, ${blockTimeLabel(meetings, breakMinutes, timezone)}`}
+      title={`${meetings.length} 1-on-1s, ${blockTimeLabel(meetings, breakMinutes, timezone, timeFormat)}`}
     >
       <p className="text-sm text-fg-muted">{meetings[0].dayLabel}</p>
       <ul className="mt-3 flex max-h-72 flex-col gap-1 overflow-y-auto">

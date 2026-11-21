@@ -17,6 +17,7 @@ import { NavBar, type NavItem } from "./nav-bar";
 import { ReloadOffer } from "./reload-offer";
 import type { AppServices } from "./services";
 import { ThemeProvider } from "./theme";
+import { TimeFormatProvider } from "./time-format";
 import { UnreadProvider } from "./unread-count";
 import { useUpdateStatus } from "./updates";
 import { type PickableGuest, UserMenu } from "./user-menu";
@@ -88,13 +89,17 @@ export function ShellProviders({
   const people = useMemo(() => createDirectoryQuery({ api }), [api]);
   return (
     <ThemeProvider>
-      <NoticeProvider>
-        <ViewerProvider api={api}>
-          <ViewerUnread createSource={createSource}>
-            <PersonCardsProvider query={people}>{children}</PersonCardsProvider>
-          </ViewerUnread>
-        </ViewerProvider>
-      </NoticeProvider>
+      <TimeFormatProvider>
+        <NoticeProvider>
+          <ViewerProvider api={api}>
+            <ViewerUnread createSource={createSource}>
+              <PersonCardsProvider query={people}>
+                {children}
+              </PersonCardsProvider>
+            </ViewerUnread>
+          </ViewerProvider>
+        </NoticeProvider>
+      </TimeFormatProvider>
     </ThemeProvider>
   );
 }

@@ -33,6 +33,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **See and turn off the devices that get your notifications**
   ([#969](https://github.com/schellingboard/schellingboard/issues/969)): Settings lists each phone
   or laptop with notifications on, so a lost one can be switched off from another.
+- **12-hour or 24-hour times**
+  ([#607](https://github.com/schellingboard/schellingboard/issues/607)): choose a time format in
+  Settings; Automatic follows your browser's language.
 
 ### Changed
 

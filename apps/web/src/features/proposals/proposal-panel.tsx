@@ -2,7 +2,7 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import type { Session } from "@schellingboard/domain/session";
 import { wantsHost } from "@schellingboard/domain/session";
-import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { formatOptionalTime } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import {
   NO_VOTE_LABEL,
@@ -11,6 +11,7 @@ import {
 } from "@schellingboard/domain/vote-display";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useTimeFormat } from "../../app/time-format";
 import type {
   ProposalDetailQuery,
   ProposalDetailState,
@@ -284,6 +285,7 @@ function Scheduled({
   links: ProposalLinks;
   timezone: string;
 }) {
+  const timeFormat = useTimeFormat();
   const inRooms = (session: Session) =>
     session.locations.length > 0
       ? ` in ${session.locations.map((l) => l.name).join(", ")}`
@@ -298,7 +300,7 @@ function Scheduled({
           This proposal was scheduled on{" "}
           <a href={links.session(sessions[0].id)} className={link}>
             {formatOptionalTime(sessions[0].startTime, timezone, "EEEE")} at{" "}
-            {formatOptionalTime(sessions[0].startTime, timezone, TIME_FORMAT)}
+            {formatOptionalTime(sessions[0].startTime, timezone, timeFormat)}
             {inRooms(sessions[0])}
           </a>
           .
@@ -313,7 +315,7 @@ function Scheduled({
                   {formatOptionalTime(
                     session.startTime,
                     timezone,
-                    `EEEE ${TIME_FORMAT}`
+                    `EEEE ${timeFormat}`
                   )}
                   {inRooms(session)}
                 </a>

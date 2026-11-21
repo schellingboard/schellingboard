@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ThemeSelect } from "../../app/theme";
+import { TimeFormatSelect } from "../../app/time-format";
 import type { MeetingAvailabilityCalls } from "../../commands/meeting-availability";
 import type { SettingsCalls } from "../../commands/settings";
 import type { SettingsState } from "../../queries/settings";
@@ -125,6 +126,13 @@ export function Appearance() {
       </p>
       <div>
         <ThemeSelect />
+      </div>
+      <h3 className="text-sm font-medium">Time format</h3>
+      <p className="text-sm text-fg-subtle">
+        Automatic follows your browser's language.
+      </p>
+      <div>
+        <TimeFormatSelect />
       </div>
     </section>
   );
