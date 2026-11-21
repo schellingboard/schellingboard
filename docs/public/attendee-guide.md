@@ -26,7 +26,8 @@ scheduling phase.
 
 The schedule can be read in every phase, from **View Schedule** on the proposals page. Before
 scheduling opens, and after it closes, it is read-only: you can look at sessions, bookmark them and
-hide them, but not RSVP or book slots. The phase bar at the top shows when scheduling opens.
+hide them, but not RSVP or book slots. The phase bar at the top shows when scheduling opens, and so
+does a short message when you click an empty part of the schedule.
 
 :::info "Only an RSVP commits you to anything"
 

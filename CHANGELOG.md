@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Ask someone to open up to 1-on-1s**
   ([#1046](https://github.com/schellingboard/schellingboard/issues/1046)): a profile without free
   slots now has an "Ask them to open up" button; you are told when they do.
+- **The read-only schedule says why**: clicking an empty part of it before scheduling opens, or
+  after the event, says when scheduling opens or that the event is over.
 
 ### Changed
 
