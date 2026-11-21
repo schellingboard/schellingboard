@@ -14,10 +14,10 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // sign-out deliberately hard-reloads right after the request resolves, so
   // this can happen there too.
   /Error in input stream/,
-  // Firefox quirk: a reload or navigation that lands while the schedule's
-  // change feed (an EventSource) is connecting is logged as a failed
+  // Firefox quirk: a reload or navigation that cuts off an EventSource (the
+  // schedule's change feed, the notification stream) is logged as a failed
   // connection, even though the page closes the stream as it leaves.
-  /can.t establish a connection to the server at \S+\/api\/v1\/events\/[^/]+\/feed/,
+  /can.t establish a connection to the server at \S+\/api\/v1\/(events\/[^/]+\/feed|me\/notifications\/stream)/,
   // Firefox quirk: a reload that cuts off a room photo mid-download (the dev
   // clock helper reloads right after the SPA has) is logged as a corrupt image.
   // The seeded photos are static files, so real damage would fail every run.
