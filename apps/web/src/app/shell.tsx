@@ -1,7 +1,9 @@
 import type { ApiClient } from "@schellingboard/api-client";
-import type { ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 
+import { PersonCardsProvider } from "../features/people/person-cards";
 import { useKioskMode } from "../features/schedule/kiosk";
+import { createDirectoryQuery } from "../queries/directory";
 import { NoticeProvider } from "../ui/notices";
 import { DevToolbar } from "./dev-toolbar";
 import { ErrorBoundary } from "./error-boundary";
@@ -83,11 +85,14 @@ export function ShellProviders({
   createSource: AppServices["createSource"];
   children: ReactNode;
 }) {
+  const people = useMemo(() => createDirectoryQuery({ api }), [api]);
   return (
     <ThemeProvider>
       <NoticeProvider>
         <ViewerProvider api={api}>
-          <ViewerUnread createSource={createSource}>{children}</ViewerUnread>
+          <ViewerUnread createSource={createSource}>
+            <PersonCardsProvider query={people}>{children}</PersonCardsProvider>
+          </ViewerUnread>
         </ViewerProvider>
       </NoticeProvider>
     </ThemeProvider>

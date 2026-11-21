@@ -2,6 +2,7 @@ import { durationMinusBreak } from "@schellingboard/domain/slots";
 import { formatDuration } from "@schellingboard/domain/time";
 
 import { Markdown } from "../../ui/markdown";
+import { PersonLink } from "../people/person-link";
 import type { ProposalLinks } from "./links";
 
 /** Who hosts a proposal and what it is about: shared by the modal and quick voting. */
@@ -31,12 +32,12 @@ export function ProposalBody({
           {proposal.hosts.map((h, i) => (
             <span key={h.id}>
               {i > 0 && ", "}
-              <a
+              <PersonLink
+                guestId={h.id}
                 href={links.guest(h.id)}
+                name={h.name}
                 className="text-brand-fg hover:text-brand-fg-hover hover:underline"
-              >
-                {h.name}
-              </a>
+              />
             </span>
           ))}
         </p>

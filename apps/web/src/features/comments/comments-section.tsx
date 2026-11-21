@@ -3,8 +3,7 @@ import { formatInLocalZone } from "@schellingboard/domain/time";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type { CommentView } from "../../commands/comment";
-import type { CommentsState } from "../../queries/comments";
-import type { CommentsQuery } from "../../queries/comments";
+import type { CommentsQuery, CommentsState } from "../../queries/comments";
 import type {
   CommentResult,
   CommentsController,
@@ -13,6 +12,7 @@ import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { Dialog } from "../../ui/dialog";
 import { Markdown } from "../../ui/markdown";
 import { Tooltip } from "../../ui/tooltip";
+import { PersonLink } from "../people/person-link";
 
 export type CommentsHandle = {
   query: CommentsQuery;
@@ -244,12 +244,12 @@ function Thread({
           ) : (
             <>
               {node.author ? (
-                <a
+                <PersonLink
+                  guestId={node.author.id}
                   href={env.guestHref(node.author.id)}
+                  name={node.author.name}
                   className="font-medium text-brand-fg hover:text-brand-fg-hover hover:underline"
-                >
-                  {node.author.name}
-                </a>
+                />
               ) : (
                 <span className="font-medium text-fg-muted">Unknown</span>
               )}

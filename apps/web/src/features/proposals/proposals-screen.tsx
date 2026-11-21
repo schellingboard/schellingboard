@@ -33,6 +33,7 @@ import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { usePaging } from "../../ui/use-paging";
 import { useSearchParamText } from "../../ui/use-search-param-text";
+import { PersonLink } from "../people/person-link";
 import type { ProposalLinks } from "./links";
 import {
   defaultSort,
@@ -462,9 +463,12 @@ function ProposalTable({
                       row.hosts.map((h, i) => (
                         <span key={h.id}>
                           {i > 0 && ", "}
-                          <a href={links.guest(h.id)} className={LINK}>
-                            {h.name}
-                          </a>
+                          <PersonLink
+                            guestId={h.id}
+                            href={links.guest(h.id)}
+                            name={h.name}
+                            className={LINK}
+                          />
                         </span>
                       ))
                     )}
