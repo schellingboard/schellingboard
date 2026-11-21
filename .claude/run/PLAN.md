@@ -10,8 +10,7 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
 ## Steps
 
 1. Done: side panel and navigation, with the session.
-2. **Proposal panel.** `/{slug}/proposals/:id` over any event page; direct open shows the proposals
-   list. `?viewProposal=` redirects. Remove `proposal-nav.ts`.
+2. Done: proposal panel, `?viewProposal=` redirects, `proposal-nav.ts` removed.
 3. **Profile panel.** `/guests/:id` opens over any page; direct open shows the directory.
    Previous/next only with the directory behind.
 4. **1-on-1 panel.** `/{slug}/meetings/:id`; direct open shows the schedule (read-only outside

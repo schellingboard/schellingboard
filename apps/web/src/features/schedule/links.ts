@@ -28,7 +28,7 @@ export function scheduleLinks(eventSlug: string): ScheduleLinks {
     editSession: (sessionId) =>
       `/${eventSlug}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
     proposal: (proposalId) =>
-      `/${eventSlug}/proposals?${new URLSearchParams({ viewProposal: proposalId })}`,
+      `/${eventSlug}/proposals/${encodeURIComponent(proposalId)}`,
     addSession: ({ location, day, time }) =>
       `/${eventSlug}/add-session?${new URLSearchParams({ location, time, day })}`,
     bookMeeting: (slotStart) =>

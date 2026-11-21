@@ -1,13 +1,15 @@
 # Progress
 
-Step 1 done: side panel, session at `/{slug}/sessions/:id`, `?viewSession=` redirects.
+Steps 1 (c344e56d) and 2 done.
 
-- Masking spike: TanStack `mask` survives reload/Back but mangles repeated query keys, so
-  `app/panel-history.ts` writes the masked entries itself (recorded in ADR 0020).
+- Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session,
+  proposal); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks` intercept;
+  spike result in ADR 0020.
+- Landing routes (`session-landing.tsx`, `proposal-landing.tsx`) replace the entry with the list
+  page and push the panel; old `?view...=` params do the same from the page components.
 - The panel is `role="dialog" aria-modal="false"`, so E2E `dialog` locators still work.
-- Landing on an address replaces the entry with the page, then pushes the panel: Close/Back never
-  leave the app.
-- Next: step 2. Add the proposal item to `PanelItem`; `PanelHost` is session-only today.
+- Next: step 3. Add a `profile` item (`/guests/:id`); the host must render outside `EventLayout`
+  (the profile panel opens over any page, including `/guests`).
 
 ## Questions
 

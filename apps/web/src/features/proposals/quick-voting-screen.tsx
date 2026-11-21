@@ -87,10 +87,7 @@ export function QuickVotingScreen({
       ) : next ? (
         <>
           <h1 className="mb-2 mt-5 text-xl font-semibold">
-            <a
-              href={`${links.quickVoting}?${new URLSearchParams({ viewProposal: next.id })}`}
-              className="hover:underline"
-            >
+            <a href={links.view(next.id)} className="hover:underline">
               {next.title}
             </a>
           </h1>

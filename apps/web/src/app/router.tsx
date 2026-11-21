@@ -6,6 +6,7 @@ import {
   Outlet,
   redirect,
   type RouterHistory,
+  useRouter,
 } from "@tanstack/react-router";
 import { type ReactElement, Suspense } from "react";
 
@@ -23,6 +24,8 @@ import { EventLayout } from "./event-page";
 import { HomePage } from "./home-page";
 import { MeetingsPage } from "./meetings-page";
 import { NotFound } from "./not-found";
+import { PanelHost } from "./panel-host";
+import { PanelLanding } from "./panel-landing";
 import { PeoplePage } from "./people-pages";
 import {
   ProposalFormPage,
@@ -31,8 +34,6 @@ import {
 } from "./proposals-pages";
 import { SchedulePage } from "./schedule-page";
 import { type AppServices, defaultServices } from "./services";
-import { SessionLanding } from "./session-landing";
-import { PanelHost } from "./session-panel-host";
 import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
 
@@ -141,7 +142,18 @@ export function createAppRouter(
     path: "sessions/$sessionId",
     component: function SessionRoute(): ReactElement {
       const { slug, sessionId } = session.useParams();
-      return <SessionLanding slug={slug} sessionId={sessionId} />;
+      const { search } = useRouter().history.location;
+      return (
+        <PanelLanding
+          item={{
+            kind: "session",
+            slug,
+            id: sessionId,
+            record: new URLSearchParams(search).get("record") === "count",
+          }}
+          background={`/${slug}/schedule`}
+        />
+      );
     },
   });
   const meetings = createRoute({
@@ -153,6 +165,19 @@ export function createAppRouter(
     getParentRoute: () => event,
     path: "proposals",
     component: ProposalsPage,
+  });
+  const proposal = createRoute({
+    getParentRoute: () => event,
+    path: "proposals/$proposalId",
+    component: function ProposalRoute(): ReactElement {
+      const { slug, proposalId } = proposal.useParams();
+      return (
+        <PanelLanding
+          item={{ kind: "proposal", slug, id: proposalId }}
+          background={`/${slug}/proposals`}
+        />
+      );
+    },
   });
   const quickVoting = createRoute({
     getParentRoute: () => event,
@@ -351,6 +376,7 @@ export function createAppRouter(
         session,
         meetings,
         proposals,
+        proposal,
         quickVoting,
         newProposal,
         editProposal,
