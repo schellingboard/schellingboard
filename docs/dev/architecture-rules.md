@@ -10,7 +10,7 @@ Two mechanisms, split by what they can see:
 | ESLint               | one file at a time     | banned calls, banned syntax, required shapes  |
 | `dependency-cruiser` | the whole module graph | cycles, layer boundaries, "X may not reach Y" |
 
-Run them with `make lint` and `make arch`; `make precommit` runs both.
+Run them with `make lint` and `make arch`; `make precommit` and `make prepush` run both.
 
 ## ESLint: rules about code inside a file
 

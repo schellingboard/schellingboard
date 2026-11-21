@@ -167,8 +167,8 @@ sender, which is how the runner's optimistic prediction knows its command has ar
    Admin routes go under `/admin/`, or the gate will not cover them. Register a new route function
    in `server/http/app.ts`.
 4. **`make openapi`.** It rewrites `packages/contracts/openapi.json` and the client's types in
-   `packages/api-client/src/schema.ts`; commit both. `make openapi-check`, in `make precommit` and
-   CI, fails while either is stale.
+   `packages/api-client/src/schema.ts`; commit both. `make openapi-check`, in `make precommit`,
+   `make prepush` and CI, fails while either is stale.
 
 `make arch` enforces the layout (see [Architecture rules](architecture-rules.md)): the kernel
 reaches no module, HTTP code or framework, even indirectly; `application/` imports no HTTP,

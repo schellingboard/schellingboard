@@ -97,7 +97,8 @@ conventions — see [docs/dev/github-issues.md](docs/dev/github-issues.md) for t
 ## Version Control
 
 - Use `jj` (jujutsu) if available, otherwise `git`
-- Pre-commit: run `make precommit` to format, lint, type check, and run tests
+- Pre-commit: run `make precommit` to check the last change (its files, related tests, changed E2E
+  specs); `make prepush` runs the full suite
 - Commit messages: conventional prefix, subject ≤ 72 chars, body wrapped at 80. Check with
   `make commit-check` after committing (see docs/dev/version-control.md)
 - Work on a GitHub issue ends with a footer naming it: `fixes #123` when the commit fully resolves
@@ -157,10 +158,10 @@ jj squash --from <commit> --to @ -m "message" -- <path>
 
 - **E2E** (Playwright): important user workflows only — quality over quantity
 - **E2E against the Docker image** (`make test-e2e-docker`): the same suite against a container. Not
-  part of `make precommit`; the release workflow runs it against the image it is about to publish,
-  so run it by hand after touching the `Dockerfile`, the standalone build, or anything path-,
-  upload- or migration-related — well before a release. The container runs in UTC, so it catches
-  dates formatted in the ambient time zone; format in the event's zone
+  part of `make prepush`; the release workflow runs it against the image it is about to publish, so
+  run it by hand after touching the `Dockerfile`, the standalone build, or anything path-, upload-
+  or migration-related — well before a release. The container runs in UTC, so it catches dates
+  formatted in the ambient time zone; format in the event's zone
 - **Integration** (Vitest, real DB): high coverage of business logic via repositories/server actions
 - **Release upgrade** (Vitest, part of `make test`): migrates a released version's seeded database
   forward and exercises CRUD on it. Add a fixture only when releasing
@@ -265,7 +266,7 @@ session start and after compaction; those files, not the conversation, are the s
   so the amend needs no force-push.
 - Delegate searches that read more than a few files to the `Explore` agent. Do not read large files,
   logs or full test output in the main session.
-- A step is done when `make precommit` passes. If a tier cannot run in the environment, say so in
+- A step is done when `make prepush` passes. If a tier cannot run in the environment, say so in
   PROGRESS.md and in the commit message; never skip it silently.
 - One commit per step. If a step is too big for one coherent commit, split it in PLAN.md first. In
   the step's own commit, replace the finished step in PLAN.md with a one-line summary and update

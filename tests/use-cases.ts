@@ -701,6 +701,11 @@ export const features = {
         actor: "developer",
         priority: "P3",
       },
+      US2: {
+        title: "Developer checks only what their last change touched",
+        actor: "developer",
+        priority: "P3",
+      },
     },
   },
   "021": {
