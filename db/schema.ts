@@ -682,6 +682,33 @@ export const meetings = sqliteTable(
   ]
 );
 
+// "Ask them to open up": one per pair per event, kept after it is answered so
+// the same person cannot be asked again.
+export const meetingNudges = sqliteTable(
+  "meeting_nudges",
+  {
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    askerId: text("asker_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    recipientId: text("recipient_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull(),
+    answeredAt: text("answered_at"),
+  },
+  (t) => [
+    uniqueIndex("meeting_nudges_no_duplicate").on(
+      t.eventId,
+      t.askerId,
+      t.recipientId
+    ),
+    index("meeting_nudges_recipient_idx").on(t.eventId, t.recipientId),
+  ]
+);
+
 // One in-app notification for one guest. `type` is the same key as the guest's
 // email settings (see EmailSettings), so a notification and the mail about it
 // are never two separate taxonomies.

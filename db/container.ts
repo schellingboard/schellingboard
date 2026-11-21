@@ -20,6 +20,7 @@ import type {
   LocationUnavailabilityRepository,
   LoginSessionsRepository,
   MeetingAvailabilityRepository,
+  MeetingNudgesRepository,
   MeetingPointsRepository,
   MeetingsRepository,
   NotificationsRepository,
@@ -53,6 +54,7 @@ import { SqliteLocationUnavailabilityRepository } from "./repositories/sqlite/lo
 import { SqliteLocationsRepository } from "./repositories/sqlite/locations";
 import { SqliteLoginSessionsRepository } from "./repositories/sqlite/login-sessions";
 import { SqliteMeetingAvailabilityRepository } from "./repositories/sqlite/meeting-availability";
+import { SqliteMeetingNudgesRepository } from "./repositories/sqlite/meeting-nudges";
 import { SqliteMeetingPointsRepository } from "./repositories/sqlite/meeting-points";
 import { SqliteMeetingsRepository } from "./repositories/sqlite/meetings";
 import { SqliteNotificationsRepository } from "./repositories/sqlite/notifications";
@@ -90,6 +92,7 @@ export type Repositories = {
   locationUnavailability: LocationUnavailabilityRepository;
   meetingPoints: MeetingPointsRepository;
   meetingAvailability: MeetingAvailabilityRepository;
+  meetingNudges: MeetingNudgesRepository;
   meetings: MeetingsRepository;
   notifications: NotificationsRepository;
   push: PushRepository;
@@ -139,6 +142,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     locationUnavailability: new SqliteLocationUnavailabilityRepository(db),
     meetingPoints: new SqliteMeetingPointsRepository(db),
     meetingAvailability: new SqliteMeetingAvailabilityRepository(db),
+    meetingNudges: new SqliteMeetingNudgesRepository(db),
     meetings: new SqliteMeetingsRepository(db),
     notifications: new SqliteNotificationsRepository(db),
     push: new SqlitePushRepository(db),

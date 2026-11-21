@@ -4,7 +4,7 @@ import {
 } from "@schellingboard/domain/slots";
 import { createContext, type ReactNode, useContext } from "react";
 
-import type { MeetingRequestCalls } from "../../commands/meeting-request";
+import type { MeetingBookingCalls } from "../../commands/meeting-request";
 import type { AttendeeCountApi } from "../../queries/attendee-count";
 import type { AttendeesQuery } from "../../queries/attendees";
 import type { CommentsQuery } from "../../queries/comments";
@@ -36,7 +36,7 @@ export type ScheduleActions = {
   cancelMeeting: (meetingId: string, note: string) => Promise<void>;
   /** The booking screen's query for one slot; the caller loads it. */
   meetingCandidates: (slotStart: string) => MeetingCandidatesQuery;
-  meetingRequest: MeetingRequestCalls;
+  meetingRequest: MeetingBookingCalls;
   /** The caller destroys the query when done. */
   comments: (sessionId: string) => {
     query: CommentsQuery;

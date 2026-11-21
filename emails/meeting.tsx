@@ -80,3 +80,67 @@ export function meetingOutcomeEmail(props: {
     ),
   };
 }
+
+function meetingNudgeHeadline(askerName: string, eventName: string): string {
+  return `${askerName} would like to book a 1-on-1 with you at ${eventName}`;
+}
+
+export function meetingNudgeNoticeText(
+  askerName: string,
+  eventName: string
+): string {
+  return `${meetingNudgeHeadline(askerName, eventName)}. Say when you are free in Settings, under 1-on-1s.`;
+}
+
+export function meetingNudgeAnsweredNoticeText(
+  recipientName: string,
+  eventName: string
+): string {
+  return `${recipientName} is open to 1-on-1s at ${eventName}`;
+}
+
+// Sent when someone asks the guest to say when they are free for 1-on-1s.
+export function meetingNudgeEmail(props: {
+  askerName: string;
+  eventName: string;
+  url: string;
+}): EmailMessage {
+  return {
+    subject: `${props.askerName} would like a 1-on-1 with you`,
+    body: (
+      <>
+        <h1>{meetingNudgeHeadline(props.askerName, props.eventName)}</h1>
+        <p>They can only book you once you are open to 1-on-1s.</p>
+        <p>
+          To open up, go to Settings and find 1-on-1s. Open {props.eventName},
+          tick &quot;I&apos;m open to 1-on-1s at this event&quot;, choose when
+          you are free and save.
+        </p>
+        <p>
+          <a href={props.url}>Open your 1-on-1 settings</a>
+        </p>
+      </>
+    ),
+  };
+}
+
+// Sent to whoever asked, once the guest has declared their first free slots.
+export function meetingNudgeAnsweredEmail(props: {
+  recipientName: string;
+  eventName: string;
+  url: string;
+}): EmailMessage {
+  return {
+    subject: `${props.recipientName} is open to 1-on-1s`,
+    body: (
+      <>
+        <h1>
+          {meetingNudgeAnsweredNoticeText(props.recipientName, props.eventName)}
+        </h1>
+        <p>
+          <a href={props.url}>Schedule a 1-on-1</a>
+        </p>
+      </>
+    ),
+  };
+}

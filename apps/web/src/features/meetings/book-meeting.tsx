@@ -6,7 +6,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
-import type { MeetingRequestCalls } from "../../commands/meeting-request";
+import type { MeetingBookingCalls } from "../../commands/meeting-request";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type {
   MeetingCandidate,
@@ -35,7 +35,7 @@ export function BookMeeting({
   onClose,
 }: {
   query: MeetingCandidatesQuery;
-  calls: MeetingRequestCalls;
+  calls: MeetingBookingCalls;
   profileHref: (guestId: string) => string;
   /** Told once a request is sent, so the column can show it straight away. */
   onBooked: () => void;
@@ -198,7 +198,7 @@ function RequestStep({
   onBooked,
   onClose,
 }: {
-  calls: MeetingRequestCalls;
+  calls: MeetingBookingCalls;
   eventId: string;
   slotStart: string;
   found: MeetingCandidates;

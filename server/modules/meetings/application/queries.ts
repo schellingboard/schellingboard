@@ -12,6 +12,7 @@ import { myMeetingsFor, type MyMeetingsResponse } from "@/utils/meeting-views";
 
 import type { MeetingDeps } from "../ports";
 import { eventNotFound } from "./meetings";
+import { type MeetingNudgeState, nudgeStatesFor } from "./nudges";
 
 // Always the caller's own: a guest's meetings and free slots are as private as
 // their RSVPs, so nothing here takes a guest to ask about.
@@ -35,18 +36,22 @@ export const listMeetingOptions =
     actor: Actor,
     { guestId }: { guestId: string },
     now: Date
-  ): Promise<Result<MeetingOption[]>> => {
+  ): Promise<
+    Result<{ options: MeetingOption[]; nudges: MeetingNudgeState[] }>
+  > => {
     const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return ok([]);
-    return ok(
-      await meetingOptionsFor(
+    if (!acting.ok) return ok({ options: [], nudges: [] });
+    const events = await repos.events.list();
+    return ok({
+      options: await meetingOptionsFor(
         acting.value,
         guestId,
-        await repos.events.list(),
+        events,
         repos,
         now
-      )
-    );
+      ),
+      nudges: await nudgeStatesFor(acting.value, guestId, events, repos, now),
+    });
   };
 
 // Site auth is shared with every attendee, so only an acting guest may ask:
