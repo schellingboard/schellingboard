@@ -33,7 +33,7 @@ export function OpenUpNudge({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-start gap-2">
       <p className="text-sm text-fg-muted">
         {showEvent
           ? t`Not open to 1-on-1s yet at ${eventName}`

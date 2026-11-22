@@ -386,7 +386,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
             <div
               role="status"
               aria-label={t`Loading profile`}
-              className="flex flex-col items-center gap-2"
+              className="flex flex-col items-start gap-2"
             >
               <div className="aspect-square w-full max-w-64 animate-pulse rounded-2xl bg-surface-muted" />
               <div className="h-9 w-48 animate-pulse rounded bg-surface-muted" />

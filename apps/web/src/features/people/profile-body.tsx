@@ -85,7 +85,7 @@ export function ProfileBody({
   const basedIn = guest.basedIn;
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-col items-center gap-2 text-center">
+      <header className="flex flex-col items-start gap-2">
         <ProfilePhoto
           name={guest.name}
           image={guest.avatarUrl}
@@ -96,7 +96,7 @@ export function ProfileBody({
           {guest.name}
         </h1>
         {(guest.pronouns || guest.isHost || guest.labels.length > 0) && (
-          <div className="flex flex-row flex-wrap items-center justify-center gap-2">
+          <div className="flex flex-row flex-wrap items-center gap-2">
             {guest.pronouns && (
               <p className="text-fg-muted">{guest.pronouns}</p>
             )}
@@ -159,7 +159,7 @@ export function ProfileBody({
             <h2 className="text-lg font-semibold mb-2">
               <Trans>Languages</Trans>
             </h2>
-            <ul className="flex flex-wrap justify-center gap-2">
+            <ul className="flex flex-wrap gap-2">
               {guest.languages!.map((language, i) => (
                 <li
                   key={i}
