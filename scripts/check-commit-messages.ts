@@ -85,16 +85,32 @@ function git(args: string[]): string {
 }
 
 function jj(args: string[]): string {
-  return execFileSync("jj", args, { encoding: "utf8", cwd: repoRoot });
+  return execFileSync("jj", args, {
+    encoding: "utf8",
+    cwd: repoRoot,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+}
+
+function gitLog(range: string): string {
+  return git(["log", "--no-merges", "--format=%h%x00%B%x01", range]);
 }
 
 function log(range: string): string {
-  if (!usesJj)
-    return git(["log", "--no-merges", "--format=%h%x00%B%x01", range]);
+  if (!usesJj) return gitLog(range);
   // An undescribed @ is work in progress, not yet a commit.
   const revset = `(${range}) ~ merges() ~ (@ & description(exact:""))`;
   const template = 'change_id.short() ++ "\\x00" ++ description ++ "\\x01"';
-  return jj(["log", "--no-graph", "-r", revset, "-T", template]);
+  try {
+    return jj(["log", "--no-graph", "-r", revset, "-T", template]);
+  } catch (jjError) {
+    // The repo is git-colocated, so a git range such as origin/main..sha works.
+    try {
+      return gitLog(range);
+    } catch {
+      throw jjError;
+    }
+  }
 }
 
 function messagesIn(range: string): { id: string; message: string }[] {
