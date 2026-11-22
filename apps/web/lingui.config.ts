@@ -3,7 +3,7 @@ import { formatter } from "@lingui/format-po";
 
 export default defineConfig({
   sourceLocale: "en",
-  locales: ["en", "de", "pseudo-LOCALE"],
+  locales: ["en", "de", "es-ES", "pt-PT", "pseudo-LOCALE"],
   pseudoLocale: "pseudo-LOCALE",
   format: formatter({ lineNumbers: false }),
   catalogs: [
