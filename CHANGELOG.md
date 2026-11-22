@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Messages at the bottom of the screen go away by themselves**: only those asking you to check
+  something stay until dismissed. Hovering or focusing one keeps it open.
 - **"Add a conversation starter"** replaces "Suggest a prompt" on the profile form, which read as
   proposing a new question to the organizers.
 - **Browser tabs show your site title**: the title set in Settings replaces "SchellingBoard".

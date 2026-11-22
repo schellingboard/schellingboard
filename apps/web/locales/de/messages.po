@@ -799,7 +799,7 @@ msgstr "1:1-Gespräch mit <0/>"
 msgid "1-on-1s"
 msgstr "1:1-Gespräche"
 
-#: src/commands/failure-message.ts:33
+#: src/commands/failure-message.ts:35
 msgid "1-on-1s are not enabled for this event."
 msgstr "1:1-Gespräche sind für diese Veranstaltung nicht aktiviert."
 
@@ -843,7 +843,7 @@ msgstr "Ein starker Rückgang von Mitgliedern zu Aktiven bedeutet, dass viele Pe
 msgid "A book that rewired my brain"
 msgstr "Ein Buch, das mein Denken umgekrempelt hat"
 
-#: src/commands/failure-message.ts:56
+#: src/commands/failure-message.ts:58
 msgid "A comment cannot be empty."
 msgstr "Ein Kommentar darf nicht leer sein."
 
@@ -867,8 +867,8 @@ msgstr "Dafür gehe ich auf die Barrikaden"
 msgid "A historical figure I'd share a meal with"
 msgstr "Eine historische Persönlichkeit, mit der ich gern essen würde"
 
-#: src/commands/failure-message.ts:17
-#: src/commands/failure-message.ts:48
+#: src/commands/failure-message.ts:19
+#: src/commands/failure-message.ts:50
 msgid "A host is not part of this event."
 msgstr "Ein Host gehört nicht zu dieser Veranstaltung."
 
@@ -1286,7 +1286,7 @@ msgstr "Es gibt bereits eine Veranstaltung mit der URL „{slug}“ („{name}�
 msgid "An organizer made a new personal link for you to join {eventName}. Links sent to you before no longer work."
 msgstr "Eine organisierende Person hat einen neuen persönlichen Link für dich erstellt, damit du {eventName} beitreten kannst. Früher an dich gesendete Links funktionieren nicht mehr."
 
-#: src/commands/failure-message.ts:51
+#: src/commands/failure-message.ts:53
 msgid "An organizer manages this session."
 msgstr "Eine organisierende Person verwaltet diese Session."
 
@@ -1294,7 +1294,7 @@ msgstr "Eine organisierende Person verwaltet diese Session."
 msgid "An unusual habit that works for me"
 msgstr "Eine ungewöhnliche Gewohnheit, die für mich funktioniert"
 
-#: src/commands/failure-message.ts:41
+#: src/commands/failure-message.ts:43
 msgid "Another session already uses that room at that time."
 msgstr "Eine andere Session nutzt diesen Raum zu dieser Zeit schon."
 
@@ -1792,7 +1792,7 @@ msgstr "Diagramm"
 msgid "Chat Bubble Left"
 msgstr "Sprechblase links"
 
-#: src/commands/failure-message.ts:73
+#: src/commands/failure-message.ts:75
 msgid "Check that it went through, then try again."
 msgstr "Prüfe, ob es geklappt hat, und versuche es dann erneut."
 
@@ -1825,7 +1825,7 @@ msgstr "Wähle ein neues Passwort. Damit wechselst du ab jetzt zu deinem Namen."
 msgid "Choose a password. You are signed in with your personal link, so the old one is not needed."
 msgstr "Wähle ein Passwort. Du bist mit deinem persönlichen Link angemeldet, daher brauchst du das alte nicht."
 
-#: src/commands/failure-message.ts:32
+#: src/commands/failure-message.ts:34
 msgid "Choose or type where to meet."
 msgstr "Wähle oder gib ein, wo ihr euch trefft."
 
@@ -1837,7 +1837,7 @@ msgstr "Ausschnitt wählen"
 msgid "Choose what My schedule shows"
 msgstr "Wähle, was „Mein Programm“ zeigt"
 
-#: src/commands/failure-message.ts:22
+#: src/commands/failure-message.ts:24
 msgid "Choose who you are first."
 msgstr "Wähle zuerst, wer du bist."
 
@@ -2553,7 +2553,7 @@ msgstr "Tage mit Zusagen"
 msgid "Decline"
 msgstr "Ablehnen"
 
-#: src/commands/failure-message.ts:40
+#: src/commands/failure-message.ts:42
 msgid "Decline it instead of canceling."
 msgstr "Lehne es ab, statt abzusagen."
 
@@ -2743,7 +2743,7 @@ msgstr "Änderungen verwerfen?"
 msgid "Discord"
 msgstr "Discord"
 
-#: src/ui/notices.tsx:106
+#: src/ui/notices.tsx:116
 msgid "Dismiss"
 msgstr "Schließen"
 
@@ -2878,14 +2878,14 @@ msgstr "{title} am {date} bearbeiten"
 msgid "Edit day {from} – {to} ({timezone})"
 msgstr "Tag {from} – {to} ({timezone}) bearbeiten"
 
-#: src/app/profile-host.tsx:203
+#: src/app/profile-host.tsx:202
 #: src/app/user-menu.tsx:107
 #: src/features/people/directory-screen.tsx:126
 #: src/features/people/profile-body.tsx:121
 msgid "Edit profile"
 msgstr "Profil bearbeiten"
 
-#: src/app/profile-host.tsx:202
+#: src/app/profile-host.tsx:201
 msgid "Edit profile form"
 msgstr "Profilformular bearbeiten"
 
@@ -3489,11 +3489,11 @@ msgstr "Hosts"
 msgid "Hosts and proposals"
 msgstr "Hosts und Vorschläge"
 
-#: src/commands/failure-message.ts:10
+#: src/commands/failure-message.ts:12
 msgid "Hosts cannot RSVP to their own session."
 msgstr "Hosts können ihrer eigenen Session nicht zusagen."
 
-#: src/commands/failure-message.ts:13
+#: src/commands/failure-message.ts:15
 msgid "Hosts cannot vote on their own proposal."
 msgstr "Hosts können nicht über ihren eigenen Vorschlag abstimmen."
 
@@ -3932,7 +3932,7 @@ msgstr "Vorschläge werden geladen …"
 #: src/app/admin-pages.tsx:640
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:94
-#: src/app/profile-host.tsx:174
+#: src/app/profile-host.tsx:173
 #: src/features/admin/event-layout.tsx:82
 #: src/features/admin/event-sessions.tsx:394
 #: src/features/admin/event-stats.tsx:199
@@ -4090,7 +4090,7 @@ msgstr "max. {capacity}"
 msgid "Max attendees"
 msgstr "Max. Teilnehmende"
 
-#: src/commands/failure-message.ts:4
+#: src/commands/failure-message.ts:6
 msgid "Max attendees must be a non-negative whole number"
 msgstr "Max. Teilnehmende muss eine nicht negative ganze Zahl sein"
 
@@ -4750,7 +4750,7 @@ msgstr "Eine Zeile pro Session. Füllung sind die Zusagen geteilt durch die Kapa
 msgid "One row per voter: their votes by choice, and the share of all proposals they voted on."
 msgstr "Eine Zeile pro Abstimmende: ihre Stimmen nach Auswahl und der Anteil aller Vorschläge, über die sie abgestimmt haben."
 
-#: src/commands/failure-message.ts:16
+#: src/commands/failure-message.ts:18
 msgid "Only a host of this proposal can change it."
 msgstr "Nur ein Host dieses Vorschlags kann ihn ändern."
 
@@ -4758,7 +4758,7 @@ msgstr "Nur ein Host dieses Vorschlags kann ihn ändern."
 msgid "Only a host of this proposal can edit it."
 msgstr "Nur ein Host dieses Vorschlags kann ihn bearbeiten."
 
-#: src/commands/failure-message.ts:49
+#: src/commands/failure-message.ts:51
 msgid "Only a host of this session can change it."
 msgstr "Nur ein Host dieser Session kann sie ändern."
 
@@ -4766,11 +4766,11 @@ msgstr "Nur ein Host dieser Session kann sie ändern."
 msgid "Only people who marked this time free are listed. Nobody is told you looked."
 msgstr "Nur Personen, die diese Zeit als frei markiert haben, werden aufgeführt. Niemand erfährt, dass du nachgesehen hast."
 
-#: src/commands/failure-message.ts:57
+#: src/commands/failure-message.ts:59
 msgid "Only the author can change a comment."
 msgstr "Nur die Verfasserin oder der Verfasser kann einen Kommentar ändern."
 
-#: src/commands/failure-message.ts:35
+#: src/commands/failure-message.ts:37
 msgid "Only the person asked can answer."
 msgstr "Nur die angefragte Person kann antworten."
 
@@ -5046,7 +5046,7 @@ msgstr "Bitte gib das Passwort ein, um auf diese Website zuzugreifen"
 msgid "Please fix the highlighted fields."
 msgstr "Bitte korrigiere die markierten Felder."
 
-#: src/commands/failure-message.ts:74
+#: src/commands/failure-message.ts:76
 msgid "Please try again."
 msgstr "Bitte versuche es erneut."
 
@@ -5128,7 +5128,7 @@ msgstr "Profilkommentare haben keine Veranstaltung: Auf einer Website mit mehrer
 msgid "Profile fields filled in per member"
 msgstr "Ausgefüllte Profilfelder pro Mitglied"
 
-#: src/app/profile-host.tsx:180
+#: src/app/profile-host.tsx:179
 msgid "Profile not found, please log in again."
 msgstr "Profil nicht gefunden, bitte melde dich erneut an."
 
@@ -6209,7 +6209,7 @@ msgstr "Zeitfenster, ab"
 msgid "Slots, up to"
 msgstr "Zeitfenster, bis"
 
-#: src/commands/failure-message.ts:24
+#: src/commands/failure-message.ts:26
 msgid "Some of those slots are no longer offered. Reload the page."
 msgstr "Einige dieser Zeitfenster werden nicht mehr angeboten. Lade die Seite neu."
 
@@ -6480,11 +6480,11 @@ msgstr "Erzähle anderen von dir"
 msgid "Test email"
 msgstr "Test-E-Mail"
 
-#: src/commands/failure-message.ts:31
+#: src/commands/failure-message.ts:33
 msgid "That 1-on-1 is longer than the event allows."
 msgstr "Dieses 1:1-Gespräch ist länger, als die Veranstaltung erlaubt."
 
-#: src/commands/failure-message.ts:47
+#: src/commands/failure-message.ts:49
 msgid "That day is no longer part of this event."
 msgstr "Dieser Tag gehört nicht mehr zu dieser Veranstaltung."
 
@@ -6492,27 +6492,27 @@ msgstr "Dieser Tag gehört nicht mehr zu dieser Veranstaltung."
 msgid "That is more than {roomName} holds ({roomCapacity})."
 msgstr "Das ist mehr, als {roomName} fasst ({roomCapacity})."
 
-#: src/commands/failure-message.ts:44
+#: src/commands/failure-message.ts:46
 msgid "That length is not allowed for this event."
 msgstr "Diese Länge ist für diese Veranstaltung nicht erlaubt."
 
-#: src/commands/failure-message.ts:23
+#: src/commands/failure-message.ts:25
 msgid "That picture cannot be used."
 msgstr "Dieses Bild kann nicht verwendet werden."
 
-#: src/commands/failure-message.ts:46
+#: src/commands/failure-message.ts:48
 msgid "That room cannot be booked."
 msgstr "Dieser Raum kann nicht gebucht werden."
 
-#: src/commands/failure-message.ts:45
+#: src/commands/failure-message.ts:47
 msgid "That room is unavailable at that time."
 msgstr "Dieser Raum ist zu dieser Zeit nicht verfügbar."
 
-#: src/commands/failure-message.ts:26
+#: src/commands/failure-message.ts:28
 msgid "That slot has already passed."
 msgstr "Dieses Zeitfenster ist schon vorbei."
 
-#: src/commands/failure-message.ts:37
+#: src/commands/failure-message.ts:39
 msgid "That slot has already started."
 msgstr "Dieses Zeitfenster hat schon begonnen."
 
@@ -6520,15 +6520,15 @@ msgstr "Dieses Zeitfenster hat schon begonnen."
 msgid "That slot is no longer open for 1-on-1s."
 msgstr "Dieses Zeitfenster ist für 1:1-Gespräche nicht mehr offen."
 
-#: src/commands/failure-message.ts:25
+#: src/commands/failure-message.ts:27
 msgid "That slot is not available."
 msgstr "Dieses Zeitfenster ist nicht verfügbar."
 
-#: src/commands/failure-message.ts:42
+#: src/commands/failure-message.ts:44
 msgid "That start time has already passed."
 msgstr "Diese Startzeit ist schon vorbei."
 
-#: src/commands/failure-message.ts:43
+#: src/commands/failure-message.ts:45
 msgid "That time is outside the hours sessions can be booked."
 msgstr "Diese Zeit liegt außerhalb der Stunden, in denen Sessions gebucht werden können."
 
@@ -6556,7 +6556,7 @@ msgstr "Der gebuchte Anteil der offenen Zeit jedes Ortes: die Buchungsfenster de
 msgid "The chart could not load. The table below has the figures."
 msgstr "Das Diagramm konnte nicht geladen werden. Die Tabelle darunter enthält die Zahlen."
 
-#: src/commands/failure-message.ts:60
+#: src/commands/failure-message.ts:62
 msgid "The comment you replied to no longer exists."
 msgstr "Der Kommentar, auf den du geantwortet hast, existiert nicht mehr."
 
@@ -6625,7 +6625,7 @@ msgstr "Das gewählte Bild"
 msgid "The predicted columns come from the attendance model, fitted on one event: treat them as rough."
 msgstr "Die vorhergesagten Spalten stammen aus dem Teilnahmemodell, an einer Veranstaltung angepasst: Nimm sie als grob."
 
-#: src/commands/failure-message.ts:18
+#: src/commands/failure-message.ts:20
 msgid "The proposal phase is over."
 msgstr "Die Vorschlagsphase ist vorbei."
 
@@ -6673,7 +6673,7 @@ msgstr "Es gibt noch keine Veranstaltungen."
 msgid "There is a problem:"
 msgstr "Es gibt ein Problem:"
 
-#: src/commands/failure-message.ts:39
+#: src/commands/failure-message.ts:41
 msgid "There is nothing left to cancel."
 msgstr "Es gibt nichts mehr abzusagen."
 
@@ -6681,11 +6681,11 @@ msgstr "Es gibt nichts mehr abzusagen."
 msgid "There is nothing to measure this against yet — guessing at attendance needs the event's attendee list and {interestedEmoji} votes on its other proposals."
 msgstr "Es gibt noch nichts, womit sich das vergleichen ließe — für eine Schätzung der Teilnahme braucht es die Teilnehmendenliste der Veranstaltung und {interestedEmoji}-Stimmen für ihre anderen Vorschläge."
 
-#: src/commands/failure-message.ts:28
+#: src/commands/failure-message.ts:30
 msgid "They are not attending this event."
 msgstr "Diese Person nimmt nicht an dieser Veranstaltung teil."
 
-#: src/commands/failure-message.ts:27
+#: src/commands/failure-message.ts:29
 msgid "They are not available at that time."
 msgstr "Diese Person ist zu der Zeit nicht verfügbar."
 
@@ -6705,7 +6705,7 @@ msgstr "Drittes Viertel"
 msgid "This 1-on-1 is confirmed"
 msgstr "Dieses 1:1-Gespräch ist bestätigt"
 
-#: src/commands/failure-message.ts:34
+#: src/commands/failure-message.ts:36
 msgid "This 1-on-1 no longer exists."
 msgstr "Dieses 1:1-Gespräch gibt es nicht mehr."
 
@@ -6717,11 +6717,11 @@ msgstr "Dieses 1:1-Gespräch wurde abgesagt."
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
 msgstr "Dieser Browser kann keine Benachrichtigungen anzeigen. Du siehst weiterhin alles auf der Benachrichtigungsseite."
 
-#: src/commands/failure-message.ts:11
+#: src/commands/failure-message.ts:13
 msgid "This can only be changed during the scheduling phase."
 msgstr "Das lässt sich nur in der Planungsphase ändern."
 
-#: src/commands/failure-message.ts:12
+#: src/commands/failure-message.ts:14
 msgid "This can only be changed during the voting phase."
 msgstr "Das lässt sich nur in der Abstimmungsphase ändern."
 
@@ -6730,7 +6730,7 @@ msgstr "Das lässt sich nur in der Abstimmungsphase ändern."
 msgid "This cannot be undone."
 msgstr "Das kann nicht rückgängig gemacht werden."
 
-#: src/commands/failure-message.ts:59
+#: src/commands/failure-message.ts:61
 msgid "This comment no longer exists."
 msgstr "Diesen Kommentar gibt es nicht mehr."
 
@@ -6774,7 +6774,7 @@ msgstr "Dieser Anmeldelink ist ungültig. Fordere über die Namensauswahl oder d
 msgid "This might not have been saved. Check that it went through, then try again."
 msgstr "Das wurde möglicherweise nicht gespeichert. Prüfe, ob es geklappt hat, und versuche es dann erneut."
 
-#: src/commands/failure-message.ts:21
+#: src/commands/failure-message.ts:23
 msgid "This name is protected. Sign in with its password."
 msgstr "Dieser Name ist geschützt. Melde dich mit seinem Passwort an."
 
@@ -6806,11 +6806,11 @@ msgstr "Dieser Vorschlag wurde noch nicht eingeplant."
 msgid "This proposal is already on the schedule:"
 msgstr "Dieser Vorschlag steht schon im Programm:"
 
-#: src/commands/failure-message.ts:15
+#: src/commands/failure-message.ts:17
 msgid "This proposal is not looking for a host."
 msgstr "Dieser Vorschlag sucht keinen Host."
 
-#: src/commands/failure-message.ts:14
+#: src/commands/failure-message.ts:16
 msgid "This proposal no longer exists."
 msgstr "Diesen Vorschlag gibt es nicht mehr."
 
@@ -6826,7 +6826,7 @@ msgstr "Dieser Vorschlag wurde am <0>{day} um {time}</0> eingeplant."
 msgid "This proposal was scheduled several times:"
 msgstr "Dieser Vorschlag wurde mehrfach eingeplant:"
 
-#: src/commands/failure-message.ts:36
+#: src/commands/failure-message.ts:38
 msgid "This request has already been answered."
 msgstr "Diese Anfrage wurde schon beantwortet."
 
@@ -6838,11 +6838,11 @@ msgstr "Dieser Bildschirm funktioniert nicht mehr. Deine Daten sind sicher."
 msgid "This server cannot send email. Copy a personal link for each guest and share it yourself."
 msgstr "Dieser Server kann keine E-Mails senden. Kopiere für jeden Gast einen persönlichen Link und gib ihn selbst weiter."
 
-#: src/commands/failure-message.ts:53
+#: src/commands/failure-message.ts:55
 msgid "This session already has a host."
 msgstr "Diese Session hat schon einen Host."
 
-#: src/commands/failure-message.ts:54
+#: src/commands/failure-message.ts:56
 msgid "This session changed meanwhile. Check it and try again."
 msgstr "Diese Session hat sich inzwischen geändert. Prüfe sie und versuche es erneut."
 
@@ -6854,15 +6854,15 @@ msgstr "Diese Session überschneidet sich mit {list}. Willst du trotzdem zusagen
 msgid "This session has already started, so it can no longer be moved to another time — but you can still change everything else, including how long it runs."
 msgstr "Diese Session hat schon begonnen und kann daher nicht mehr auf eine andere Zeit verschoben werden — alles andere kannst du aber noch ändern, auch ihre Dauer."
 
-#: src/commands/failure-message.ts:50
+#: src/commands/failure-message.ts:52
 msgid "This session has already started, so it can no longer be moved."
 msgstr "Diese Session hat schon begonnen und kann daher nicht mehr verschoben werden."
 
-#: src/commands/failure-message.ts:9
+#: src/commands/failure-message.ts:11
 msgid "This session is full."
 msgstr "Diese Session ist voll."
 
-#: src/commands/failure-message.ts:52
+#: src/commands/failure-message.ts:54
 msgid "This session no longer exists."
 msgstr "Diese Session gibt es nicht mehr."
 
@@ -7574,7 +7574,7 @@ msgstr "Ja, absagen"
 msgid "Yes, mail all guests"
 msgstr "Ja, alle Gäste anmailen"
 
-#: src/commands/failure-message.ts:19
+#: src/commands/failure-message.ts:21
 msgid "You already host this proposal."
 msgstr "Du hostest diesen Vorschlag bereits."
 
@@ -7588,11 +7588,11 @@ msgstr "Du und alle Co-Hosts, die zugestimmt haben, diese Session mit dir zu hos
 msgid "You are hosting this session"
 msgstr "Du hostest diese Session"
 
-#: src/commands/failure-message.ts:38
+#: src/commands/failure-message.ts:40
 msgid "You are not part of this 1-on-1."
 msgstr "Du bist nicht Teil dieses 1:1-Gesprächs."
 
-#: src/commands/failure-message.ts:20
+#: src/commands/failure-message.ts:22
 msgid "You are not part of this event."
 msgstr "Du bist nicht Teil dieser Veranstaltung."
 
@@ -7608,7 +7608,7 @@ msgstr "Du bist jetzt Host von: {title}"
 msgid "You can still schedule here; just expect a smaller group."
 msgstr "Du kannst hier trotzdem einplanen; rechne nur mit einer kleineren Gruppe."
 
-#: src/commands/failure-message.ts:58
+#: src/commands/failure-message.ts:60
 msgid "You cannot remove this comment."
 msgstr "Du kannst diesen Kommentar nicht entfernen."
 
@@ -7616,7 +7616,7 @@ msgstr "Du kannst diesen Kommentar nicht entfernen."
 msgid "You declined this."
 msgstr "Du hast das abgelehnt."
 
-#: src/commands/failure-message.ts:29
+#: src/commands/failure-message.ts:31
 msgid "You have already asked them for that time."
 msgstr "Du hast sie schon um diese Zeit gebeten."
 
@@ -7629,7 +7629,7 @@ msgstr "Du hast noch keine Kommentare geschrieben."
 msgid "You have RSVP'd to this session"
 msgstr "Du hast dieser Session zugesagt"
 
-#: src/commands/failure-message.ts:30
+#: src/commands/failure-message.ts:32
 msgid "You have too many requests waiting for an answer. Wait for a reply, or cancel one first."
 msgstr "Du hast zu viele Anfragen, die auf eine Antwort warten. Warte auf eine Antwort oder sage zuerst eine ab."
 

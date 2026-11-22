@@ -122,6 +122,58 @@ describe("notices", () => {
     }
   });
 
+  it("clears every notice by itself, a failure later than news", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      render(
+        <NoticeProvider>
+          <Raiser notice={{ tone: "info", message: "Saved" }} />
+          <Raiser notice={{ tone: "failure", message: "Could not save" }} />
+        </NoticeProvider>
+      );
+
+      for (const button of screen.getAllByRole("button", { name: "Go" }))
+        await userEvent.click(button);
+      await act(() => vi.advanceTimersByTimeAsync(6000));
+      expect(screen.queryByRole("status")).toBeNull();
+      expect(screen.getByRole("alert")).toBeTruthy();
+
+      await act(() => vi.advanceTimersByTimeAsync(6000));
+      expect(screen.queryByRole("alert")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps a notice that needs an answer until it gets one", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      render(
+        <NoticeProvider>
+          <Raiser
+            notice={{ tone: "failure", message: "Unsure", sticky: true }}
+          />
+          <Raiser
+            notice={{
+              tone: "info",
+              message: "Undo?",
+              action: { label: "Undo", run: () => {} },
+            }}
+          />
+        </NoticeProvider>
+      );
+
+      for (const button of screen.getAllByRole("button", { name: "Go" }))
+        await userEvent.click(button);
+      await act(() => vi.advanceTimersByTimeAsync(60_000));
+
+      expect(screen.getByRole("alert")).toBeTruthy();
+      expect(screen.getByRole("status")).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("holds off dismissing while the pointer or focus is on the notice", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {

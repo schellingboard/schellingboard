@@ -1,7 +1,7 @@
 // @module-tag 009-US1
 import { describe, expect, it } from "vitest";
 
-import { failureMessage } from "./failure-message";
+import { failureMessage, failureNotice } from "./failure-message";
 
 const subject = "“Intro” (Mon 10:00, Room A)";
 const described = {
@@ -51,5 +51,19 @@ describe("failureMessage", () => {
     ).toBe(
       "Your request to RSVP to “Intro” (Mon 10:00, Room A) might not have been saved. Check that it went through, then try again."
     );
+  });
+});
+
+describe("failureNotice", () => {
+  it("keeps a might-not-have-been-saved notice up until it is read", () => {
+    expect(
+      failureNotice({ described, code: "network.unreachable", gaveUp: true })
+    ).toMatchObject({ tone: "failure", sticky: true });
+  });
+
+  it("lets a plain refusal go by itself", () => {
+    expect(
+      failureNotice({ described, code: "session.full", gaveUp: false })
+    ).toMatchObject({ tone: "failure", sticky: false });
   });
 });

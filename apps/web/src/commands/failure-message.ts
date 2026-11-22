@@ -1,6 +1,8 @@
 import { i18n, type MessageDescriptor } from "@lingui/core";
 import { msg, t } from "@lingui/core/macro";
 
+import type { Notice } from "../ui/notices";
+
 const CAPACITY_INVALID = msg`Max attendees must be a non-negative whole number`;
 
 export const capacityError = () => i18n._(CAPACITY_INVALID);
@@ -73,3 +75,10 @@ export function failureMessage({ described, code, gaveUp }: Failure): string {
     return `${described.unsure} ${t`Check that it went through, then try again.`}`;
   return `${described.failed} ${reasonFor(code) ?? t`Please try again.`}`;
 }
+
+/** The person must check a given-up command themselves, so its notice waits for them. */
+export const failureNotice = (failure: Failure): Notice => ({
+  tone: "failure",
+  message: failureMessage(failure),
+  sticky: failure.gaveUp,
+});

@@ -5,7 +5,7 @@ import {
 } from "@schellingboard/contracts/snapshot";
 import { useEffect, useRef, useState } from "react";
 
-import { failureMessage } from "../commands/failure-message";
+import { failureNotice } from "../commands/failure-message";
 import { newKey } from "../commands/keys";
 import { type CommandRunner, createCommandRunner } from "../commands/runner";
 import type { ReplicaPersistence } from "../replica/persistence";
@@ -84,11 +84,7 @@ export function useScheduleSession({
           store: opened.store,
           api,
           newKey,
-          onFailure: (failure) =>
-            latest.current.notify({
-              tone: "failure",
-              message: failureMessage(failure),
-            }),
+          onFailure: (failure) => latest.current.notify(failureNotice(failure)),
         });
         stop = () => {
           runner.stop();

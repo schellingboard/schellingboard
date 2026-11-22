@@ -14,9 +14,15 @@ export type Notice = {
   tone: "failure" | "info";
   message: string;
   action?: { label: string; run: () => void };
-  /** For routine news; a failure should stay until dismissed. */
+  /** Overrides the time a notice stays up, which by default grows with its length. */
   autoDismissMs?: number;
+  /** Stays until dismissed: for what the person must act on. A notice with an action always does. */
+  sticky?: boolean;
 };
+
+// A failure stays longer than news: missing it means not knowing a change was lost.
+const shownFor = ({ tone, message }: Notice) =>
+  (tone === "failure" ? 10_000 : 5_000) + Math.max(0, message.length - 60) * 50;
 
 type Shown = Notice & { id: number };
 type Notify = (notice: Notice) => void;
@@ -64,7 +70,11 @@ function Toast({
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const held = hovered || focused;
-  const { id, autoDismissMs } = notice;
+  const { id } = notice;
+  const autoDismissMs =
+    notice.sticky || notice.action
+      ? undefined
+      : (notice.autoDismissMs ?? shownFor(notice));
   useEffect(() => {
     if (!autoDismissMs || held) return;
     const timer = setTimeout(() => dismiss(id), autoDismissMs);

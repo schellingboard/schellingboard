@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { actingGuestRefusal } from "../commands/acting-guest-message";
-import { failureMessage } from "../commands/failure-message";
+import { failureNotice } from "../commands/failure-message";
 import { newKey } from "../commands/keys";
 import { meetingRequestCalls } from "../commands/meeting-request";
 import { profileFormCalls } from "../commands/profile-form";
@@ -75,8 +75,7 @@ function ProfileHost({
         store: createReplicaStore(blankSnapshot(new Date().toISOString())),
         api,
         newKey,
-        onFailure: (failure) =>
-          notify({ tone: "failure", message: failureMessage(failure) }),
+        onFailure: (failure) => notify(failureNotice(failure)),
       }),
     [api, notify]
   );
