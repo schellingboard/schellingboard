@@ -35,6 +35,9 @@ export const SHOWN_RELEASES = 3;
 
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: "Unreleased",
+  },
+  {
     version: "5.3.0",
     date: "2026-11-22",
   },

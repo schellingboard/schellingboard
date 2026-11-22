@@ -640,80 +640,28 @@ msgid "@handle, address, or URL"
 msgstr "@usuario, dirección o URL"
 
 #: src/app/release-highlights.ts
-msgid "**A faster, live schedule**: sessions open at once and changes to sessions, RSVP counts and rooms appear on everyone's screen without a reload. It also opens offline."
-msgstr "**Un programa más rápido y en vivo**: las sesiones se abren al instante y los cambios en sesiones, confirmaciones y salas aparecen en la pantalla de todos sin recargar. También funciona sin conexión."
-
-#: src/app/release-highlights.ts
 msgid "**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position."
 msgstr "**Un panel lateral para los detalles**: las sesiones, propuestas, 1 a 1 y perfiles se abren junto a la página, que conserva su búsqueda, filtros y posición de desplazamiento."
-
-#: src/app/release-highlights.ts
-msgid "**An API for scripts and integrations**: organizers can set up events, rooms, guests and sessions from a script, with a reference at `/api/v1/docs`."
-msgstr "**Una API para scripts e integraciones**: los organizadores pueden configurar eventos, salas, invitados y sesiones desde un script, con una referencia en `/api/v1/docs`."
-
-#: src/app/release-highlights.ts
-msgid "**Create a session from a proposal**: organizers turn a proposal into a session in one click, prefilled with its title, hosts and duration."
-msgstr "**Crea una sesión desde una propuesta**: los organizadores convierten una propuesta en sesión con un clic, con su título, anfitriones y duración ya rellenados."
-
-#: src/app/release-highlights.ts
-msgid "**Event statistics**: admins see how an event went in explained charts and searchable tables, with CSV download, and can leave out volunteer shifts or other sessions."
-msgstr "**Estadísticas del evento**: los administradores ven cómo fue un evento en gráficos explicados y tablas con búsqueda, con descarga en CSV, y pueden excluir turnos de voluntariado u otras sesiones."
-
-#: src/app/release-highlights.ts
-msgid "**Hosting on NixOS**: a NixOS module runs SchellingBoard as a system service."
-msgstr "**Alojamiento en NixOS**: un módulo de NixOS ejecuta SchellingBoard como servicio del sistema."
 
 #: src/app/release-highlights.ts
 msgid "**Know the phase**: a thin bar under the menu shows whether the event is in proposals, voting or scheduling."
 msgstr "**Conoce la fase**: una barra fina bajo el menú indica si el evento está en propuestas, votación o programación."
 
 #: src/app/release-highlights.ts
-msgid "**Live notifications**: the bell and the notification list update the moment something is sent, with no reload."
-msgstr "**Notificaciones en vivo**: la campana y la lista de notificaciones se actualizan en el momento en que se envía algo, sin recargar."
-
-#: src/app/release-highlights.ts
-msgid "**Location unavailability**: mark when a location can't be used, such as a room only free on Saturday, and attendees simply aren't offered those slots."
-msgstr "**Ubicaciones no disponibles**: indica cuándo no se puede usar una ubicación, por ejemplo una sala libre solo el sábado, y a los asistentes simplemente no se les ofrecerán esas franjas."
-
-#: src/app/release-highlights.ts
-msgid "**Longer 1-on-1s**: ask someone for 50 minutes instead of 20, or any length up to the event's longest session, as long as they are free for all of it."
-msgstr "**1 a 1 más largos**: pide 50 minutos en lugar de 20, o cualquier duración hasta la de la sesión más larga del evento, siempre que la otra persona esté libre todo ese tiempo."
-
-#: src/app/release-highlights.ts
-msgid "**Proposals that want a host**: hosts can ask for a co-host, a Host wanted filter finds those proposals and the ones with no host, and one click makes you a host."
-msgstr "**Propuestas que buscan anfitrión**: los anfitriones pueden pedir un coanfitrión, un filtro «Se busca anfitrión» encuentra esas propuestas y las que no tienen anfitrión, y con un clic te conviertes en anfitrión."
-
-#: src/app/release-highlights.ts
 msgid "**SchellingBoard in German, Spanish and Portuguese**: choose Deutsch, Español or Português in Settings or the footer, and the app, emails and notifications follow, on every device you use."
 msgstr "**SchellingBoard en alemán, español y portugués**: elige Deutsch, Español o Português en Ajustes o en el pie de página, y la aplicación, los correos y las notificaciones se adaptan, en todos tus dispositivos."
-
-#: src/app/release-highlights.ts
-msgid "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting."
-msgstr "**Busca y filtra el programa**: encuentra sesiones por cualquier cosa de su descripción, o reduce la cuadrícula y la agenda a las sesiones a las que has confirmado asistencia o que organizas."
 
 #: src/app/release-highlights.ts
 msgid "**See the schedule early**: attendees can browse, bookmark and hide sessions before scheduling opens, with RSVPs and booking switched on when it does."
 msgstr "**Consulta el programa con antelación**: los asistentes pueden explorar, guardar y ocultar sesiones antes de que se abra la programación; las confirmaciones y las reservas se activan cuando se abre."
 
 #: src/app/release-highlights.ts
-msgid "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote."
-msgstr "**Sesiones a cualquier minuto, con o sin descanso**: los organizadores pueden empezar una sesión cuando quieran y omitir el descanso previo a una, como una conferencia inaugural."
-
-#: src/app/release-highlights.ts
 msgid "**Shared moments**: organizers mark lunch or a keynote as a striped band across every room, so hosts see when most people are away, and can still book there."
 msgstr "**Momentos compartidos**: los organizadores marcan el almuerzo o una conferencia inaugural como una banda rayada que cruza todas las salas, para que los anfitriones vean cuándo la mayoría está ausente, y aun así pueden reservar ahí."
 
 #: src/app/release-highlights.ts
-msgid "**Site admins**: organizers make people site admins, who replace the shared admin password and sign in with a password or email code."
-msgstr "**Administradores del sitio**: los organizadores nombran administradores del sitio, que sustituyen la contraseña de administración compartida e inician sesión con una contraseña o un código por correo."
-
-#: src/app/release-highlights.ts
 msgid "**Spot clashes**: a Clashes filter lists your overlapping sessions and 1-on-1s, and clashing blocks get a warning icon."
 msgstr "**Detecta solapamientos**: un filtro «Solapamientos» lista tus sesiones y 1 a 1 que coinciden en el tiempo, y los bloques solapados muestran un icono de aviso."
-
-#: src/app/release-highlights.ts
-msgid "**Verified events and personal join links**: organizers choose whether attendees must prove who they are, and send each guest a link that signs them in."
-msgstr "**Eventos verificados y enlaces personales para unirse**: los organizadores deciden si los asistentes deben demostrar quién son y envían a cada invitado un enlace que inicia su sesión."
 
 #: src/features/proposals/quick-voting-screen.tsx
 msgid "← Proposals"
