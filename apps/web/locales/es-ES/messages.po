@@ -684,8 +684,8 @@ msgid "**Proposals that want a host**: hosts can ask for a co-host, a Host wante
 msgstr "**Propuestas que buscan anfitrión**: los anfitriones pueden pedir un coanfitrión, un filtro «Se busca anfitrión» encuentra esas propuestas y las que no tienen anfitrión, y con un clic te conviertes en anfitrión."
 
 #: src/app/release-highlights.ts
-msgid "**SchellingBoard in German**: choose Deutsch in Settings, and the app, emails and notifications follow, on every device you use."
-msgstr "**SchellingBoard en alemán**: elige Deutsch en Ajustes y la aplicación, los correos y las notificaciones lo seguirán, en todos tus dispositivos."
+msgid "**SchellingBoard in German, Spanish and Portuguese**: choose Deutsch, Español or Português in Settings or the footer, and the app, emails and notifications follow, on every device you use."
+msgstr "**SchellingBoard en alemán, español y portugués**: elige Deutsch, Español o Português en Ajustes o en el pie de página, y la aplicación, los correos y las notificaciones se adaptan, en todos tus dispositivos."
 
 #: src/app/release-highlights.ts
 msgid "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting."
@@ -1443,7 +1443,6 @@ msgstr "Los asistentes votan las propuestas."
 msgid "Authors"
 msgstr "Autores"
 
-#: src/app/language-select.tsx
 #: src/app/time-format.tsx
 msgid "Automatic"
 msgstr "Automático"

@@ -684,7 +684,7 @@ msgid "**Proposals that want a host**: hosts can ask for a co-host, a Host wante
 msgstr ""
 
 #: src/app/release-highlights.ts
-msgid "**SchellingBoard in German**: choose Deutsch in Settings, and the app, emails and notifications follow, on every device you use."
+msgid "**SchellingBoard in German, Spanish and Portuguese**: choose Deutsch, Español or Português in Settings or the footer, and the app, emails and notifications follow, on every device you use."
 msgstr ""
 
 #: src/app/release-highlights.ts
@@ -1443,7 +1443,6 @@ msgstr ""
 msgid "Authors"
 msgstr ""
 
-#: src/app/language-select.tsx
 #: src/app/time-format.tsx
 msgid "Automatic"
 msgstr ""

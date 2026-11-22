@@ -684,8 +684,8 @@ msgid "**Proposals that want a host**: hosts can ask for a co-host, a Host wante
 msgstr "**Proposals that want a host**: hosts can ask for a co-host, a Host wanted filter finds those proposals and the ones with no host, and one click makes you a host."
 
 #: src/app/release-highlights.ts
-msgid "**SchellingBoard in German**: choose Deutsch in Settings, and the app, emails and notifications follow, on every device you use."
-msgstr "**SchellingBoard in German**: choose Deutsch in Settings, and the app, emails and notifications follow, on every device you use."
+msgid "**SchellingBoard in German, Spanish and Portuguese**: choose Deutsch, Español or Português in Settings or the footer, and the app, emails and notifications follow, on every device you use."
+msgstr "**SchellingBoard in German, Spanish and Portuguese**: choose Deutsch, Español or Português in Settings or the footer, and the app, emails and notifications follow, on every device you use."
 
 #: src/app/release-highlights.ts
 msgid "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting."
@@ -1443,7 +1443,6 @@ msgstr "Attendees vote on the proposals."
 msgid "Authors"
 msgstr "Authors"
 
-#: src/app/language-select.tsx
 #: src/app/time-format.tsx
 msgid "Automatic"
 msgstr "Automatic"

@@ -4,7 +4,7 @@ import { msg } from "@lingui/core/macro";
 /** Source text is English; the dates live in the domain's `releaseNotes`. */
 export const releaseHighlights: Record<string, MessageDescriptor[]> = {
   Unreleased: [
-    msg`**SchellingBoard in German**: choose Deutsch in Settings, and the app, emails and notifications follow, on every device you use.`,
+    msg`**SchellingBoard in German, Spanish and Portuguese**: choose Deutsch, Español or Português in Settings or the footer, and the app, emails and notifications follow, on every device you use.`,
     msg`**Shared moments**: organizers mark lunch or a keynote as a striped band across every room, so hosts see when most people are away, and can still book there.`,
     msg`**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position.`,
   ],
