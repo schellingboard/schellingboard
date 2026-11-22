@@ -1469,7 +1469,7 @@ msgstr ""
 msgid "Available hours"
 msgstr ""
 
-#: src/ui/side-panel.tsx:208
+#: src/ui/side-panel.tsx:262
 msgctxt "Side panel: go to the previous panel"
 msgid "Back"
 msgstr ""
@@ -1903,7 +1903,7 @@ msgid "Clearing every slot is the same as switching this off."
 msgstr ""
 
 #: src/ui/dialog.tsx:118
-#: src/ui/side-panel.tsx:222
+#: src/ui/side-panel.tsx:276
 msgid "Close"
 msgstr ""
 
@@ -5431,7 +5431,7 @@ msgstr ""
 msgid "Reset to default"
 msgstr ""
 
-#: src/ui/side-panel.tsx:193
+#: src/ui/side-panel.tsx:247
 msgid "Resize panel"
 msgstr ""
 

@@ -85,6 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ([#204](https://github.com/schellingboard/schellingboard/issues/204)): the session form's
   proposal, room and start time, the "Who are you?" sign-in list and the statistics event picker
   narrow as you type. Times that are taken are no longer listed.
+- **Close the side panel with Esc or a click beside it**: Esc now works wherever you are, and a
+  click on an empty part of the page closes the panel too.
 - **Tab goes straight from a field to the text box**: the Edit, Preview and formatting buttons above
   descriptions and comments are one Tab stop; the arrow keys move between them.
 

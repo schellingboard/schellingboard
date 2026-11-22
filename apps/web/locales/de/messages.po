@@ -1469,7 +1469,7 @@ msgstr "Verfügbarkeit für 1:1-Gespräche"
 msgid "Available hours"
 msgstr "Verfügbare Stunden"
 
-#: src/ui/side-panel.tsx:208
+#: src/ui/side-panel.tsx:262
 msgctxt "Side panel: go to the previous panel"
 msgid "Back"
 msgstr "Zurück"
@@ -1903,7 +1903,7 @@ msgid "Clearing every slot is the same as switching this off."
 msgstr "Alle Zeitfenster zu leeren ist dasselbe wie das Ausschalten."
 
 #: src/ui/dialog.tsx:118
-#: src/ui/side-panel.tsx:222
+#: src/ui/side-panel.tsx:276
 msgid "Close"
 msgstr "Schließen"
 
@@ -5431,7 +5431,7 @@ msgstr "Link zum Zurücksetzen gesendet — prüfe deine E-Mails, um ein neues P
 msgid "Reset to default"
 msgstr "Auf Standard zurücksetzen"
 
-#: src/ui/side-panel.tsx:193
+#: src/ui/side-panel.tsx:247
 msgid "Resize panel"
 msgstr "Panelgröße ändern"
 

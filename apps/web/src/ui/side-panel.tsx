@@ -33,6 +33,31 @@ function storedWidth() {
   }
 }
 
+/* eslint-disable lingui/no-unlocalized-strings -- CSS selectors */
+const TEXT_FIELD =
+  "textarea, select, [contenteditable=''], [contenteditable=true], input:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=range])";
+const KEEPS_PANEL = [
+  "a[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "label",
+  "summary",
+  "[contenteditable]",
+  "[tabindex]",
+  "[role=button]",
+  "[role=link]",
+  "[role=option]",
+  "[role=listbox]",
+  "[role=menu]",
+  "[role=tooltip]",
+  "[role=dialog]",
+  "[role=status]",
+  "[role=alert]",
+].join(", ");
+/* eslint-enable lingui/no-unlocalized-strings */
+
 const openPanels = new Set<{ transient: boolean; close: () => void }>();
 
 type PanelGuard = {
@@ -137,12 +162,41 @@ export function SidePanel({
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented || anyDialogOpen()) return;
-      const target = e.target as Node;
-      if (target !== document.body && !ref.current?.contains(target)) return;
+      const target = e.target as Element;
+      if (!ref.current?.contains(target) && target.matches?.(TEXT_FIELD))
+        return;
       escape();
     };
+    // The page behind stays usable: a click on one of its controls does what
+    // the control does, and a click anywhere else closes the panel, unless the
+    // click itself moved on (a clickable row opening another panel).
+    let pending: ReturnType<typeof setTimeout> | undefined;
+    const onClick = (e: MouseEvent) => {
+      const target = e.target;
+      if (
+        e.button !== 0 ||
+        e.defaultPrevented ||
+        anyDialogOpen() ||
+        !(target instanceof Element) ||
+        !target.isConnected ||
+        target === document.documentElement ||
+        ref.current?.contains(target) ||
+        target.closest(KEEPS_PANEL)
+      )
+        return;
+      const at = window.location.href;
+      clearTimeout(pending);
+      pending = setTimeout(() => {
+        if (window.location.href === at) requestClose.current();
+      });
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("click", onClick);
+    return () => {
+      clearTimeout(pending);
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("click", onClick);
+    };
   }, [escape]);
 
   useEffect(() => {

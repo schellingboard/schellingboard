@@ -1469,7 +1469,7 @@ msgstr "Availability for 1-on-1s"
 msgid "Available hours"
 msgstr "Available hours"
 
-#: src/ui/side-panel.tsx:208
+#: src/ui/side-panel.tsx:262
 msgctxt "Side panel: go to the previous panel"
 msgid "Back"
 msgstr "Back"
@@ -1903,7 +1903,7 @@ msgid "Clearing every slot is the same as switching this off."
 msgstr "Clearing every slot is the same as switching this off."
 
 #: src/ui/dialog.tsx:118
-#: src/ui/side-panel.tsx:222
+#: src/ui/side-panel.tsx:276
 msgid "Close"
 msgstr "Close"
 
@@ -5431,7 +5431,7 @@ msgstr "Reset link sent — check your email to set a new password"
 msgid "Reset to default"
 msgstr "Reset to default"
 
-#: src/ui/side-panel.tsx:193
+#: src/ui/side-panel.tsx:247
 msgid "Resize panel"
 msgstr "Resize panel"
 

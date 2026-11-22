@@ -90,8 +90,8 @@ reply.
   are replies, a "Comment deleted" placeholder stays behind.
 - You can also delete comments left on your profile, or on a session or proposal you host. Site
   admins can delete any comment. The author is not notified.
-- Closing the panel with Esc or the close button while you have typed text asks "Discard what you
-  have typed?" first; choose Keep editing to carry on.
+- Closing the panel with Esc, the close button or a click beside it while you have typed text asks
+  "Discard what you have typed?" first; choose Keep editing to carry on.
 - **My comments** in your name menu lists every comment you wrote, newest first. Filter by sessions,
   proposals, profiles or event, search the text, and click a row to open the comment where it was
   written. Only you can see this list.
@@ -282,7 +282,8 @@ it, since anyone may still take it on.
 ### RSVP
 
 Click a session to see its details in a panel beside the schedule, and **RSVP**. Drag the panel's
-left edge to resize it, or use **Copy link** at its end to copy its link.
+left edge to resize it, or use **Copy link** at its end to copy its link. Esc, the close button or a
+click on an empty part of the page closes it.
 
 ![Session details panel with host, location, time, attendee list, and full description](../screenshots/session-details.webp)
 

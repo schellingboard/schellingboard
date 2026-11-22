@@ -12,6 +12,8 @@ afterEach(() => {
   document.documentElement.style.removeProperty("--side-panel-inset");
 });
 
+const tick = () => new Promise((resolve) => setTimeout(resolve));
+
 const panel = (props: Partial<Parameters<typeof SidePanel>[0]> = {}) => (
   <SidePanel label="Details" title="A title" onClose={() => {}} {...props}>
     body
@@ -88,7 +90,7 @@ describe("SidePanel", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("leaves Escape alone when focus is in the page behind", async () => {
+  it("leaves Escape to a text field in the page behind", async () => {
     const onClose = vi.fn();
     const field = document.createElement("input");
     document.body.append(field);
@@ -97,6 +99,45 @@ describe("SidePanel", () => {
     await userEvent.keyboard("{Escape}");
     expect(onClose).not.toHaveBeenCalled();
     field.remove();
+  });
+
+  it("closes on Escape with focus on a button in the page behind", async () => {
+    const onClose = vi.fn();
+    const button = document.createElement("button");
+    document.body.append(button);
+    render(panel({ onClose }));
+    button.focus();
+    await userEvent.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
+    button.remove();
+  });
+
+  it("closes on a press on an empty part of the page behind", async () => {
+    const onClose = vi.fn();
+    const page = document.createElement("div");
+    page.textContent = "page";
+    document.body.append(page);
+    render(panel({ onClose }));
+    await userEvent.click(screen.getByText("body"));
+    await tick();
+    expect(onClose).not.toHaveBeenCalled();
+    await userEvent.click(page);
+    await tick();
+    expect(onClose).toHaveBeenCalledTimes(1);
+    page.remove();
+  });
+
+  it("leaves a press on a control in the page behind to that control", async () => {
+    const onClose = vi.fn();
+    const link = document.createElement("a");
+    link.href = "#other";
+    link.textContent = "Other session";
+    document.body.append(link);
+    render(panel({ onClose }));
+    await userEvent.click(link);
+    await tick();
+    expect(onClose).not.toHaveBeenCalled();
+    link.remove();
   });
 
   it("moves focus in and returns it to the opener", () => {
