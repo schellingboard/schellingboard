@@ -2,6 +2,7 @@
 //
 //     bun scripts/check-commit-messages.ts            # origin/main..HEAD, or trunk()..@ in jj
 //     bun scripts/check-commit-messages.ts base..head # a git range, or a jj revset
+//     bun scripts/check-commit-messages.ts --commits sha1 sha2
 //     echo "feat: x" | bun scripts/check-commit-messages.ts --stdin
 
 import { execFileSync } from "node:child_process";
@@ -96,6 +97,16 @@ function gitLog(range: string): string {
   return git(["log", "--no-merges", "--format=%h%x00%B%x01", range]);
 }
 
+function gitCommits(shas: string[]): string {
+  return git([
+    "log",
+    "--no-walk",
+    "--no-merges",
+    "--format=%h%x00%B%x01",
+    ...shas,
+  ]);
+}
+
 function log(range: string): string {
   if (!usesJj) return gitLog(range);
   // An undescribed @ is work in progress, not yet a commit.
@@ -113,8 +124,8 @@ function log(range: string): string {
   }
 }
 
-function messagesIn(range: string): { id: string; message: string }[] {
-  return log(range)
+function parse(output: string): { id: string; message: string }[] {
+  return output
     .split("\x01")
     .map((entry) => entry.replace(/^\n/, ""))
     .filter((entry) => entry.trim() !== "")
@@ -125,11 +136,13 @@ function messagesIn(range: string): { id: string; message: string }[] {
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-  const arg = process.argv[2];
+  const [arg, ...shas] = process.argv.slice(2);
   const commits =
     arg === "--stdin"
       ? [{ id: "stdin", message: readFileSync(0, "utf8") }]
-      : messagesIn(arg ?? defaultRange());
+      : arg === "--commits"
+        ? parse(gitCommits(shas))
+        : parse(log(arg ?? defaultRange()));
 
   let failed = 0;
   for (const { id, message } of commits) {

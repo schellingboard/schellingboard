@@ -6,8 +6,9 @@
 - Subject line ≤ 72 chars; explain WHY in the body if not obvious
 - Wrap the body at 80 chars; a line with a URL, or one unbreakable word, may exceed it
 - `make commit-check` verifies the commits since `origin/main`, or `trunk()..@` in a jj repo
-  (`RANGE=a..b`, or a jj revset, for another range); CI runs it on pull requests. Check a draft
-  first with `echo "<message>" | bun scripts/check-commit-messages.ts --stdin`
+  (`RANGE=a..b`, or a jj revset, for another range); CI runs it on the pull request's own commits,
+  as the GitHub API lists them. Check a draft first with
+  `echo "<message>" | bun scripts/check-commit-messages.ts --stdin`
 - Before committing, run `make precommit`: it formats and lints the last change's files (jj `@`, or
   `@-` when `@` is empty; git's uncommitted changes, or `HEAD` when there are none), type checks,
   and runs the tests related to them and the E2E specs it changed. A change to tooling or test setup
