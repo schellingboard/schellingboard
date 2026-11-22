@@ -13,7 +13,6 @@ import {
   publicProfileListSchema,
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
-import { MIN_AVATAR_WIDTH } from "@schellingboard/domain/avatar-image";
 
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { pageOf } from "@/server/http/pagination";
@@ -41,7 +40,7 @@ const avatarForm = z.object({
     .instanceof(File)
     .openapi({ type: "string", format: "binary" })
     .describe(
-      `JPEG, PNG or WebP, at most ${MAX_IMAGE_BYTES / 1024 / 1024} MiB, at least ${MIN_AVATAR_WIDTH} px square`
+      `JPEG, PNG or WebP, at most ${MAX_IMAGE_BYTES / 1024 / 1024} MiB, any size; stored cropped to a square`
     ),
   expectedVersion,
 });

@@ -413,7 +413,12 @@ describe("/api/v1 profiles", () => {
 
       const res = await call("PUT", "/me/avatar", {
         cookie: asGuest(ada.id),
-        form: await avatarForm(64),
+        form: (() => {
+          const form = new FormData();
+          form.set("avatar", new File(["not a picture"], "me.png"));
+          form.set("expectedVersion", "1");
+          return form;
+        })(),
       });
       expect(res.status).toBe(400);
       expect(await res.json()).toMatchObject({

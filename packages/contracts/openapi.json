@@ -6163,7 +6163,7 @@
                   "avatar": {
                     "type": "string",
                     "format": "binary",
-                    "description": "JPEG, PNG or WebP, at most 5 MiB, at least 256 px square"
+                    "description": "JPEG, PNG or WebP, at most 15 MiB, any size; stored cropped to a square"
                   },
                   "expectedVersion": {
                     "type": "string",
@@ -9197,7 +9197,7 @@
                   "image": {
                     "type": "string",
                     "format": "binary",
-                    "description": "JPEG, PNG or WebP, at most 5 MiB, at least 400 px wide, 4:3"
+                    "description": "JPEG, PNG or WebP, at most 15 MiB, any size; stored cropped to 4:3"
                   },
                   "expectedVersion": {
                     "type": "string",

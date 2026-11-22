@@ -1,16 +1,13 @@
+import { AVATAR_MAX_SIZE } from "@schellingboard/domain/avatar-image";
+import { cropBox } from "@schellingboard/domain/image-crop";
 import {
-  AVATAR_MAX_SIZE,
-  coverSquareSize,
-  MIN_AVATAR_WIDTH,
-} from "@schellingboard/domain/avatar-image";
-import {
-  ASPECT_RATIO_TOLERANCE,
-  MIN_IMAGE_WIDTH,
-  REQUIRED_ASPECT_RATIO,
+  LOCATION_IMAGE_ASPECT_RATIO,
+  LOCATION_IMAGE_MAX_WIDTH,
+  MAX_IMAGE_BYTES,
 } from "@schellingboard/domain/location-image-constraints";
 import fs from "fs/promises";
 import path from "path";
-import sharp, { FormatEnum, Metadata, Sharp } from "sharp";
+import sharp, { FormatEnum, Metadata } from "sharp";
 
 import { uploadsDir } from "@/utils/uploads-dir";
 
@@ -27,12 +24,17 @@ const FORMAT_EXTENSIONS: Partial<Record<keyof FormatEnum, string>> = {
   webp: "webp",
 };
 
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+export { MAX_IMAGE_BYTES };
+
+// A decoded pixel costs memory whatever the file size, so a small file can
+// still be a decompression bomb. 50 MP admits a 48 MP phone photo.
+export const MAX_IMAGE_PIXELS = 50_000_000;
 
 export abstract class BaseImageResourceRepository<Id extends string> {
   readonly maxImageBytes = MAX_IMAGE_BYTES;
-  abstract readonly minImageWidth: number;
   abstract readonly directory: string;
+  protected abstract readonly aspectRatio: number;
+  protected abstract readonly maxWidth: number;
 
   get dirPath() {
     // These paths point at a runtime uploads volume, not build assets. The
@@ -59,11 +61,9 @@ export abstract class BaseImageResourceRepository<Id extends string> {
       };
     }
 
-    let decodedImage: Sharp;
     let metadata: Metadata;
     try {
-      decodedImage = sharp(buffer);
-      metadata = await decodedImage.metadata();
+      metadata = await sharp(buffer).metadata();
     } catch {
       return { error: "File is not a valid image" };
     }
@@ -72,38 +72,35 @@ export abstract class BaseImageResourceRepository<Id extends string> {
       [metadata.width, metadata.height] = [metadata.height, metadata.width];
     }
 
-    const { width, format } = metadata;
+    const { width, height, format } = metadata;
 
     const ext = FORMAT_EXTENSIONS[format];
 
     if (!ext) {
       return { error: "Unsupported image format (use JPEG, PNG, or WebP)" };
     }
-    if (width < this.minImageWidth) {
-      return { error: `Image is too small (min ${this.minImageWidth}px wide)` };
+    if (width * height > MAX_IMAGE_PIXELS) {
+      return {
+        error: `Image is too large (max ${MAX_IMAGE_PIXELS / 1_000_000} megapixels)`,
+      };
     }
 
     try {
-      const imageResult = this.decodeImage(decodedImage, metadata);
-
-      if ("error" in imageResult) {
-        return { error: imageResult.error };
-      }
-
-      // strips EXIF, ICC profiles, XMP, IPTC, GPS data, and other metadata from images
-      const newBuffer = await imageResult.ok.toBuffer();
+      const size = cropBox(width, height, this.aspectRatio, this.maxWidth);
+      // Re-encoding strips EXIF, ICC profiles, XMP, IPTC, GPS data and other
+      // metadata from images.
+      const newBuffer = await sharp(buffer, {
+        limitInputPixels: MAX_IMAGE_PIXELS,
+      })
+        .rotate()
+        .resize(size.width, size.height, { fit: "cover" })
+        .toFormat(format)
+        .toBuffer();
 
       return { ext, buffer: newBuffer };
     } catch {
       return { error: "Unable to decode image" };
     }
-  }
-
-  protected decodeImage(
-    image: Sharp,
-    metadata: Metadata
-  ): { ok: Sharp } | { error: string } {
-    return { ok: image.rotate().toFormat(metadata.format) };
   }
 
   /**
@@ -289,69 +286,18 @@ const CONTENT_TYPES: Record<string, string> = {
 
 export class AvatarImageResourceRepository extends BaseImageResourceRepository<string> {
   override directory = "avatars";
-
-  override minImageWidth = MIN_AVATAR_WIDTH;
+  protected override aspectRatio = 1;
+  protected override maxWidth = AVATAR_MAX_SIZE;
 
   protected override getEndpoint(filename: string): string {
     return `/media/avatars/${filename}`;
-  }
-
-  override decodeImage(
-    image: Sharp,
-    metadata: Metadata
-  ): { ok: Sharp } | { error: string } {
-    const decodeResult = super.decodeImage(image, metadata);
-
-    if ("error" in decodeResult) {
-      return decodeResult;
-    }
-
-    // Crop to a square without ever enlarging: upscaling invents no detail and
-    // only costs bytes, so a small upload stays at its own size.
-    const size = coverSquareSize(
-      AVATAR_MAX_SIZE,
-      metadata.width,
-      metadata.height
-    );
-
-    // The base check only looks at the width, which a flat panorama passes
-    // while its square crop lands well under the minimum.
-    if (size < MIN_AVATAR_WIDTH) {
-      return {
-        error: `Image is too small (min ${MIN_AVATAR_WIDTH}×${MIN_AVATAR_WIDTH}px)`,
-      };
-    }
-
-    return { ok: decodeResult.ok.resize(size, size, { fit: "cover" }) };
   }
 }
 
 export class LocationImageResourceRepository extends BaseImageResourceRepository<string> {
   override directory = "locations";
-
-  override minImageWidth = MIN_IMAGE_WIDTH;
-
-  override decodeImage(
-    image: Sharp,
-    metadata: Metadata
-  ): { ok: Sharp } | { error: string } {
-    const decodeResult = super.decodeImage(image, metadata);
-
-    if ("error" in decodeResult) {
-      return decodeResult;
-    }
-
-    const { width, height } = metadata;
-    const ratio = width / height;
-    const deviation = Math.abs(ratio - REQUIRED_ASPECT_RATIO);
-    if (deviation > REQUIRED_ASPECT_RATIO * ASPECT_RATIO_TOLERANCE) {
-      return {
-        error: `Image must have a 4:3 aspect ratio (got ${width}×${height})`,
-      };
-    }
-
-    return decodeResult;
-  }
+  protected override aspectRatio = LOCATION_IMAGE_ASPECT_RATIO;
+  protected override maxWidth = LOCATION_IMAGE_MAX_WIDTH;
 
   protected override getEndpoint(filename: string): string {
     return `/media/locations/${filename}`;

@@ -362,24 +362,24 @@ describe("keeping photo files in step with profiles", () => {
 
 describe("uploading a photo", () => {
   it(
-    "refuses an image too small to crop, after checking who is asking",
+    "refuses a file that is no picture, after checking who is asking",
     { tags: ["011-US2"] },
     async () => {
       const ada = await createGuest({ name: "Ada" });
-      const small = await png(64);
+      const garbage = Buffer.from("not a picture");
 
       expect(
         code(
           await people().replaceMyAvatar(
             NOBODY,
-            { image: small, expectedVersion: 1 },
+            { image: garbage, expectedVersion: 1 },
             now()
           )
         )
       ).toBe("guest.unselected");
       const refused = await people().replaceMyAvatar(
         open(ada.id),
-        { image: small, expectedVersion: ada.profileVersion },
+        { image: garbage, expectedVersion: ada.profileVersion },
         now()
       );
       expect(refused).toMatchObject({

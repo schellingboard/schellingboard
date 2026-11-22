@@ -73,6 +73,10 @@ test.describe("Edit profile", () => {
       mimeType: "image/png",
       buffer: await makeImage(800, 800),
     });
+    await page
+      .getByRole("dialog", { name: "Choose the part to show" })
+      .getByRole("button", { name: "Use this part" })
+      .click();
     await page.getByRole("button", { name: /^Save$/ }).click();
 
     // Saving closes the form over the directory; Alice's profile shows the new
@@ -439,35 +443,6 @@ test("summarizes validation errors next to the Save button @011-US1", async ({
   await summary.getByRole("button", { name: /Keep language names/ }).click();
   await expect(addLanguage).toBeVisible();
   await expect(language).toBeFocused();
-});
-
-test("sends a rejected picture back to the picker that chose it @011-US2", async ({
-  page,
-}) => {
-  await login(page);
-  await page.goto("/Conference-Alpha/proposals");
-
-  await selectUser(page, "Alice Test");
-  await page.getByRole("link", { name: "Attendees", exact: true }).click();
-  await page.getByRole("link", { name: /Edit profile/i }).click();
-
-  // hidden inputs aren't interactable through `getByLabel` in playwright
-  await page.locator('input[type="file"]').setInputFiles({
-    name: "tiny.png",
-    mimeType: "image/png",
-    buffer: await makeImage(100, 100),
-  });
-  await page.getByRole("button", { name: /^Save$/ }).click();
-
-  const summary = page.getByRole("alert").filter({ hasText: /problem/ });
-  await expect(summary).toContainText("Image is too small");
-
-  // The file input behind the picture is hidden, so nothing can be focused
-  // there: the jump has to land on the visible picker instead.
-  await summary.getByRole("button", { name: /Image is too small/ }).click();
-  await expect(
-    page.getByRole("button", { name: /Change profile picture/ })
-  ).toBeFocused();
 });
 
 test("shows an error on the edit page when no user is selected @011-US1", async ({

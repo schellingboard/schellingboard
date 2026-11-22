@@ -8,8 +8,9 @@ import {
   type LocationColorName,
 } from "@schellingboard/domain/location-colors";
 import {
+  LOCATION_IMAGE_ASPECT_RATIO,
+  LOCATION_IMAGE_MAX_WIDTH,
   MAX_IMAGE_BYTES,
-  MIN_IMAGE_WIDTH,
 } from "@schellingboard/domain/location-image-constraints";
 import { type FormEvent, useRef, useState } from "react";
 
@@ -27,8 +28,11 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { ImageCropDialog } from "../../ui/image-crop-dialog";
+import { ImagePreview } from "../../ui/image-preview";
 import type { OnParams } from "../../ui/list-paging";
 import { LocationPlaceholder } from "../../ui/location-placeholder";
+import { cropFile } from "../../ui/resize-image";
 import { usePaging } from "../../ui/use-paging";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { useRowMode } from "./row-mode";
@@ -92,6 +96,7 @@ function LocationForm({
   const [bookable, setBookable] = useState(location?.bookable ?? false);
   const [eventIds, setEventIds] = useState(location?.eventIds ?? []);
   const [image, setImage] = useState<File>();
+  const [cropping, setCropping] = useState<File>();
   const [checking, setChecking] = useState(false);
   const [imageRefused, setImageRefused] = useState(false);
   const [created, setCreated] = useState(false);
@@ -278,23 +283,52 @@ function LocationForm({
         </fieldset>
       )}
       <div className="space-y-1">
-        {location?.imageUrl && (
-          <img
-            src={location.imageUrl}
-            alt={t`Current image of ${locationName}`}
+        {image ? (
+          <ImagePreview
+            file={image}
+            label={t`New image of ${locationName}`}
             width={160}
             height={120}
             className="rounded border border-line-subtle"
           />
+        ) : (
+          location?.imageUrl && (
+            <img
+              src={location.imageUrl}
+              alt={t`Current image of ${locationName}`}
+              width={160}
+              height={120}
+              className="rounded border border-line-subtle"
+            />
+          )
         )}
         <FileField
           label={t`Image`}
           name="image"
           accept="image/jpeg,image/png,image/webp"
-          hint={t`JPEG, PNG, or WebP, max ${maxImageMb} MB, at least ${MIN_IMAGE_WIDTH}px wide, 4:3 aspect ratio (e.g. 800×600)`}
-          onChange={setImage}
+          hint={t`JPEG, PNG, or WebP, max ${maxImageMb} MB. You choose the part to show, in 4:3.`}
+          onChange={(file) => (file ? setCropping(file) : setImage(undefined))}
           error={fields.image}
         />
+        {cropping && (
+          <ImageCropDialog
+            file={cropping}
+            aspectRatio={LOCATION_IMAGE_ASPECT_RATIO}
+            onConfirm={(region) => {
+              setCropping(undefined);
+              if (!region) return setImage(cropping);
+              void cropFile(
+                cropping,
+                {
+                  aspectRatio: LOCATION_IMAGE_ASPECT_RATIO,
+                  maxWidth: LOCATION_IMAGE_MAX_WIDTH,
+                },
+                region
+              ).then(setImage);
+            }}
+            onCancel={() => setCropping(undefined)}
+          />
+        )}
       </div>
       <FormErrorSummary
         fields={fields}

@@ -97,7 +97,7 @@ The event's "Locations" tab assigns rooms from this pool and sets
 - **Bookable** — whether attendees can self-book blank slots here. A location that isn't bookable
   still shows on the grid and you can schedule sessions into it yourself; attendees just can't pick
   it.
-- **Image** — JPEG/PNG/WebP, max 5 MB, min 400px wide, **must be 4:3** (±2% tolerance).
+- **Image** — JPEG/PNG/WebP, max 15 MB, any size. It is cropped to 4:3 around its centre.
 - **Sort order** — controls column order in the grid.
 - **Deleting a location** requires typing the name to confirm; the dialog shows how many
   sessions/events reference it before it cascades. The hosts of sessions in it and the guests who

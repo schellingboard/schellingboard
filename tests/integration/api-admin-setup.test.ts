@@ -484,13 +484,16 @@ describe("/api/v1/admin locations", () => {
       );
       vi.stubEnv("SB_UPLOADS_DIR", uploadsDir);
       const room = await createLocation({ name: "Hall" });
-      const upload = async (width: number, expectedVersion: number) => {
+      const upload = async (expectedVersion: number, image?: File) => {
         const form = new FormData();
-        form.set("image", await createImageFile(width, 600, "room.png"));
+        form.set(
+          "image",
+          image ?? (await createImageFile(800, 600, "room.png"))
+        );
         form.set("expectedVersion", String(expectedVersion));
         return call("PUT", `/admin/locations/${room.id}/image`, { form });
       };
-      const replaced = await upload(800, room.version);
+      const replaced = await upload(room.version);
       expect(replaced.status).toBe(200);
       const body = (await replaced.json()) as { imageUrl: string };
       expect(body).toMatchObject({
@@ -504,14 +507,17 @@ describe("/api/v1/admin locations", () => {
       );
       expect(fs.existsSync(file)).toBe(true);
 
-      const stale = await upload(800, room.version);
+      const stale = await upload(room.version);
       expect(stale.status).toBe(409);
       expect(await stale.json()).toMatchObject({
         code: "location.versionConflict",
       });
-      const wrongShape = await upload(600, room.version + 1);
-      expect(wrongShape.status).toBe(400);
-      expect(await wrongShape.json()).toMatchObject({
+      const notAnImage = await upload(
+        room.version + 1,
+        new File(["not a picture"], "room.png", { type: "image/png" })
+      );
+      expect(notAnImage.status).toBe(400);
+      expect(await notAnImage.json()).toMatchObject({
         code: "location.imageInvalid",
       });
       const byGuest = await call(

@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Upload pictures of any size and shape**: pick the part of a profile or room picture to show by
+  moving and resizing a frame; it is no longer refused for its size or aspect ratio.
 - **The session, proposal and profile forms open in a side panel**: you keep your place, and closing
   over typed text asks before discarding it.
 - **1-on-1s are mentioned only where an event offers them**: the phase bar, the Clashes hint and

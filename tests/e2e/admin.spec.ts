@@ -2156,24 +2156,27 @@ test.describe("Admin UI locations", () => {
     await region.getByRole("button", { name: "New location" }).click();
     await region.getByLabel("Name*").fill(name);
 
-    // An image without the 4:3 aspect ratio is rejected
-    await region.getByLabel("Image").setInputFiles({
-      name: "square.png",
+    await region.getByLabel("Image", { exact: true }).setInputFiles({
+      name: "room.png",
       mimeType: "image/png",
-      buffer: await makeImage(800, 800),
+      buffer: Buffer.from("not a picture"),
     });
+    const crop = page.getByRole("dialog", { name: "Choose the part to show" });
+    await expect(crop.getByText("cannot be shown here")).toBeVisible();
+    await crop.getByRole("button", { name: "Use this part" }).click();
     await region.getByRole("button", { name: "Add location" }).click();
     // Reported inline and repeated in the summary by the submit button.
     await expect(
-      page.getByText("Image must have a 4:3 aspect ratio (got 800×800)").first()
+      page.getByText("File is not a valid image").first()
     ).toBeVisible();
 
-    // A valid 4:3 image is accepted and shown in the list
-    await region.getByLabel("Image").setInputFiles({
+    // Any shape is accepted: the organizer picks the 4:3 part to keep.
+    await region.getByLabel("Image", { exact: true }).setInputFiles({
       name: "room.png",
       mimeType: "image/png",
-      buffer: await makeImage(800, 600),
+      buffer: await makeImage(800, 800),
     });
+    await crop.getByRole("button", { name: "Use this part" }).click();
     // The location was kept without its image, so the form now saves it.
     await region.getByRole("button", { name: "Save", exact: true }).click();
     const row = region.getByRole("listitem").filter({ hasText: name });

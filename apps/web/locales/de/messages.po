@@ -637,7 +637,7 @@ msgstr "{where, select, place {Deine Änderung an einem Kommentar zu {place} wur
 msgid "{withoutEmail, plural, one {# has no email.} other {# have no email.}}"
 msgstr "{withoutEmail, plural, one {# hat keine E-Mail.} other {# haben keine E-Mail.}}"
 
-#: src/features/people/profile-form.tsx:588
+#: src/features/people/profile-form.tsx:615
 msgid "@handle, address, or URL"
 msgstr "@Handle, Adresse oder URL"
 
@@ -936,7 +936,7 @@ msgstr "Ein Ritual, das mich bei Verstand hält"
 msgid "A rule I always break"
 msgstr "Eine Regel, die ich immer breche"
 
-#: src/features/people/profile-form.tsx:465
+#: src/features/people/profile-form.tsx:492
 msgid "A sentence or two"
 msgstr "Ein oder zwei Sätze"
 
@@ -1034,7 +1034,7 @@ msgstr "Zu {title}"
 
 #: src/features/admin/stats-text.ts:287
 #: src/features/people/profile-body.tsx:180
-#: src/features/people/profile-form.tsx:391
+#: src/features/people/profile-form.tsx:418
 msgid "About me"
 msgstr "Über mich"
 
@@ -1117,7 +1117,7 @@ msgstr "Eine Zeile Kontext hinzufügen (optional)"
 msgid "Add a session"
 msgstr "Session hinzufügen"
 
-#: src/features/people/profile-form.tsx:613
+#: src/features/people/profile-form.tsx:640
 msgid "Add contact"
 msgstr "Kontakt hinzufügen"
 
@@ -1130,11 +1130,11 @@ msgstr "Tag hinzufügen"
 msgid "Add label"
 msgstr "Label hinzufügen"
 
-#: src/features/people/profile-form.tsx:534
+#: src/features/people/profile-form.tsx:561
 msgid "Add language"
 msgstr "Sprache hinzufügen"
 
-#: src/features/admin/locations-screen.tsx:527
+#: src/features/admin/locations-screen.tsx:561
 msgid "Add location"
 msgstr "Ort hinzufügen"
 
@@ -1178,7 +1178,7 @@ msgstr "Als Co-Host hinzugefügt"
 #: src/features/admin/event-moments.tsx:196
 #: src/features/admin/guests-screen.tsx:188
 #: src/features/admin/location-availability.tsx:187
-#: src/features/admin/locations-screen.tsx:528
+#: src/features/admin/locations-screen.tsx:562
 msgid "Adding..."
 msgstr "Wird hinzugefügt …"
 
@@ -1265,7 +1265,7 @@ msgstr "Immer dunkle Farben verwenden"
 msgid "Always use light colours"
 msgstr "Immer helle Farben verwenden"
 
-#: src/features/admin/locations-screen.tsx:47
+#: src/features/admin/locations-screen.tsx:51
 msgctxt "Location colour"
 msgid "Amber"
 msgstr "Bernstein"
@@ -1294,7 +1294,7 @@ msgstr "Eine ungewöhnliche Gewohnheit, die für mich funktioniert"
 msgid "Another session already uses that room at that time."
 msgstr "Eine andere Session nutzt diesen Raum zu dieser Zeit schon."
 
-#: src/features/people/profile-form.tsx:82
+#: src/features/people/profile-form.tsx:87
 msgid "Any pronouns"
 msgstr "Beliebige Pronomen"
 
@@ -1314,7 +1314,7 @@ msgstr "Darstellung (dieses Gerät)"
 msgid "Applies to sessions booked from now on."
 msgstr "Gilt für Sessions, die ab jetzt gebucht werden."
 
-#: src/features/admin/locations-screen.tsx:213
+#: src/features/admin/locations-screen.tsx:218
 msgid "Area description"
 msgstr "Beschreibung des Bereichs"
 
@@ -1335,7 +1335,7 @@ msgstr "Anfragen"
 msgid "Ask {name}"
 msgstr "{name} anfragen"
 
-#: src/features/people/profile-form.tsx:83
+#: src/features/people/profile-form.tsx:88
 msgid "Ask me"
 msgstr "Frag mich"
 
@@ -1491,7 +1491,7 @@ msgstr "Direkt aufeinanderfolgende Paare"
 #. Chart axis: place where members are based
 #: src/features/admin/stats-figures.tsx:204
 #: src/features/admin/stats-text.ts:289
-#: src/features/people/profile-form.tsx:383
+#: src/features/people/profile-form.tsx:410
 msgid "Based in"
 msgstr "Wohnort"
 
@@ -1578,7 +1578,7 @@ msgstr "Sperren"
 msgid "Blue"
 msgstr "Blau"
 
-#: src/features/admin/locations-screen.tsx:55
+#: src/features/admin/locations-screen.tsx:59
 msgctxt "Location colour"
 msgid "Blue"
 msgstr "Blau"
@@ -1599,11 +1599,11 @@ msgid "Book Open"
 msgstr "Offenes Buch"
 
 #. Adjective in a lowercase details list
-#: src/features/admin/locations-screen.tsx:372
+#: src/features/admin/locations-screen.tsx:406
 msgid "bookable"
 msgstr "buchbar"
 
-#: src/features/admin/locations-screen.tsx:246
+#: src/features/admin/locations-screen.tsx:251
 #: src/features/admin/stats-text.ts:137
 msgid "Bookable"
 msgstr "Buchbar"
@@ -1714,16 +1714,17 @@ msgstr "Kalender"
 #: src/features/admin/guests-screen.tsx:313
 #: src/features/admin/guests-screen.tsx:445
 #: src/features/admin/join-links.tsx:145
-#: src/features/admin/locations-screen.tsx:309
+#: src/features/admin/locations-screen.tsx:343
 #: src/features/comments/comments-section.tsx:586
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
-#: src/features/people/profile-form.tsx:637
+#: src/features/people/profile-form.tsx:664
 #: src/features/proposals/proposal-form.tsx:333
 #: src/features/proposals/proposal-form.tsx:346
 #: src/features/sessions/session-form.tsx:801
 #: src/features/sessions/session-form.tsx:828
 #: src/features/sign-in/account-security.tsx:274
+#: src/ui/image-crop-dialog.tsx:128
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -1742,7 +1743,7 @@ msgstr "Abgesagt"
 
 #: src/features/admin/event-locations.tsx:36
 #: src/features/admin/event-sessions.tsx:233
-#: src/features/admin/locations-screen.tsx:193
+#: src/features/admin/locations-screen.tsx:198
 #: src/features/admin/stats-text.ts:136
 msgid "Capacity"
 msgstr "Kapazität"
@@ -1752,7 +1753,7 @@ msgid "Capacity by location"
 msgstr "Kapazität nach Ort"
 
 #: src/features/admin/admin-session-model.ts:126
-#: src/features/admin/locations-screen.tsx:108
+#: src/features/admin/locations-screen.tsx:113
 msgid "Capacity must be a non-negative whole number"
 msgstr "Die Kapazität muss eine nicht negative ganze Zahl sein"
 
@@ -1765,7 +1766,7 @@ msgstr "Kapazität: {capacity}"
 msgid "Change password"
 msgstr "Passwort ändern"
 
-#: src/features/people/profile-form.tsx:329
+#: src/features/people/profile-form.tsx:344
 msgid "Change profile picture"
 msgstr "Profilbild ändern"
 
@@ -1828,6 +1829,10 @@ msgstr "Wähle ein Passwort. Du bist mit deinem persönlichen Link angemeldet, d
 msgid "Choose or type where to meet."
 msgstr "Wähle oder gib ein, wo ihr euch trefft."
 
+#: src/ui/image-crop-dialog.tsx:85
+msgid "Choose the part to show"
+msgstr "Ausschnitt wählen"
+
 #: src/features/schedule/schedule-filters.tsx:290
 msgid "Choose what My schedule shows"
 msgstr "Wähle, was „Mein Programm“ zeigt"
@@ -1844,7 +1849,7 @@ msgstr "Wähle, wer du bist, und melde dich an, falls dein Name geschützt ist, 
 msgid "Choose…"
 msgstr "Auswählen …"
 
-#: src/features/people/profile-form.tsx:387
+#: src/features/people/profile-form.tsx:414
 msgid "City, region, or country"
 msgstr "Stadt, Region oder Land"
 
@@ -1983,7 +1988,7 @@ msgid "Collapse comment"
 msgstr "Kommentar einklappen"
 
 #. Field: the colour of a location on the schedule
-#: src/features/admin/locations-screen.tsx:229
+#: src/features/admin/locations-screen.tsx:234
 msgid "Color"
 msgstr "Farbe"
 
@@ -2132,18 +2137,18 @@ msgctxt "Profile section: how to reach the person"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/features/people/profile-form.tsx:544
+#: src/features/people/profile-form.tsx:571
 msgid "Contact details"
 msgstr "Kontaktdaten"
 
-#: src/features/people/profile-form.tsx:572
+#: src/features/people/profile-form.tsx:599
 msgid "Contact label"
 msgstr "Kontaktbezeichnung"
 
 #. Chart axis: kind of contact a member gave
 #: src/features/admin/stats-figures.tsx:208
 #: src/features/admin/stats-text.ts:186
-#: src/features/people/profile-form.tsx:560
+#: src/features/people/profile-form.tsx:587
 msgid "Contact type"
 msgstr "Kontaktart"
 
@@ -2151,7 +2156,7 @@ msgstr "Kontaktart"
 msgid "Contact types used"
 msgstr "Verwendete Kontaktarten"
 
-#: src/features/people/profile-form.tsx:583
+#: src/features/people/profile-form.tsx:610
 msgid "Contact value"
 msgstr "Kontaktwert"
 
@@ -2159,7 +2164,7 @@ msgstr "Kontaktwert"
 msgid "Contacts"
 msgstr "Kontakte"
 
-#: src/features/people/profile-form.tsx:400
+#: src/features/people/profile-form.tsx:427
 msgid "Conversation starters"
 msgstr "Gesprächsanregungen"
 
@@ -2287,7 +2292,7 @@ msgid "Could not load the labels."
 msgstr "Die Labels konnten nicht geladen werden."
 
 #: src/app/admin-pages.tsx:467
-#: src/features/admin/locations-screen.tsx:508
+#: src/features/admin/locations-screen.tsx:542
 msgid "Could not load the locations."
 msgstr "Die Orte konnten nicht geladen werden."
 
@@ -2481,7 +2486,7 @@ msgstr "CSV"
 msgid "CSV file"
 msgstr "CSV-Datei"
 
-#: src/features/admin/locations-screen.tsx:284
+#: src/features/admin/locations-screen.tsx:298
 msgid "Current image of {locationName}"
 msgstr "Aktuelles Bild von {locationName}"
 
@@ -2497,7 +2502,7 @@ msgstr "Aktuelles Passwort"
 msgid "Currently obsessed with"
 msgstr "Gerade besessen von"
 
-#: src/features/admin/locations-screen.tsx:53
+#: src/features/admin/locations-screen.tsx:57
 msgctxt "Location colour"
 msgid "Cyan"
 msgstr "Cyan"
@@ -2569,7 +2574,7 @@ msgstr "Abgelehnt"
 #: src/features/admin/event-sessions.tsx:586
 #: src/features/admin/guests-screen.tsx:474
 #: src/features/admin/location-availability.tsx:68
-#: src/features/admin/locations-screen.tsx:458
+#: src/features/admin/locations-screen.tsx:492
 #: src/features/comments/comments-section.tsx:348
 #: src/features/comments/comments-section.tsx:397
 #: src/features/notifications/notifications-screen.tsx:174
@@ -2653,11 +2658,11 @@ msgstr "Nicht verfügbare Zeit {roomName} {from} – {until} löschen"
 msgid "Deleted, kept for replies"
 msgstr "Gelöscht, wegen Antworten behalten"
 
-#: src/features/admin/locations-screen.tsx:389
+#: src/features/admin/locations-screen.tsx:423
 msgid "Deleting “{name}” removes it from {sessionCount, plural, one {# session} other {# sessions}} and {eventCount, plural, one {# event} other {# events}}. Hosts and RSVPed guests of those sessions are told. This cannot be undone. Type the location name to confirm."
 msgstr "Das Löschen von „{name}“ entfernt den Ort aus {sessionCount, plural, one {# Session} other {# Sessions}} und {eventCount, plural, one {# Veranstaltung} other {# Veranstaltungen}}. Hosts und Gäste mit Zusage dieser Sessions werden informiert. Das kann nicht rückgängig gemacht werden. Gib zur Bestätigung den Namen des Ortes ein."
 
-#: src/features/admin/locations-screen.tsx:396
+#: src/features/admin/locations-screen.tsx:430
 msgid "Deleting “{name}” removes it from {sessionCount, plural, one {# session} other {# sessions}} and {eventCount, plural, one {# event} other {# events}}. This cannot be undone. Type the location name to confirm."
 msgstr "Das Löschen von „{name}“ entfernt den Ort aus {sessionCount, plural, one {# Session} other {# Sessions}} und {eventCount, plural, one {# Veranstaltung} other {# Veranstaltungen}}. Das kann nicht rückgängig gemacht werden. Gib zur Bestätigung den Namen des Ortes ein."
 
@@ -2681,7 +2686,7 @@ msgstr "Beschreibe, worum es in deiner Session geht"
 #: src/features/admin/event-proposals.tsx:109
 #: src/features/admin/event-sessions.tsx:168
 #: src/features/admin/events-screen.tsx:99
-#: src/features/admin/locations-screen.tsx:204
+#: src/features/admin/locations-screen.tsx:209
 #: src/features/admin/settings-screen.tsx:84
 #: src/features/proposals/proposal-form.tsx:236
 #: src/features/proposals/proposals-screen.tsx:421
@@ -2762,6 +2767,10 @@ msgstr "Alle herunterladen"
 msgid "Download CSV of {tableTitle}"
 msgstr "CSV von {tableTitle} herunterladen"
 
+#: src/ui/image-crop-dialog.tsx:87
+msgid "Drag the frame to move it, or drag its corners to make it bigger or smaller."
+msgstr "Zieh den Rahmen, um ihn zu verschieben, oder seine Ecken, um ihn zu vergrößern oder zu verkleinern."
+
 #: src/features/admin/event-sessions.tsx:579
 msgid "Duplicate"
 msgstr "Duplizieren"
@@ -2835,7 +2844,7 @@ msgstr "Jeder Gast erhält per E-Mail einen persönlichen Link. Er ersetzt den b
 #: src/features/admin/event-proposals.tsx:314
 #: src/features/admin/event-sessions.tsx:572
 #: src/features/admin/guests-screen.tsx:451
-#: src/features/admin/locations-screen.tsx:455
+#: src/features/admin/locations-screen.tsx:489
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:198
 #: src/features/proposals/proposals-screen.tsx:671
@@ -2929,7 +2938,7 @@ msgstr "E-Mail oder Benutzername"
 msgid "Email settings"
 msgstr "E-Mail-Einstellungen"
 
-#: src/features/admin/locations-screen.tsx:51
+#: src/features/admin/locations-screen.tsx:55
 msgctxt "Location colour"
 msgid "Emerald"
 msgstr "Smaragd"
@@ -3056,7 +3065,7 @@ msgstr "Veranstaltungsbereiche"
 #: src/features/admin/event-layout.tsx:90
 #: src/features/admin/events-screen.tsx:200
 #: src/features/admin/guests-screen.tsx:42
-#: src/features/admin/locations-screen.tsx:255
+#: src/features/admin/locations-screen.tsx:260
 msgid "Events"
 msgstr "Veranstaltungen"
 
@@ -3072,7 +3081,7 @@ msgstr "Danach stimmen alle über die Vorschläge ab, und die beliebtesten komme
 msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
 msgstr "Alles hier ist privat und wird anderen Teilnehmenden nie angezeigt. Dein <0>öffentliches Profil</0> bearbeitest du separat."
 
-#: src/features/people/profile-form.tsx:298
+#: src/features/people/profile-form.tsx:313
 msgid "Everything here is shown on your public profile. Email notifications and other private preferences live in <0>Settings</0>."
 msgstr "Alles hier wird in deinem öffentlichen Profil angezeigt. E-Mail-Benachrichtigungen und andere private Einstellungen findest du in den <0>Einstellungen</0>."
 
@@ -3096,11 +3105,11 @@ msgstr "Erwarteter Anteil"
 msgid "Expired"
 msgstr "Abgelaufen"
 
-#: src/ui/resize-image.ts:77
+#: src/ui/resize-image.ts:61
 msgid "Failed to draw image"
 msgstr "Das Bild konnte nicht gezeichnet werden"
 
-#: src/ui/resize-image.ts:48
+#: src/ui/resize-image.ts:23
 msgid "Failed to resize image"
 msgstr "Die Bildgröße konnte nicht geändert werden"
 
@@ -3251,7 +3260,7 @@ msgstr "Von"
 msgid "From is required"
 msgstr "„Von“ ist erforderlich"
 
-#: src/features/admin/locations-screen.tsx:59
+#: src/features/admin/locations-screen.tsx:63
 msgctxt "Location colour"
 msgid "Fuchsia"
 msgstr "Fuchsia"
@@ -3304,7 +3313,7 @@ msgstr "Zu den Veranstaltungen"
 msgid "Go to the start page"
 msgstr "Zur Startseite"
 
-#: src/features/admin/locations-screen.tsx:41
+#: src/features/admin/locations-screen.tsx:45
 msgctxt "Location colour"
 msgid "Gray"
 msgstr "Grau"
@@ -3313,7 +3322,7 @@ msgstr "Grau"
 msgid "Green"
 msgstr "Grün"
 
-#: src/features/admin/locations-screen.tsx:50
+#: src/features/admin/locations-screen.tsx:54
 msgctxt "Location colour"
 msgid "Green"
 msgstr "Grün"
@@ -3344,15 +3353,15 @@ msgstr "Gäste"
 msgid "Has profile"
 msgstr "Hat Profil"
 
-#: src/features/people/profile-form.tsx:77
+#: src/features/people/profile-form.tsx:82
 msgid "He/Him"
 msgstr "Er/Ihm"
 
-#: src/features/people/profile-form.tsx:378
+#: src/features/people/profile-form.tsx:405
 msgid "He/Him/His/They/etc."
 msgstr "Er/Ihm/Sein/Sie/usw."
 
-#: src/features/people/profile-form.tsx:80
+#: src/features/people/profile-form.tsx:85
 msgid "He/They"
 msgstr "Er/They"
 
@@ -3628,11 +3637,11 @@ msgstr "Wenn du diese Änderung nicht vorgenommen hast, schütze deinen Namen in
 msgid "If you didn’t request this code, you can safely ignore this email."
 msgstr "Wenn du diesen Code nicht angefordert hast, kannst du diese E-Mail ignorieren."
 
-#: src/features/admin/locations-screen.tsx:291
+#: src/features/admin/locations-screen.tsx:306
 msgid "Image"
 msgstr "Bild"
 
-#: src/features/admin/locations-screen.tsx:110
+#: src/features/admin/locations-screen.tsx:115
 msgid "Image exceeds {maxImageMb} MB limit."
 msgstr "Das Bild überschreitet das Limit von {maxImageMb} MB."
 
@@ -3664,7 +3673,7 @@ msgstr "Gelesene In-App-Benachrichtigungen (eine gelöschte ungelesene zählt ni
 msgid "In-app notifications sent per kind, and the share read. It shows which notifications people act on."
 msgstr "Gesendete In-App-Benachrichtigungen je Art und der gelesene Anteil. Das zeigt, auf welche Benachrichtigungen Leute reagieren."
 
-#: src/features/admin/locations-screen.tsx:56
+#: src/features/admin/locations-screen.tsx:60
 msgctxt "Location colour"
 msgid "Indigo"
 msgstr "Indigo"
@@ -3721,9 +3730,9 @@ msgstr "Beitrittslink für {guestName}"
 msgid "Join the event"
 msgstr "Der Veranstaltung beitreten"
 
-#: src/features/admin/locations-screen.tsx:294
-msgid "JPEG, PNG, or WebP, max {maxImageMb} MB, at least {MIN_IMAGE_WIDTH}px wide, 4:3 aspect ratio (e.g. 800×600)"
-msgstr "JPEG, PNG oder WebP, max. {maxImageMb} MB, mindestens {MIN_IMAGE_WIDTH} px breit, Seitenverhältnis 4:3 (z. B. 800×600)"
+#: src/features/admin/locations-screen.tsx:309
+msgid "JPEG, PNG, or WebP, max {maxImageMb} MB. You choose the part to show, in 4:3."
+msgstr "JPEG, PNG oder WebP, max. {maxImageMb} MB. Du wählst den gezeigten Ausschnitt im Format 4:3."
 
 #: src/features/admin/settings-screen.tsx:105
 msgid "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
@@ -3770,7 +3779,7 @@ msgid "Kind"
 msgstr "Art"
 
 #: src/features/people/label-menu.tsx:30
-#: src/features/people/profile-form.tsx:577
+#: src/features/people/profile-form.tsx:604
 msgid "Label"
 msgstr "Label"
 
@@ -3790,8 +3799,8 @@ msgstr "Labels von {name}"
 
 #. Chart axis: one bar per language
 #: src/features/admin/stats-figures.tsx:200
-#: src/features/people/profile-form.tsx:497
-#: src/features/people/profile-form.tsx:513
+#: src/features/people/profile-form.tsx:524
+#: src/features/people/profile-form.tsx:540
 #: src/features/settings/language-setting.tsx:36
 #: src/features/settings/language-setting.tsx:39
 msgid "Language"
@@ -3799,7 +3808,7 @@ msgstr "Sprache"
 
 #: src/features/admin/stats-text.ts:290
 #: src/features/people/profile-body.tsx:160
-#: src/features/people/profile-form.tsx:488
+#: src/features/people/profile-form.tsx:515
 msgid "Languages"
 msgstr "Sprachen"
 
@@ -3811,7 +3820,7 @@ msgstr "Sprachen (von mindestens 3 Mitgliedern angegeben)"
 msgid "Languages members speak. A language appears only when at least 3 members share it."
 msgstr "Sprachen, die Mitglieder sprechen. Eine Sprache erscheint nur, wenn mindestens 3 Mitglieder sie teilen."
 
-#: src/features/people/profile-form.tsx:489
+#: src/features/people/profile-form.tsx:516
 msgid "Languages you're happy to talk in"
 msgstr "Sprachen, in denen du gern sprichst"
 
@@ -3860,7 +3869,7 @@ msgstr "Geliked von"
 msgid "Likes"
 msgstr "Likes"
 
-#: src/features/admin/locations-screen.tsx:49
+#: src/features/admin/locations-screen.tsx:53
 msgctxt "Location colour"
 msgid "Lime"
 msgstr "Limette"
@@ -3915,7 +3924,7 @@ msgstr "Vorschläge werden geladen …"
 #: src/features/admin/event-stats.tsx:199
 #: src/features/admin/events-screen.tsx:193
 #: src/features/admin/guests-screen.tsx:518
-#: src/features/admin/locations-screen.tsx:514
+#: src/features/admin/locations-screen.tsx:548
 #: src/features/admin/settings-screen.tsx:161
 #: src/features/comments/my-comments-screen.tsx:42
 #: src/features/meetings/book-meeting.tsx:74
@@ -3936,7 +3945,7 @@ msgstr "Wird geladen …"
 msgid "Location"
 msgstr "Ort"
 
-#: src/features/admin/locations-screen.tsx:464
+#: src/features/admin/locations-screen.tsx:498
 msgid "Location name confirmation"
 msgstr "Bestätigung des Ortsnamens"
 
@@ -3959,8 +3968,8 @@ msgstr "Ort:"
 #: src/features/admin/event-sessions.tsx:281
 #: src/features/admin/event-stats.tsx:28
 #: src/features/admin/location-availability.tsx:134
-#: src/features/admin/locations-screen.tsx:519
-#: src/features/admin/locations-screen.tsx:521
+#: src/features/admin/locations-screen.tsx:553
+#: src/features/admin/locations-screen.tsx:555
 #: src/features/admin/stats-text.ts:46
 #: src/features/admin/stats-text.ts:153
 msgid "Locations"
@@ -4048,7 +4057,7 @@ msgstr "Als gelesen markieren"
 #: src/features/admin/event-proposals.tsx:111
 #: src/features/admin/event-sessions.tsx:170
 #: src/features/comments/comments-section.tsx:577
-#: src/features/people/profile-form.tsx:616
+#: src/features/people/profile-form.tsx:643
 #: src/ui/form.tsx:187
 #: src/ui/form.tsx:375
 msgid "Markdown supported"
@@ -4058,7 +4067,7 @@ msgstr "Markdown wird unterstützt"
 msgid "max {capacity}"
 msgstr "max. {capacity}"
 
-#: src/features/admin/locations-screen.tsx:366
+#: src/features/admin/locations-screen.tsx:400
 msgctxt "Location details: seats, lowercase in a list"
 msgid "max {capacity}"
 msgstr "max. {capacity}"
@@ -4219,11 +4228,11 @@ msgstr "Sessions mit den meisten Zusagen"
 msgid "Most RSVPed sessions: {list}"
 msgstr "Sessions mit den meisten Zusagen: {list}"
 
-#: src/features/admin/locations-screen.tsx:448
+#: src/features/admin/locations-screen.tsx:482
 msgid "Move {name} down"
 msgstr "{name} nach unten verschieben"
 
-#: src/features/admin/locations-screen.tsx:440
+#: src/features/admin/locations-screen.tsx:474
 msgid "Move {name} up"
 msgstr "{name} nach oben verschieben"
 
@@ -4309,8 +4318,8 @@ msgstr "k. A."
 #: src/features/admin/events-screen.tsx:91
 #: src/features/admin/guests-screen.tsx:155
 #: src/features/admin/guests-screen.tsx:272
-#: src/features/admin/locations-screen.tsx:185
-#: src/features/people/profile-form.tsx:363
+#: src/features/admin/locations-screen.tsx:190
+#: src/features/people/profile-form.tsx:390
 #: src/features/sign-in/bootstrap-screen.tsx:70
 msgid "Name"
 msgstr "Name"
@@ -4322,7 +4331,7 @@ msgstr "Name (A–Z)"
 #: src/commands/field-message.ts:20
 #: src/features/admin/event-labels.tsx:48
 #: src/features/admin/events-screen.tsx:59
-#: src/features/admin/locations-screen.tsx:106
+#: src/features/admin/locations-screen.tsx:111
 msgid "Name is required"
 msgstr "Der Name ist erforderlich"
 
@@ -4348,7 +4357,7 @@ msgstr "wartet auf deine Antwort"
 msgid "Neither"
 msgstr "Keines von beiden"
 
-#: src/features/admin/locations-screen.tsx:43
+#: src/features/admin/locations-screen.tsx:47
 msgctxt "Location colour"
 msgid "Neutral"
 msgstr "Neutral"
@@ -4374,6 +4383,10 @@ msgstr "Neuer Tag"
 msgid "New event"
 msgstr "Neue Veranstaltung"
 
+#: src/features/admin/locations-screen.tsx:289
+msgid "New image of {locationName}"
+msgstr "Neues Bild von {locationName}"
+
 #: src/features/admin/join-links.tsx:70
 msgid "New link"
 msgstr "Neuer Link"
@@ -4382,7 +4395,7 @@ msgstr "Neuer Link"
 msgid "New link for {guestName}"
 msgstr "Neuer Link für {guestName}"
 
-#: src/features/admin/locations-screen.tsx:534
+#: src/features/admin/locations-screen.tsx:568
 msgid "New location"
 msgstr "Neuer Ort"
 
@@ -4508,7 +4521,7 @@ msgstr "Dieser Veranstaltung sind noch keine Orte zugewiesen."
 msgid "No locations match."
 msgstr "Keine Orte passen."
 
-#: src/features/admin/locations-screen.tsx:539
+#: src/features/admin/locations-screen.tsx:573
 msgid "No locations yet."
 msgstr "Noch keine Orte."
 
@@ -4795,7 +4808,7 @@ msgstr "Dein Link wird geöffnet …"
 msgid "Opens from the Need ideas? button. Markdown supported."
 msgstr "Öffnet sich über die Schaltfläche „Brauchst du Ideen?“. Markdown wird unterstützt."
 
-#: src/features/people/profile-form.tsx:401
+#: src/features/people/profile-form.tsx:428
 msgid "Optional prompts that give people something to ask you about"
 msgstr "Optionale Fragen, die Leuten einen Anlass geben, dich anzusprechen"
 
@@ -4819,7 +4832,7 @@ msgstr "oder woanders eingeben"
 msgid "Orange"
 msgstr "Orange"
 
-#: src/features/admin/locations-screen.tsx:46
+#: src/features/admin/locations-screen.tsx:50
 msgctxt "Location colour"
 msgid "Orange"
 msgstr "Orange"
@@ -5002,7 +5015,7 @@ msgstr "Wähle eins oder gib beliebigen Text ein"
 msgid "Picky or generous voters?"
 msgstr "Wählerische oder großzügige Abstimmende?"
 
-#: src/features/admin/locations-screen.tsx:60
+#: src/features/admin/locations-screen.tsx:64
 msgctxt "Location colour"
 msgid "Pink"
 msgstr "Rosa"
@@ -5112,7 +5125,7 @@ msgid "Profiles"
 msgstr "Profile"
 
 #. placeholder {0}: prompts.filter((r) => !CORE_PROMPTS.includes(r.prompt)).indexOf(row) + 1
-#: src/features/people/profile-form.tsx:417
+#: src/features/people/profile-form.tsx:444
 msgid "Prompt {0}"
 msgstr "Frage {0}"
 
@@ -5121,7 +5134,7 @@ msgid "Prompts"
 msgstr "Fragen"
 
 #: src/features/admin/stats-text.ts:288
-#: src/features/people/profile-form.tsx:373
+#: src/features/people/profile-form.tsx:400
 msgid "Pronouns"
 msgstr "Pronomen"
 
@@ -5255,7 +5268,7 @@ msgstr "Schutz ausgeschaltet"
 msgid "Purple"
 msgstr "Lila"
 
-#: src/features/admin/locations-screen.tsx:58
+#: src/features/admin/locations-screen.tsx:62
 msgctxt "Location colour"
 msgid "Purple"
 msgstr "Lila"
@@ -5302,7 +5315,7 @@ msgstr "Zahl der Teilnehmenden eintragen"
 msgid "Red"
 msgstr "Rot"
 
-#: src/features/admin/locations-screen.tsx:45
+#: src/features/admin/locations-screen.tsx:49
 msgctxt "Location colour"
 msgid "Red"
 msgstr "Rot"
@@ -5313,9 +5326,9 @@ msgid "Reload"
 msgstr "Neu laden"
 
 #: src/features/admin/event-sessions.tsx:356
-#: src/features/people/profile-form.tsx:455
-#: src/features/people/profile-form.tsx:522
-#: src/features/people/profile-form.tsx:597
+#: src/features/people/profile-form.tsx:482
+#: src/features/people/profile-form.tsx:549
+#: src/features/people/profile-form.tsx:624
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -5414,7 +5427,7 @@ msgstr "Gesendete Anfragen"
 msgid "Requests sent, received and accepted, per person."
 msgstr "Gesendete, erhaltene und angenommene Anfragen pro Person."
 
-#: src/features/people/profile-form.tsx:344
+#: src/features/people/profile-form.tsx:359
 msgctxt "Profile picture: go back to the saved one"
 msgid "Reset"
 msgstr "Zurücksetzen"
@@ -5444,7 +5457,7 @@ msgstr "Antwortzeit (eine spätere Absage verbirgt die Antwort)"
 msgid "Rocket Launch"
 msgstr "Rakete"
 
-#: src/features/admin/locations-screen.tsx:61
+#: src/features/admin/locations-screen.tsx:65
 msgctxt "Location colour"
 msgid "Rose"
 msgstr "Rosé"
@@ -5521,10 +5534,10 @@ msgstr "Zusagen zu laufenden Sessions (Durchschnitt)"
 #: src/features/admin/event-proposals.tsx:143
 #: src/features/admin/event-sessions.tsx:517
 #: src/features/admin/guests-screen.tsx:310
-#: src/features/admin/locations-screen.tsx:306
-#: src/features/admin/locations-screen.tsx:355
+#: src/features/admin/locations-screen.tsx:340
+#: src/features/admin/locations-screen.tsx:389
 #: src/features/comments/comments-section.tsx:306
-#: src/features/people/profile-form.tsx:640
+#: src/features/people/profile-form.tsx:667
 #: src/features/schedule/attendee-count-field.tsx:129
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Save"
@@ -5582,11 +5595,11 @@ msgstr "Gespeichert!"
 #: src/features/admin/event-proposals.tsx:143
 #: src/features/admin/event-sessions.tsx:518
 #: src/features/admin/guests-screen.tsx:310
-#: src/features/admin/locations-screen.tsx:356
+#: src/features/admin/locations-screen.tsx:390
 #: src/features/admin/settings-screen.tsx:128
 #: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:193
-#: src/features/people/profile-form.tsx:640
+#: src/features/people/profile-form.tsx:667
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Saving..."
 msgstr "Wird gespeichert …"
@@ -6042,11 +6055,11 @@ msgstr "Gemeinsamer Moment: {title}"
 msgid "Shared moments"
 msgstr "Gemeinsame Momente"
 
-#: src/features/people/profile-form.tsx:78
+#: src/features/people/profile-form.tsx:83
 msgid "She/Her"
 msgstr "Sie/Ihr"
 
-#: src/features/people/profile-form.tsx:81
+#: src/features/people/profile-form.tsx:86
 msgid "She/They"
 msgstr "Sie/They"
 
@@ -6083,7 +6096,7 @@ msgstr "Zeigt nur deine Sessions, die sich zeitlich mit anderen von dir übersch
 msgid "Show suggestions"
 msgstr "Vorschläge anzeigen"
 
-#: src/features/people/profile-form.tsx:545
+#: src/features/people/profile-form.tsx:572
 msgid "Shown publicly on your profile — only add what you want visible"
 msgstr "In deinem Profil öffentlich sichtbar — gib nur an, was sichtbar sein soll"
 
@@ -6144,12 +6157,12 @@ msgstr "Überspringen"
 msgid "Skip to content"
 msgstr "Zum Inhalt springen"
 
-#: src/features/admin/locations-screen.tsx:54
+#: src/features/admin/locations-screen.tsx:58
 msgctxt "Location colour"
 msgid "Sky"
 msgstr "Himmelblau"
 
-#: src/features/admin/locations-screen.tsx:40
+#: src/features/admin/locations-screen.tsx:44
 msgctxt "Location colour"
 msgid "Slate"
 msgstr "Schiefer"
@@ -6368,7 +6381,7 @@ msgstr "Schritt"
 msgid "Step through matches"
 msgstr "Treffer durchgehen"
 
-#: src/features/admin/locations-screen.tsx:44
+#: src/features/admin/locations-screen.tsx:48
 msgctxt "Location colour"
 msgid "Stone"
 msgstr "Stein"
@@ -6387,12 +6400,12 @@ msgstr "Absenden fügt eine weitere Session hinzu. Um eine eingeplante zu änder
 msgid "Submitting..."
 msgstr "Wird abgesendet …"
 
-#: src/features/people/profile-form.tsx:433
-#: src/features/people/profile-form.tsx:437
+#: src/features/people/profile-form.tsx:460
+#: src/features/people/profile-form.tsx:464
 msgid "Suggest a different prompt"
 msgstr "Eine andere Frage vorschlagen"
 
-#: src/features/people/profile-form.tsx:483
+#: src/features/people/profile-form.tsx:510
 msgid "Suggest a prompt"
 msgstr "Eine Frage vorschlagen"
 
@@ -6424,7 +6437,7 @@ msgstr "Bring mir etwas bei über"
 msgid "Teal"
 msgstr "Petrol"
 
-#: src/features/admin/locations-screen.tsx:52
+#: src/features/admin/locations-screen.tsx:56
 msgctxt "Location colour"
 msgid "Teal"
 msgstr "Petrol"
@@ -6433,7 +6446,7 @@ msgstr "Petrol"
 msgid "Telegram"
 msgstr "Telegram"
 
-#: src/features/people/profile-form.tsx:395
+#: src/features/people/profile-form.tsx:422
 msgid "Tell others about yourself"
 msgstr "Erzähle anderen von dir"
 
@@ -6579,6 +6592,10 @@ msgstr "Das nützlichste Ding, das ich besitze"
 msgid "The organizer hasn't set up any days with 1-on-1 slots yet."
 msgstr "Die Organisierenden haben noch keine Tage mit 1:1-Zeitfenstern eingerichtet."
 
+#: src/ui/image-crop-dialog.tsx:105
+msgid "The picture you chose"
+msgstr "Das gewählte Bild"
+
 #: src/features/admin/stats-figures.tsx:617
 msgid "The predicted columns come from the attendance model, fitted on one event: treat them as rough."
 msgstr "Die vorhergesagten Spalten stammen aus dem Teilnahmemodell, an einer Veranstaltung angepasst: Nimm sie als grob."
@@ -6651,7 +6668,7 @@ msgstr "Diese Person ist zu der Zeit nicht verfügbar."
 msgid "They can only book you once you are open to 1-on-1s."
 msgstr "Die Person kann dich erst buchen, wenn du für 1:1-Gespräche offen bist."
 
-#: src/features/people/profile-form.tsx:79
+#: src/features/people/profile-form.tsx:84
 msgid "They/Them"
 msgstr "They/Them"
 
@@ -6751,6 +6768,10 @@ msgstr "Diese Person ist nicht mehr aufgeführt."
 #: src/features/sign-in/join-screen.tsx:96
 msgid "This person needs to sign in first. You then join the event."
 msgstr "Diese Person muss sich zuerst anmelden. Danach trittst du der Veranstaltung bei."
+
+#: src/ui/image-crop-dialog.tsx:113
+msgid "This picture cannot be shown here. You can still send it, and the server crops it around its centre."
+msgstr "Dieses Bild kann hier nicht angezeigt werden. Du kannst es trotzdem senden; der Server schneidet es mittig zu."
 
 #: src/features/proposals/proposal-panel.tsx:342
 msgid "This proposal has not been scheduled yet."
@@ -7101,6 +7122,10 @@ msgstr "Verwende mindestens 8 Zeichen"
 msgid "Use this link to set a new password for your name. It works once and expires in {validMinutes, plural, one {# minute} other {# minutes}}:"
 msgstr "Mit diesem Link legst du ein neues Passwort für deinen Namen fest. Er funktioniert einmal und läuft in {validMinutes, plural, one {# Minute} other {# Minuten}} ab:"
 
+#: src/ui/image-crop-dialog.tsx:125
+msgid "Use this part"
+msgstr "Diesen Ausschnitt verwenden"
+
 #: ../../emails/join-link.tsx:18
 msgid "Use this personal link to join {eventName}. It signs you in as you, so keep it to yourself:"
 msgstr "Mit diesem persönlichen Link trittst du {eventName} bei. Er meldet dich als dich selbst an, behalte ihn also für dich:"
@@ -7214,7 +7239,7 @@ msgstr "Das Programm ansehen"
 msgid "View the session"
 msgstr "Die Session ansehen"
 
-#: src/features/admin/locations-screen.tsx:57
+#: src/features/admin/locations-screen.tsx:61
 msgctxt "Location colour"
 msgid "Violet"
 msgstr "Violett"
@@ -7510,7 +7535,7 @@ msgstr "Antwort schreiben"
 msgid "Yellow"
 msgstr "Gelb"
 
-#: src/features/admin/locations-screen.tsx:48
+#: src/features/admin/locations-screen.tsx:52
 msgctxt "Location colour"
 msgid "Yellow"
 msgstr "Gelb"
@@ -7637,7 +7662,7 @@ msgstr "Dein Link zu {eventName}"
 
 #: src/app/user-menu.tsx:57
 #: src/app/user-menu.tsx:90
-#: src/features/people/profile-form.tsx:368
+#: src/features/people/profile-form.tsx:395
 msgid "Your name"
 msgstr "Dein Name"
 
@@ -7665,7 +7690,7 @@ msgstr "Dein Passwort wurde geändert"
 msgid "Your password was just changed."
 msgstr "Dein Passwort wurde gerade geändert."
 
-#: src/features/people/profile-form.tsx:632
+#: src/features/people/profile-form.tsx:659
 msgid "Your photo was saved; the details were not."
 msgstr "Dein Foto wurde gespeichert, die Angaben nicht."
 
@@ -7838,7 +7863,7 @@ msgstr "Deine Stimme ↓"
 msgid "Your vote:"
 msgstr "Deine Stimme:"
 
-#: src/features/admin/locations-screen.tsx:42
+#: src/features/admin/locations-screen.tsx:46
 msgctxt "Location colour"
 msgid "Zinc"
 msgstr "Zink"

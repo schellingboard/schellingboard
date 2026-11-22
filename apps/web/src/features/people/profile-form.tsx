@@ -9,6 +9,7 @@ import {
   MAX_CONTACTS,
   MAX_LANGUAGES,
 } from "@schellingboard/domain/guest";
+import type { CropRegion } from "@schellingboard/domain/image-crop";
 import { languageSuggestions } from "@schellingboard/domain/language-suggestions";
 import { CORE_PROMPTS, PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import { containsIgnoringAccents } from "@schellingboard/domain/search-text";
@@ -40,7 +41,8 @@ import {
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { ArrowPathIcon } from "../../ui/icons";
-import { resizeImage } from "../../ui/resize-image";
+import { ImageCropDialog } from "../../ui/image-crop-dialog";
+import { cropImage } from "../../ui/resize-image";
 import { SearchableSelect } from "../../ui/searchable-select";
 import { Tooltip } from "../../ui/tooltip";
 import { contactLabel } from "./contact-labels";
@@ -64,8 +66,11 @@ export type ProfileFormProps = {
   profile: ProfileDraft;
   links: { settings: string };
   actions: ProfileFormCalls;
-  /** Cuts the chosen picture down before it is sent; the server has the final say. */
-  prepareImage?: (file: Blob) => Promise<{ blob: Blob } | { error: string }>;
+  /** Cuts the chosen part out of the picture before it is sent; the server has the final say. */
+  prepareImage?: (
+    file: Blob,
+    region: CropRegion
+  ) => Promise<{ blob: Blob } | { error: string }>;
   /** Saved: the caller leaves the form. */
   onDone: () => void;
   onCancel: () => void;
@@ -89,7 +94,7 @@ const TEXT_BUTTON = "text-sm text-brand-fg hover:text-brand-fg-hover";
 type Row<T> = T & { key: number };
 type ContactRow = { type: ContactType; label: string; value: string };
 type Photo =
-  { kind: "keep" } | { kind: "file"; file: File } | { kind: "reset" };
+  { kind: "keep" } | { kind: "file"; file: Blob } | { kind: "reset" };
 
 let keySeed = 0;
 const rows = <T,>(items: T[]): Row<T>[] =>
@@ -112,8 +117,13 @@ function seedPrompts(saved: ProfileDraft["prompts"]) {
   ];
 }
 
-function prepareWithCanvas(file: Blob) {
-  return resizeImage(document.createElement("canvas"), file, AVATAR_MAX_SIZE);
+function prepareWithCanvas(file: Blob, region: CropRegion) {
+  return cropImage(
+    document.createElement("canvas"),
+    file,
+    { aspectRatio: 1, maxWidth: AVATAR_MAX_SIZE },
+    region
+  );
 }
 
 /** The edit-profile screen: the details, and the photo through its own endpoints. */
@@ -146,6 +156,7 @@ export function ProfileForm({
     )
   );
   const [photo, setPhoto] = useState<Photo>({ kind: "keep" });
+  const [cropping, setCropping] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [open, setOpen] = useState({
     prompts: (profile.prompts ?? []).length > 0,
@@ -259,10 +270,21 @@ export function ProfileForm({
   }, [open]);
 
   const choose = (file: File | undefined) => {
-    if (file) setPhoto({ kind: "file", file });
+    if (file) setCropping(file);
+  };
+  const cropped = async (file: File, region?: CropRegion) => {
+    setCropping(null);
     setPhotoError(null);
     photoDone.current = false;
     setPhotoSaved(false);
+    if (!region) return setPhoto({ kind: "file", file });
+    try {
+      const prepared = await prepareImage(file, region);
+      if ("error" in prepared) return setPhotoError(prepared.error);
+      setPhoto({ kind: "file", file: prepared.blob });
+    } catch {
+      setPhoto({ kind: "file", file });
+    }
   };
   const onDrop = (e: DragEvent) => {
     e.preventDefault();
@@ -276,15 +298,8 @@ export function ProfileForm({
     setChecking(!!invalid);
     if (invalid) return;
     setPhotoError(null);
-    if (photo.kind === "file" && !photoDone.current) {
-      try {
-        const prepared = await prepareImage(photo.file);
-        if ("error" in prepared) return setPhotoError(prepared.error);
-        upload.current = prepared.blob;
-      } catch {
-        upload.current = photo.file;
-      }
-    }
+    if (photo.kind === "file" && !photoDone.current)
+      upload.current = photo.file;
     body.current = next;
     if ((await mutation.submit())?.ok) onDone();
   };
@@ -350,8 +365,20 @@ export function ProfileForm({
             type="file"
             accept="image/*"
             hidden
-            onChange={(e) => choose(e.target.files?.[0])}
+            onChange={(e) => {
+              choose(e.target.files?.[0]);
+              e.target.value = "";
+            }}
           />
+          {cropping && (
+            <ImageCropDialog
+              file={cropping}
+              aspectRatio={1}
+              round
+              onConfirm={(region) => void cropped(cropping, region)}
+              onCancel={() => setCropping(null)}
+            />
+          )}
         </div>
         {fields.avatar && (
           <p className="text-sm text-danger-fg">{fields.avatar}</p>

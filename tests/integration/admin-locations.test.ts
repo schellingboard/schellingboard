@@ -261,9 +261,9 @@ describe("admin location actions", () => {
     it("keeps the location and says why the image was refused", async () => {
       const result = await createLocationAction({
         ...baseLocationData,
-        image: await makeImageFile(800, 800),
+        image: new File(["not a picture"], "notes.png", { type: "image/png" }),
       });
-      expect(!result.ok && result.error).toMatch(/4:3/);
+      expect(!result.ok && result.error).toMatch(/not a valid image/);
       const [saved] = await getRepositories().locations.list();
       expect(saved.imageUrl).toBeFalsy();
     });

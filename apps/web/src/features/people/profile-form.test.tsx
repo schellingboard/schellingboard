@@ -1,3 +1,4 @@
+import type { CropRegion } from "@schellingboard/domain/image-crop";
 import {
   cleanup,
   fireEvent,
@@ -14,7 +15,10 @@ import { profileFormCalls } from "../../commands/profile-form";
 import { NoticeProvider } from "../../ui/notices";
 import { type ProfileDraft, ProfileForm } from "./profile-form";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 const profile: ProfileDraft = {
   id: "al",
@@ -40,7 +44,10 @@ function setup({
   track?: (check: () => boolean) => () => void;
   handler?: FakeHandler;
   draft?: ProfileDraft;
-  prepareImage?: (file: Blob) => Promise<{ blob: Blob } | { error: string }>;
+  prepareImage?: (
+    file: Blob,
+    region: CropRegion
+  ) => Promise<{ blob: Blob } | { error: string }>;
 } = {}) {
   const { api, calls } = fakeApi(handler);
   const onDone = vi.fn();
@@ -63,10 +70,24 @@ function setup({
 
 const save = () => screen.getByRole("button", { name: "Save" });
 const png = () => new File(["x"], "me.png", { type: "image/png" });
-const pick = (file: File) =>
+const choose = (file: File) =>
   fireEvent.change(document.querySelector('input[type="file"]')!, {
     target: { files: [file] },
   });
+const pictureOf = (width: number, height: number) =>
+  vi.stubGlobal("createImageBitmap", () =>
+    Promise.resolve({ width, height, close: () => {} })
+  );
+const confirmCrop = async () => {
+  const button = screen.getByRole("button", { name: "Use this part" });
+  await waitFor(() => expect(button).not.toHaveProperty("disabled", true));
+  await userEvent.click(button);
+};
+const pick = async (file: File) => {
+  pictureOf(400, 200);
+  choose(file);
+  await confirmCrop();
+};
 
 describe("editing my profile", { tags: ["011-US1"] }, () => {
   it("leaves through the caller when Cancel is pressed", async () => {
@@ -273,11 +294,11 @@ describe("unsaved changes", { tags: ["011-US1"] }, () => {
     expect(t.dirty()).toBe(false);
   });
 
-  it("count a new photo", () => {
+  it("count a new photo", async () => {
     const t = tracked();
     setup({ track: t.track });
-    pick(png());
-    expect(t.dirty()).toBe(true);
+    await pick(png());
+    await waitFor(() => expect(t.dirty()).toBe(true));
   });
 
   it("count a removed photo", async () => {
@@ -313,7 +334,7 @@ describe("the profile photo", { tags: ["011-US2"] }, () => {
           : saved({ version: 6 }),
     });
 
-    pick(png());
+    await pick(png());
     await userEvent.click(save());
 
     await waitFor(() => expect(onDone).toHaveBeenCalled());
@@ -373,7 +394,7 @@ describe("the profile photo", { tags: ["011-US2"] }, () => {
             ),
     });
 
-    pick(png());
+    await pick(png());
     await userEvent.click(save());
 
     expect(
@@ -408,7 +429,7 @@ describe("the profile photo", { tags: ["011-US2"] }, () => {
         ),
     });
 
-    pick(png());
+    await pick(png());
     await userEvent.click(save());
 
     const summary = await screen.findByRole("alert");
@@ -426,12 +447,44 @@ describe("the profile photo", { tags: ["011-US2"] }, () => {
       prepareImage: () => Promise.resolve({ error: "Failed to resize image" }),
     });
 
-    pick(png());
-    await userEvent.click(save());
-
+    await pick(png());
     expect(
       (await screen.findAllByText(/Failed to resize image/)).length
     ).toBeGreaterThan(0);
-    expect(calls).toHaveLength(0);
+    await userEvent.click(save());
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].path).toBe("/api/v1/me/profile");
+  });
+
+  it("sends the part of the picture chosen in the crop frame", async () => {
+    const prepareImage = vi.fn((file: Blob) => Promise.resolve({ blob: file }));
+    setup({ prepareImage });
+
+    pictureOf(400, 200);
+    choose(png());
+    await confirmCrop();
+
+    expect(prepareImage).toHaveBeenCalledWith(expect.any(File), {
+      x: 0.25,
+      y: 0,
+      width: 0.5,
+      height: 1,
+    });
+  });
+
+  it("keeps the saved picture when the crop is cancelled", async () => {
+    const prepareImage = vi.fn((file: Blob) => Promise.resolve({ blob: file }));
+    setup({ prepareImage });
+
+    choose(png());
+    await userEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "Cancel" })
+    );
+
+    expect(
+      screen.queryByRole("img", { name: "The picture you chose" })
+    ).toBeNull();
+    expect(prepareImage).not.toHaveBeenCalled();
   });
 });

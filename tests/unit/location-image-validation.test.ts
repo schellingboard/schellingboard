@@ -45,30 +45,35 @@ describe("locationImages.validate", () => {
     ).toEqual({ buffer: expect.any(Buffer) as Buffer, ext: "webp" });
   });
 
-  it("accepts a slight deviation from 4:3 within tolerance", async () => {
-    // 799x600 is ~0.1% off the 4:3 ratio
+  const stored = async (width: number, height: number) => {
     const result = await getImageRepositories().locations.validate(
-      await makeImage(799, 600)
+      await makeImage(width, height)
     );
-    expect(result).toEqual({
-      buffer: expect.any(Buffer) as Buffer,
-      ext: "png",
+    if ("error" in result) throw new Error(result.error);
+    return sharp(result.buffer).metadata();
+  };
+
+  it("crops an image of any other shape to 4:3 around its centre", async () => {
+    expect(await stored(800, 800)).toMatchObject({ width: 800, height: 600 });
+    expect(await stored(1000, 300)).toMatchObject({ width: 400, height: 300 });
+  });
+
+  it("downscales a large photo to 1200×900", async () => {
+    expect(await stored(4032, 3024)).toMatchObject({
+      width: 1200,
+      height: 900,
     });
   });
 
-  it("rejects an image that is not 4:3", async () => {
-    const result = await getImageRepositories().locations.validate(
-      await makeImage(800, 800)
-    );
-    expect(result).toHaveProperty("error");
-    expect((result as { error: string }).error).toMatch(/4:3/);
+  it("keeps a small image at its own size", async () => {
+    expect(await stored(40, 30)).toMatchObject({ width: 40, height: 30 });
   });
 
-  it("rejects an image that is too narrow", async () => {
+  it("rejects an image with more pixels than it may decode", async () => {
     const result = await getImageRepositories().locations.validate(
-      await makeImage(200, 150)
+      await makeImage(10_000, 6_000, "jpeg")
     );
-    expect((result as { error: string }).error).toMatch(/too small/);
+    expect((result as { error: string }).error).toMatch(/too large/);
   });
 
   it("rejects oversized files without parsing them", async () => {

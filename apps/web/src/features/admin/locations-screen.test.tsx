@@ -16,7 +16,10 @@ import { paramsUpdater } from "../../ui/list-paging";
 import { NoticeProvider } from "../../ui/notices";
 import { LocationsScreen } from "./locations-screen";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 const location = (
   id: string,
@@ -77,6 +80,16 @@ const setup = (
 };
 
 const png = new File(["x"], "room.png", { type: "image/png" });
+
+const uploadImage = async (region: HTMLElement) => {
+  vi.stubGlobal("createImageBitmap", () =>
+    Promise.resolve({ width: 800, height: 800, close: () => {} })
+  );
+  await userEvent.upload(within(region).getByLabelText("Image"), png);
+  const button = screen.getByRole("button", { name: "Use this part" });
+  await waitFor(() => expect(button).not.toHaveProperty("disabled", true));
+  await userEvent.click(button);
+};
 
 describe("the admin locations screen", { tags: ["017-US1"] }, () => {
   it("lists each location with capacity, booking and events", () => {
@@ -156,7 +169,7 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
       await userEvent.type(within(region).getByLabelText("Capacity"), "25");
       await userEvent.click(within(region).getByLabelText("Bookable"));
       await userEvent.click(within(region).getByLabelText("Conference Alpha"));
-      await userEvent.upload(within(region).getByLabelText("Image"), png);
+      await uploadImage(region);
       await userEvent.click(
         within(region).getByRole("button", { name: "Add location" })
       );
@@ -183,6 +196,26 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
   );
 
   it(
+    "shows the chosen image before it is saved",
+    { tags: ["017-US2"] },
+    async () => {
+      const { region } = setup([
+        location("l1", "Attic", { imageUrl: "/media/locations/old.png" }),
+      ]);
+
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Edit" })
+      );
+      await uploadImage(region);
+
+      await within(region).findByRole("img", { name: "New image of Attic" });
+      expect(
+        within(region).queryByRole("img", { name: /Current image/ })
+      ).toBeNull();
+    }
+  );
+
+  it(
     "keeps the saved fields and says why an image was refused",
     { tags: ["017-US2"] },
     async () => {
@@ -194,7 +227,7 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
                 title: "t",
                 status: 422,
                 code: "location.imageInvalid",
-                detail: "Image must have a 4:3 aspect ratio (got 800×800)",
+                detail: "File is not a valid image",
               },
               {
                 status: 422,
@@ -210,13 +243,13 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
         within(region).getByRole("button", { name: "New location" })
       );
       await userEvent.type(within(region).getByLabelText(/^Name/), "Attic");
-      await userEvent.upload(within(region).getByLabelText("Image"), png);
+      await uploadImage(region);
       await userEvent.click(
         within(region).getByRole("button", { name: "Add location" })
       );
 
       expect(
-        (await within(region).findAllByText(/4:3 aspect ratio/)).length
+        (await within(region).findAllByText(/not a valid image/)).length
       ).toBeGreaterThan(0);
       expect(onChanged).toHaveBeenCalled();
 

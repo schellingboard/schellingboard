@@ -1,32 +1,7 @@
 import { t } from "@lingui/core/macro";
-import { coverSquareSize } from "@schellingboard/domain/avatar-image";
+import { cropBox, type CropRegion } from "@schellingboard/domain/image-crop";
 
-function drawCover(
-  ctx: CanvasRenderingContext2D,
-  image: CanvasImageSource,
-  sourceWidth: number,
-  sourceHeight: number,
-  destWidth: number,
-  destHeight: number
-) {
-  const sourceAspect = sourceWidth / sourceHeight;
-  const destAspect = destWidth / destHeight;
-
-  let sx = 0;
-  let sy = 0;
-  let sw = sourceWidth;
-  let sh = sourceHeight;
-
-  if (sourceAspect > destAspect) {
-    sw = sourceHeight * destAspect;
-    sx = (sourceWidth - sw) / 2;
-  } else {
-    sh = sourceWidth / destAspect;
-    sy = (sourceHeight - sh) / 2;
-  }
-
-  ctx.drawImage(image, sx, sy, sw, sh, 0, 0, destWidth, destHeight);
-}
+export type CropShape = { aspectRatio: number; maxWidth: number };
 
 function toBlob(canvas: HTMLCanvasElement, file: Blob) {
   return new Promise<Blob>((resolve, reject) => {
@@ -49,33 +24,62 @@ function toBlob(canvas: HTMLCanvasElement, file: Blob) {
     });
 }
 
-export async function resizeImage(
+/** Cuts `region` (by default the centre) out of the image, at the shape's size. */
+export async function cropImage(
   canvas: HTMLCanvasElement,
   file: Blob,
-  maxSize: number
+  shape: CropShape,
+  region?: CropRegion
 ): Promise<{ blob: Blob } | { error: string }> {
   const bitmap = await createImageBitmap(file);
-
-  const size = coverSquareSize(maxSize, bitmap.width, bitmap.height);
-
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext("2d")!;
+  const box = cropBox(
+    bitmap.width,
+    bitmap.height,
+    shape.aspectRatio,
+    shape.maxWidth,
+    region
+  );
+  canvas.width = box.width;
+  canvas.height = box.height;
 
   try {
-    drawCover(
-      ctx,
-      bitmap,
-      bitmap.width,
-      bitmap.height,
-      canvas.width,
-      canvas.height
-    );
+    canvas
+      .getContext("2d")!
+      .drawImage(
+        bitmap,
+        box.sx,
+        box.sy,
+        box.sw,
+        box.sh,
+        0,
+        0,
+        box.width,
+        box.height
+      );
   } catch (e) {
     console.error(e);
     return { error: t`Failed to draw image` };
   }
 
   return toBlob(canvas, file);
+}
+
+/** {@link cropImage} as a file of the same name; the original if it can't be cut. */
+export async function cropFile(
+  file: File,
+  shape: CropShape,
+  region: CropRegion
+): Promise<File> {
+  try {
+    const result = await cropImage(
+      document.createElement("canvas"),
+      file,
+      shape,
+      region
+    );
+    if ("error" in result) return file;
+    return new File([result.blob], file.name, { type: result.blob.type });
+  } catch {
+    return file;
+  }
 }

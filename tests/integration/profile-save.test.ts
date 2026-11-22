@@ -353,29 +353,44 @@ describe("saving a profile as the edit form does", () => {
     expect(answerTooLong).toMatchObject({ ok: false });
   });
 
-  it("rejects images smaller than 256x256", async () => {
+  const storedAvatar = async (guestId: string) => {
+    const updated = await getRepositories().guests.findById(guestId);
+    return sharp(
+      fs.readFileSync(
+        path.join(uploadsDir, "avatars", path.basename(updated!.avatarUrl!))
+      )
+    ).metadata();
+  };
+
+  it("accepts a tiny avatar as it is", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
-      aboutMe: "Hello there",
-      avatar: await createImageFile(128, 128, "avatar.png"),
+      aboutMe: null,
+      avatar: await createImageFile(40, 40, "avatar.png"),
     });
-    expect(result).toMatchObject({ ok: false });
+    expect(result).toEqual({ ok: true });
+    expect(await storedAvatar(guest.id)).toMatchObject({
+      width: 40,
+      height: 40,
+    });
   });
 
-  // The square crop can't be bigger than the shorter side, so a wide-but-flat
-  // image would otherwise be stored below the 256px minimum.
-  it("rejects a wide image whose shorter side is below the minimum", async () => {
+  it("crops a wide avatar to a square of its shorter side", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
-      aboutMe: "Hello there",
+      aboutMe: null,
       avatar: await createImageFile(2000, 100, "avatar.png"),
     });
-    expect(result).toMatchObject({ ok: false });
+    expect(result).toEqual({ ok: true });
+    expect(await storedAvatar(guest.id)).toMatchObject({
+      width: 100,
+      height: 100,
+    });
   });
 });

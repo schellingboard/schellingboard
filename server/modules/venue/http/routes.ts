@@ -7,10 +7,7 @@ import {
   locationUpdateBodySchema,
   locationViewSchema,
 } from "@schellingboard/contracts/location";
-import {
-  MAX_IMAGE_BYTES,
-  MIN_IMAGE_WIDTH,
-} from "@schellingboard/domain/location-image-constraints";
+import { MAX_IMAGE_BYTES } from "@schellingboard/domain/location-image-constraints";
 
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
@@ -144,7 +141,7 @@ const imageForm = z.object({
     .instanceof(File)
     .openapi({ type: "string", format: "binary" })
     .describe(
-      `JPEG, PNG or WebP, at most ${MAX_IMAGE_BYTES / 1024 / 1024} MiB, at least ${MIN_IMAGE_WIDTH} px wide, 4:3`
+      `JPEG, PNG or WebP, at most ${MAX_IMAGE_BYTES / 1024 / 1024} MiB, any size; stored cropped to 4:3`
     ),
   expectedVersion: textExpectedVersion,
 });

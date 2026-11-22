@@ -511,9 +511,10 @@ own comments.
 
 ## Your profile
 
-After picking your name, open **"Edit profile"** to set your About me, pronouns, and avatar. These
-are visible to other attendees wherever your name appears — proposals, hosting, RSVPs. The form
-opens in a side panel; closing it over changes you have not saved asks before discarding them.
+After picking your name, open **"Edit profile"** to set your About me, pronouns, and avatar. A
+picture of any size works: move and resize the round frame to pick the part to show. These are
+visible to other attendees wherever your name appears — proposals, hosting, RSVPs. The form opens in
+a side panel; closing it over changes you have not saved asks before discarding them.
 
 About me, conversation-starter answers, and contact details all accept Markdown, and a web or email
 address you paste in becomes clickable on its own. A conversation-starter answer can have several

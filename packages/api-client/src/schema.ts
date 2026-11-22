@@ -3569,7 +3569,7 @@ export interface paths {
           "multipart/form-data": {
             /**
              * Format: binary
-             * @description JPEG, PNG or WebP, at most 5 MiB, at least 256 px square
+             * @description JPEG, PNG or WebP, at most 15 MiB, any size; stored cropped to a square
              */
             avatar: string;
             /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
@@ -6423,7 +6423,7 @@ export interface paths {
           "multipart/form-data": {
             /**
              * Format: binary
-             * @description JPEG, PNG or WebP, at most 5 MiB, at least 400 px wide, 4:3
+             * @description JPEG, PNG or WebP, at most 15 MiB, any size; stored cropped to 4:3
              */
             image: string;
             /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
