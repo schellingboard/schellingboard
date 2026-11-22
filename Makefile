@@ -68,7 +68,7 @@ install:
 	bun install --frozen-lockfile
 
 install-playwright: install
-	bun x playwright install
+	bun x playwright install firefox
 
 dev: dev-migrate-up install
 	bun set-env.ts dev bun scripts/dev.ts
