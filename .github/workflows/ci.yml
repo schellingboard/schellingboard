@@ -41,6 +41,9 @@ jobs:
   commit-messages:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
 
     steps:
       - name: Checkout Source Code
@@ -51,8 +54,14 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
 
+      # No git range names exactly a PR's commits once it contains merges.
       - name: Check commit messages
-        run: bun scripts/check-commit-messages.ts "origin/${{ github.base_ref }}..${{ github.event.pull_request.head.sha }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shas=$(gh api --paginate --jq '.[].sha' \
+            "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits")
+          bun scripts/check-commit-messages.ts --commits $shas
 
   build:
     runs-on: ubuntu-latest
