@@ -1,7 +1,8 @@
 import { t } from "@lingui/core/macro";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 
 import { EventIcon } from "../ui/event-icon";
+import { useDismiss } from "../ui/use-dismiss";
 
 export type NavItem = { name: string; href: string; icon?: string | null };
 
@@ -27,13 +28,20 @@ export function NavBar({
   children?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const root = useRef<HTMLElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+  useDismiss(open, () => setOpen(false), root, toggle);
   const isCurrent = (item: NavItem) =>
     items.length > 1 && currentPath.startsWith(item.href);
 
   return (
-    <header className="fixed z-30 w-full sm:z-[56] border-b border-line bg-surface-raised">
+    <header
+      ref={root}
+      className="fixed z-30 w-full sm:z-[56] border-b border-line bg-surface-raised"
+    >
       <div className="flex h-16 items-center justify-between gap-2 px-2 sm:px-6 lg:px-8">
         <button
+          ref={toggle}
           type="button"
           aria-label={open ? t`Close menu` : t`Open menu`}
           aria-expanded={open}

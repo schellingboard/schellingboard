@@ -8,6 +8,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   useSyncExternalStore,
 } from "react";
@@ -20,6 +21,7 @@ import {
   XMarkOutlineIcon,
 } from "../ui/icons";
 import { NoticeProvider } from "../ui/notices";
+import { useDismiss } from "../ui/use-dismiss";
 import { Footer } from "./footer";
 import { hardNavigate } from "./hard-navigate";
 import { useHealth } from "./health";
@@ -126,8 +128,11 @@ function AdminHeader({
   currentPath: string;
 }) {
   const [open, setOpen] = useState(false);
+  const root = useRef<HTMLElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+  useDismiss(open, () => setOpen(false), root, toggle);
   return (
-    <header className="bg-bar text-bar-fg">
+    <header ref={root} className="bg-bar text-bar-fg">
       <div
         className={cx(FRAME, "flex items-center justify-between gap-4 py-3")}
       >
@@ -139,6 +144,7 @@ function AdminHeader({
           <LogoutButton />
         </div>
         <button
+          ref={toggle}
           type="button"
           aria-label={open ? t`Close admin menu` : t`Open admin menu`}
           aria-expanded={open}

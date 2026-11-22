@@ -43,6 +43,21 @@ const drag = (
 };
 
 describe("useDragToPan", () => {
+  it("takes the focus from a field outside, as a click would", () => {
+    render(
+      <>
+        <input aria-label="Search" />
+        <Pannable onClick={() => {}} />
+      </>
+    );
+    const search = screen.getByRole("textbox", { name: "Search" });
+    search.focus();
+
+    fireEvent.mouseDown(screen.getByTestId("pan"), { button: 0 });
+
+    expect(document.activeElement).not.toBe(search);
+  });
+
   it("scrolls the container opposite to the drag", () => {
     render(<Pannable onClick={() => {}} />);
     const pan = screen.getByTestId("pan");

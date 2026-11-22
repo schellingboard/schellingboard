@@ -69,6 +69,24 @@ describe("NavBar", () => {
     expect(within(menu).getByRole("link", { name: "Conf" })).toBeTruthy();
   });
 
+  it("closes the narrow-screen menu on a click elsewhere, and on Escape", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <NavBar items={items} currentPath="/" />
+        <p>the page</p>
+      </>
+    );
+
+    await user.click(screen.getByRole("button", { name: "Open menu" }));
+    await user.click(screen.getByText("the page"));
+    expect(screen.queryByRole("navigation", { name: "Menu" })).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: "Open menu" }));
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("navigation", { name: "Menu" })).toBeNull();
+  });
+
   it("renders its trailing controls", () => {
     render(
       <NavBar items={items} currentPath="/">

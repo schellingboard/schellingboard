@@ -43,7 +43,10 @@ export function useDragToPan(
       };
       dragged = false;
       // Prevents text selection while panning; clicks still fire on mouseup.
+      // It also keeps the focus where it was, so drop it as a click would.
       e.preventDefault();
+      if (document.activeElement instanceof HTMLElement)
+        document.activeElement.blur();
     };
     const onMouseMove = (e: MouseEvent) => {
       if (!start) return;

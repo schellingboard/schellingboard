@@ -107,6 +107,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Menus close when you click elsewhere or press Escape**: your name menu and the phone menus
+  stayed open, and a click on the schedule left the search field active.
 - **Long links in Quick Voting now wrap**
   ([#200](https://github.com/schellingboard/schellingboard/issues/200)): they used to push the page
   wider than the screen on phones.

@@ -75,7 +75,7 @@ msgstr "(erledigt)"
 msgid "(edited)"
 msgstr "(bearbeitet)"
 
-#: src/app/user-menu.tsx:253
+#: src/app/user-menu.tsx:258
 msgid "(password)"
 msgstr "(Passwort)"
 
@@ -539,7 +539,7 @@ msgstr "{them} hat das abgelehnt."
 msgid "{them} is waiting for your answer."
 msgstr "{them} wartet auf deine Antwort."
 
-#: src/app/admin-frame.tsx:135
+#: src/app/admin-frame.tsx:140
 msgid "{title} Admin"
 msgstr "{title} Admin"
 
@@ -1186,11 +1186,11 @@ msgstr "Als Co-Host hinzugefügt"
 msgid "Adding..."
 msgstr "Wird hinzugefügt …"
 
-#: src/app/admin-frame.tsx:56
+#: src/app/admin-frame.tsx:58
 msgid "Admin"
 msgstr "Admin"
 
-#: src/app/admin-frame.tsx:110
+#: src/app/admin-frame.tsx:112
 msgid "Admin logout"
 msgstr "Admin-Abmeldung"
 
@@ -1912,11 +1912,11 @@ msgstr "Alle Zeitfenster zu leeren ist dasselbe wie das Ausschalten."
 msgid "Close"
 msgstr "Schließen"
 
-#: src/app/admin-frame.tsx:143
+#: src/app/admin-frame.tsx:149
 msgid "Close admin menu"
 msgstr "Admin-Menü schließen"
 
-#: src/app/nav-bar.tsx:38
+#: src/app/nav-bar.tsx:46
 msgid "Close menu"
 msgstr "Menü schließen"
 
@@ -2344,15 +2344,15 @@ msgstr "Deine Sicherheitseinstellungen konnten nicht geladen werden. Lade die Se
 msgid "Could not load your settings. Reload the page to try again."
 msgstr "Deine Einstellungen konnten nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen."
 
-#: src/app/user-menu.tsx:137
+#: src/app/user-menu.tsx:142
 msgid "Could not log out — try again"
 msgstr "Abmelden fehlgeschlagen — versuche es erneut"
 
-#: src/app/admin-frame.tsx:114
+#: src/app/admin-frame.tsx:116
 msgid "Could not log out. Try again."
 msgstr "Abmelden fehlgeschlagen. Versuche es erneut."
 
-#: src/app/admin-frame.tsx:216
+#: src/app/admin-frame.tsx:222
 msgid "Could not open the admin area ({errorCode})."
 msgstr "Der Admin-Bereich konnte nicht geöffnet werden ({errorCode})."
 
@@ -2388,7 +2388,7 @@ msgstr "Die Zahl der Teilnehmenden für {what} konnte nicht gespeichert werden. 
 msgid "Could not save the attendee count for the session. Please try again."
 msgstr "Die Zahl der Teilnehmenden für die Session konnte nicht gespeichert werden. Bitte versuche es erneut."
 
-#: src/app/user-menu.tsx:183
+#: src/app/user-menu.tsx:188
 msgid "Could not select that name — try again"
 msgstr "Dieser Name konnte nicht ausgewählt werden — versuche es erneut"
 
@@ -2879,7 +2879,7 @@ msgid "Edit day {from} – {to} ({timezone})"
 msgstr "Tag {from} – {to} ({timezone}) bearbeiten"
 
 #: src/app/profile-host.tsx:202
-#: src/app/user-menu.tsx:107
+#: src/app/user-menu.tsx:112
 #: src/features/people/directory-screen.tsx:126
 #: src/features/people/profile-body.tsx:121
 msgid "Edit profile"
@@ -3075,7 +3075,7 @@ msgstr "Veranstaltungsphasen"
 msgid "Event sections"
 msgstr "Veranstaltungsbereiche"
 
-#: src/app/admin-frame.tsx:40
+#: src/app/admin-frame.tsx:42
 #: src/features/admin/event-layout.tsx:90
 #: src/features/admin/events-screen.tsx:200
 #: src/features/admin/guests-screen.tsx:42
@@ -3976,7 +3976,7 @@ msgstr "Nicht verfügbare Orte"
 msgid "Location:"
 msgstr "Ort:"
 
-#: src/app/admin-frame.tsx:42
+#: src/app/admin-frame.tsx:44
 #: src/features/admin/event-layout.tsx:19
 #: src/features/admin/event-locations.tsx:27
 #: src/features/admin/event-sessions.tsx:281
@@ -4010,7 +4010,7 @@ msgstr "Als {guestName} anmelden"
 msgid "Log in as {name}"
 msgstr "Als {name} anmelden"
 
-#: src/app/user-menu.tsx:133
+#: src/app/user-menu.tsx:138
 msgid "Log out"
 msgstr "Abmelden"
 
@@ -4018,8 +4018,8 @@ msgstr "Abmelden"
 msgid "Logging in as"
 msgstr "Angemeldet als"
 
-#: src/app/admin-frame.tsx:110
-#: src/app/user-menu.tsx:133
+#: src/app/admin-frame.tsx:112
+#: src/app/user-menu.tsx:138
 msgid "Logging out..."
 msgstr "Wird abgemeldet …"
 
@@ -4212,7 +4212,7 @@ msgstr "Mitglieder mit Push"
 msgid "Members without an email address"
 msgstr "Mitglieder ohne E-Mail-Adresse"
 
-#: src/app/nav-bar.tsx:63
+#: src/app/nav-bar.tsx:71
 msgid "Menu"
 msgstr "Menü"
 
@@ -4259,7 +4259,7 @@ msgstr "Musiknote"
 msgid "My comfort activity"
 msgstr "Meine Wohlfühlbeschäftigung"
 
-#: src/app/user-menu.tsx:123
+#: src/app/user-menu.tsx:128
 #: src/features/comments/my-comments-screen.tsx:77
 msgid "My comments"
 msgstr "Meine Kommentare"
@@ -4284,11 +4284,11 @@ msgstr "Mein liebster Weg, einen Nachmittag zu vertrödeln"
 msgid "My most controversial food opinion"
 msgstr "Meine umstrittenste Meinung zum Essen"
 
-#: src/app/user-menu.tsx:211
+#: src/app/user-menu.tsx:216
 msgid "My name is:"
 msgstr "Mein Name ist:"
 
-#: src/app/user-menu.tsx:99
+#: src/app/user-menu.tsx:104
 msgid "My profile"
 msgstr "Mein Profil"
 
@@ -4353,7 +4353,7 @@ msgstr "Der Name ist erforderlich"
 msgid "Name of {pointName}"
 msgstr "Name von {pointName}"
 
-#: src/app/user-menu.tsx:237
+#: src/app/user-menu.tsx:242
 msgid "Names"
 msgstr "Namen"
 
@@ -4794,11 +4794,11 @@ msgstr "Nur du siehst deine gemerkten Sessions. Das ist keine Zusage."
 msgid "Open"
 msgstr "Offen"
 
-#: src/app/admin-frame.tsx:143
+#: src/app/admin-frame.tsx:149
 msgid "Open admin menu"
 msgstr "Admin-Menü öffnen"
 
-#: src/app/nav-bar.tsx:38
+#: src/app/nav-bar.tsx:46
 msgid "Open menu"
 msgstr "Menü öffnen"
 
@@ -5786,7 +5786,7 @@ msgstr "Alle Zeitfenster am {dayLabel} auswählen"
 msgid "Select page"
 msgstr "Seite auswählen"
 
-#: src/app/user-menu.tsx:61
+#: src/app/user-menu.tsx:65
 msgid "Select your name"
 msgstr "Namen auswählen"
 
@@ -6001,8 +6001,8 @@ msgstr "Passwort festlegen"
 msgid "Set your password"
 msgstr "Lege dein Passwort fest"
 
-#: src/app/admin-frame.tsx:44
-#: src/app/user-menu.tsx:115
+#: src/app/admin-frame.tsx:46
+#: src/app/user-menu.tsx:120
 #: src/features/admin/settings-screen.tsx:168
 #: src/features/settings/settings-screen.tsx:50
 msgid "Settings"
@@ -6384,7 +6384,7 @@ msgstr "Beginnt um {startTime}"
 msgid "Starts at what the room holds. 0 means no limit."
 msgstr "Beginnt bei dem, was der Raum fasst. 0 heißt unbegrenzt."
 
-#: src/app/admin-frame.tsx:43
+#: src/app/admin-frame.tsx:45
 #: src/app/admin-pages.tsx:257
 #: src/features/admin/event-layout.tsx:99
 msgid "Statistics"
@@ -7176,7 +7176,7 @@ msgstr "Benutzername gespeichert"
 msgid "Username settings"
 msgstr "Benutzername-Einstellungen"
 
-#: src/app/admin-frame.tsx:41
+#: src/app/admin-frame.tsx:43
 #: src/features/admin/guest-import.tsx:46
 #: src/features/admin/guests-screen.tsx:539
 #: src/features/admin/guests-screen.tsx:548
@@ -7494,7 +7494,7 @@ msgstr "Zähle bitte, wie viele Personen teilnehmen, solange du dort bist. Sobal
 msgid "Who are you looking for?"
 msgstr "Wen suchst du?"
 
-#: src/app/user-menu.tsx:209
+#: src/app/user-menu.tsx:214
 #: src/features/sign-in/bootstrap-screen.tsx:58
 msgid "Who are you?"
 msgstr "Wer bist du?"
@@ -7681,8 +7681,8 @@ msgstr "dein 1:1-Gespräch mit {otherName}"
 msgid "Your link to {eventName}"
 msgstr "Dein Link zu {eventName}"
 
-#: src/app/user-menu.tsx:57
-#: src/app/user-menu.tsx:90
+#: src/app/user-menu.tsx:61
+#: src/app/user-menu.tsx:95
 #: src/features/people/profile-form.tsx:395
 msgid "Your name"
 msgstr "Dein Name"
@@ -7699,7 +7699,7 @@ msgstr "Dein Name ist geschützt: Um zu ihm zu wechseln, brauchst du dein Passwo
 msgid "Your name protection was turned off"
 msgstr "Der Schutz deines Namens wurde ausgeschaltet"
 
-#: src/app/user-menu.tsx:78
+#: src/app/user-menu.tsx:83
 msgid "Your name: {name}"
 msgstr "Dein Name: {name}"
 

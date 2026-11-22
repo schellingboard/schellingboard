@@ -39,6 +39,20 @@ function setup({
 describe("UserMenu", () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it("closes its menu on a click elsewhere, and on Escape", async () => {
+    const { user } = setup({ guestId: "g1" });
+    const opener = screen.getByRole("button", { name: "Your name: Ada" });
+
+    await user.click(opener);
+    await user.click(document.body);
+    expect(screen.queryByRole("menu")).toBeNull();
+
+    await user.click(opener);
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(opener);
+  });
+
   it("asks an anonymous visitor to select a name", async () => {
     const { user, choose } = setup();
 

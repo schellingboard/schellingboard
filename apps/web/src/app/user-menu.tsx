@@ -1,8 +1,9 @@
 import { i18n, type MessageDescriptor } from "@lingui/core";
 import { msg, t } from "@lingui/core/macro";
-import { type KeyboardEvent, useEffect, useId, useState } from "react";
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 
 import { Dialog } from "../ui/dialog";
+import { useDismiss } from "../ui/use-dismiss";
 import { hardNavigate, hardReload } from "./hard-navigate";
 import { endSiteSession } from "./site-session";
 import type { Viewer } from "./viewer";
@@ -31,6 +32,9 @@ export function UserMenu({
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutFailed, setLogoutFailed] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLButtonElement>(null);
+  useDismiss(menuOpen, () => setMenuOpen(false), root, opener);
 
   if (viewer.guestId === undefined || guests === undefined) return null;
   const current = guests.find((g) => g.id === viewer.guestId);
@@ -72,8 +76,9 @@ export function UserMenu({
 
   const name = current.name;
   return (
-    <div className="relative">
+    <div ref={root} className="relative">
       <button
+        ref={opener}
         type="button"
         aria-label={t`Your name: ${name}`}
         aria-expanded={menuOpen}

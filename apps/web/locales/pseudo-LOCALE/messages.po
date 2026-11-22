@@ -75,7 +75,7 @@ msgstr ""
 msgid "(edited)"
 msgstr ""
 
-#: src/app/user-menu.tsx:253
+#: src/app/user-menu.tsx:258
 msgid "(password)"
 msgstr ""
 
@@ -539,7 +539,7 @@ msgstr ""
 msgid "{them} is waiting for your answer."
 msgstr ""
 
-#: src/app/admin-frame.tsx:135
+#: src/app/admin-frame.tsx:140
 msgid "{title} Admin"
 msgstr ""
 
@@ -1186,11 +1186,11 @@ msgstr ""
 msgid "Adding..."
 msgstr ""
 
-#: src/app/admin-frame.tsx:56
+#: src/app/admin-frame.tsx:58
 msgid "Admin"
 msgstr ""
 
-#: src/app/admin-frame.tsx:110
+#: src/app/admin-frame.tsx:112
 msgid "Admin logout"
 msgstr ""
 
@@ -1912,11 +1912,11 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/app/admin-frame.tsx:143
+#: src/app/admin-frame.tsx:149
 msgid "Close admin menu"
 msgstr ""
 
-#: src/app/nav-bar.tsx:38
+#: src/app/nav-bar.tsx:46
 msgid "Close menu"
 msgstr ""
 
@@ -2344,15 +2344,15 @@ msgstr ""
 msgid "Could not load your settings. Reload the page to try again."
 msgstr ""
 
-#: src/app/user-menu.tsx:137
+#: src/app/user-menu.tsx:142
 msgid "Could not log out — try again"
 msgstr ""
 
-#: src/app/admin-frame.tsx:114
+#: src/app/admin-frame.tsx:116
 msgid "Could not log out. Try again."
 msgstr ""
 
-#: src/app/admin-frame.tsx:216
+#: src/app/admin-frame.tsx:222
 msgid "Could not open the admin area ({errorCode})."
 msgstr ""
 
@@ -2388,7 +2388,7 @@ msgstr ""
 msgid "Could not save the attendee count for the session. Please try again."
 msgstr ""
 
-#: src/app/user-menu.tsx:183
+#: src/app/user-menu.tsx:188
 msgid "Could not select that name — try again"
 msgstr ""
 
@@ -2879,7 +2879,7 @@ msgid "Edit day {from} – {to} ({timezone})"
 msgstr ""
 
 #: src/app/profile-host.tsx:202
-#: src/app/user-menu.tsx:107
+#: src/app/user-menu.tsx:112
 #: src/features/people/directory-screen.tsx:126
 #: src/features/people/profile-body.tsx:121
 msgid "Edit profile"
@@ -3075,7 +3075,7 @@ msgstr ""
 msgid "Event sections"
 msgstr ""
 
-#: src/app/admin-frame.tsx:40
+#: src/app/admin-frame.tsx:42
 #: src/features/admin/event-layout.tsx:90
 #: src/features/admin/events-screen.tsx:200
 #: src/features/admin/guests-screen.tsx:42
@@ -3976,7 +3976,7 @@ msgstr ""
 msgid "Location:"
 msgstr ""
 
-#: src/app/admin-frame.tsx:42
+#: src/app/admin-frame.tsx:44
 #: src/features/admin/event-layout.tsx:19
 #: src/features/admin/event-locations.tsx:27
 #: src/features/admin/event-sessions.tsx:281
@@ -4010,7 +4010,7 @@ msgstr ""
 msgid "Log in as {name}"
 msgstr ""
 
-#: src/app/user-menu.tsx:133
+#: src/app/user-menu.tsx:138
 msgid "Log out"
 msgstr ""
 
@@ -4018,8 +4018,8 @@ msgstr ""
 msgid "Logging in as"
 msgstr ""
 
-#: src/app/admin-frame.tsx:110
-#: src/app/user-menu.tsx:133
+#: src/app/admin-frame.tsx:112
+#: src/app/user-menu.tsx:138
 msgid "Logging out..."
 msgstr ""
 
@@ -4212,7 +4212,7 @@ msgstr ""
 msgid "Members without an email address"
 msgstr ""
 
-#: src/app/nav-bar.tsx:63
+#: src/app/nav-bar.tsx:71
 msgid "Menu"
 msgstr ""
 
@@ -4259,7 +4259,7 @@ msgstr ""
 msgid "My comfort activity"
 msgstr ""
 
-#: src/app/user-menu.tsx:123
+#: src/app/user-menu.tsx:128
 #: src/features/comments/my-comments-screen.tsx:77
 msgid "My comments"
 msgstr ""
@@ -4284,11 +4284,11 @@ msgstr ""
 msgid "My most controversial food opinion"
 msgstr ""
 
-#: src/app/user-menu.tsx:211
+#: src/app/user-menu.tsx:216
 msgid "My name is:"
 msgstr ""
 
-#: src/app/user-menu.tsx:99
+#: src/app/user-menu.tsx:104
 msgid "My profile"
 msgstr ""
 
@@ -4353,7 +4353,7 @@ msgstr ""
 msgid "Name of {pointName}"
 msgstr ""
 
-#: src/app/user-menu.tsx:237
+#: src/app/user-menu.tsx:242
 msgid "Names"
 msgstr ""
 
@@ -4794,11 +4794,11 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: src/app/admin-frame.tsx:143
+#: src/app/admin-frame.tsx:149
 msgid "Open admin menu"
 msgstr ""
 
-#: src/app/nav-bar.tsx:38
+#: src/app/nav-bar.tsx:46
 msgid "Open menu"
 msgstr ""
 
@@ -5786,7 +5786,7 @@ msgstr ""
 msgid "Select page"
 msgstr ""
 
-#: src/app/user-menu.tsx:61
+#: src/app/user-menu.tsx:65
 msgid "Select your name"
 msgstr ""
 
@@ -6001,8 +6001,8 @@ msgstr ""
 msgid "Set your password"
 msgstr ""
 
-#: src/app/admin-frame.tsx:44
-#: src/app/user-menu.tsx:115
+#: src/app/admin-frame.tsx:46
+#: src/app/user-menu.tsx:120
 #: src/features/admin/settings-screen.tsx:168
 #: src/features/settings/settings-screen.tsx:50
 msgid "Settings"
@@ -6384,7 +6384,7 @@ msgstr ""
 msgid "Starts at what the room holds. 0 means no limit."
 msgstr ""
 
-#: src/app/admin-frame.tsx:43
+#: src/app/admin-frame.tsx:45
 #: src/app/admin-pages.tsx:257
 #: src/features/admin/event-layout.tsx:99
 msgid "Statistics"
@@ -7176,7 +7176,7 @@ msgstr ""
 msgid "Username settings"
 msgstr ""
 
-#: src/app/admin-frame.tsx:41
+#: src/app/admin-frame.tsx:43
 #: src/features/admin/guest-import.tsx:46
 #: src/features/admin/guests-screen.tsx:539
 #: src/features/admin/guests-screen.tsx:548
@@ -7494,7 +7494,7 @@ msgstr ""
 msgid "Who are you looking for?"
 msgstr ""
 
-#: src/app/user-menu.tsx:209
+#: src/app/user-menu.tsx:214
 #: src/features/sign-in/bootstrap-screen.tsx:58
 msgid "Who are you?"
 msgstr ""
@@ -7681,8 +7681,8 @@ msgstr ""
 msgid "Your link to {eventName}"
 msgstr ""
 
-#: src/app/user-menu.tsx:57
-#: src/app/user-menu.tsx:90
+#: src/app/user-menu.tsx:61
+#: src/app/user-menu.tsx:95
 #: src/features/people/profile-form.tsx:395
 msgid "Your name"
 msgstr ""
@@ -7699,7 +7699,7 @@ msgstr ""
 msgid "Your name protection was turned off"
 msgstr ""
 
-#: src/app/user-menu.tsx:78
+#: src/app/user-menu.tsx:83
 msgid "Your name: {name}"
 msgstr ""
 
