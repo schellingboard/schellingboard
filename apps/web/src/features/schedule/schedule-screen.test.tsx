@@ -964,7 +964,7 @@ describe("the schedule before scheduling opens", { tags: ["007-US14"] }, () => {
       screen.getByRole("list", { name: "Event phases" })
     ).getAllByRole("listitem");
     expect(steps.at(-1)?.textContent).toMatch(
-      /^Scheduling, \d\d:\d\d - 01 Jul/
+      /^Scheduling, Starts 1 Jul, \d\d:\d\d/
     );
   });
 

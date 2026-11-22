@@ -40,4 +40,34 @@ describe("the phase bar", () => {
       expect(await schedulingHint(true)).toMatch(/book 1-on-1s/);
     }
   );
+
+  it(
+    "says when the current phase ends and when the next ones start, date first",
+    { tags: ["006-US3"] },
+    () => {
+      const event = toEvent({
+        ...snapshot.event,
+        timezone: "UTC",
+        proposalPhaseStart: new Date(Date.UTC(2025, 11, 1, 9)).toISOString(),
+        proposalPhaseEnd: null,
+        votingPhaseStart: new Date(Date.UTC(2026, 0, 10, 9)).toISOString(),
+        votingPhaseEnd: null,
+        schedulingPhaseStart: new Date(
+          Date.UTC(2026, 0, 20, 14, 30)
+        ).toISOString(),
+      });
+      render(
+        <PhaseBar
+          event={event}
+          now={now}
+          localZone={null}
+          timeFormat="h:mm a"
+        />
+      );
+      const steps = screen.getAllByRole("listitem").map((li) => li.textContent);
+      expect(steps[0]).toContain("Ends 10 Jan, 9:00 AM");
+      expect(steps[1]).toContain("Starts 10 Jan, 9:00 AM");
+      expect(steps[2]).toContain("Starts 20 Jan, 2:30 PM");
+    }
+  );
 });

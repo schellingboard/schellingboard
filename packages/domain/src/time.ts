@@ -14,14 +14,13 @@ export const DATETIME_FORMAT = `${TIME_FORMAT} - dd MMM`;
 export function formatInLocalZone(
   date: Date,
   eventZone: string,
-  localZone: string | null
+  localZone: string | null,
+  format = DATETIME_FORMAT
 ): string {
   const shown = DateTime.fromJSDate(date).setZone(localZone ?? eventZone);
   const atEvent = DateTime.fromJSDate(date).setZone(eventZone);
   return shown.toFormat(
-    shown.offset === atEvent.offset
-      ? DATETIME_FORMAT
-      : `${DATETIME_FORMAT} ZZZZ`
+    shown.offset === atEvent.offset ? format : `${format} ZZZZ`
   );
 }
 

@@ -5,6 +5,7 @@ import type { Event } from "@schellingboard/domain/event";
 import { hasPhases } from "@schellingboard/domain/phase";
 import type { ReactNode } from "react";
 
+import { useTimeFormat } from "../../app/time-format";
 import { cx } from "../../ui/cx";
 import { ClockIcon, QueueIcon, TableIcon } from "../../ui/icons";
 import { PhaseBar } from "../../ui/phase-bar";
@@ -71,7 +72,12 @@ export function ScheduleToolbar({
     // the inner one sticks the controls to the visible area, as the fold bars do.
     <div className="w-full border-b border-line-subtle bg-surface">
       <div className="sticky left-0 max-w-[100dvw]">
-        <PhaseBar event={event} now={now} localZone={LOCAL_ZONE} />
+        <PhaseBar
+          event={event}
+          now={now}
+          localZone={LOCAL_ZONE}
+          timeFormat={useTimeFormat()}
+        />
       </div>
       <div className="sticky left-0 flex max-w-[100dvw] flex-wrap items-center gap-x-4 gap-y-1 px-2 py-1.5 sm:px-3">
         <EventPagesNav

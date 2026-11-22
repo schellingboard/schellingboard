@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Clearer dates in the phase bar**: each phase says when it starts, ends or ended, date first, in
+  your 12- or 24-hour clock.
 - **Same switch between proposals and schedule**: both pages start with the same Proposals and
   Schedule tabs and an Event details button.
 - **Upload pictures of any size and shape**: pick the part of a profile or room picture to show by

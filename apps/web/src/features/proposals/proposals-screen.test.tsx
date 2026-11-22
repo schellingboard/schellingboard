@@ -157,7 +157,7 @@ describe("the proposals list", () => {
   });
 
   it(
-    "shows the phase bar with the running phase marked and each start date",
+    "shows the phase bar with the running phase marked, when it ends and when the next starts",
     { tags: ["006-US3"] },
     () => {
       setup("voting");
@@ -166,8 +166,10 @@ describe("the proposals list", () => {
       const steps = within(strip).getAllByRole("listitem");
       expect(steps.map((s) => s.textContent)).toEqual([
         "Proposals (skipped)",
-        expect.stringMatching(/^Voting, \d\d:\d\d - \d\d \w{3}$/) as string,
-        expect.stringMatching(/^Scheduling, /) as string,
+        expect.stringMatching(
+          /^Voting, Ends \d{1,2} \w{3}, \d\d:\d\d$/
+        ) as string,
+        expect.stringMatching(/^Scheduling, Starts \d{1,2} \w{3}, /) as string,
       ]);
       expect(steps.map((s) => s.getAttribute("aria-current"))).toEqual([
         null,
@@ -208,7 +210,9 @@ describe("the proposals list", () => {
       const steps = within(
         screen.getByRole("list", { name: "Event phases" })
       ).getAllByRole("listitem");
-      expect(steps[0].textContent).toMatch(/^Proposals, \d\d:\d\d/);
+      expect(steps[0].textContent).toMatch(
+        /^Proposals, Starts \d{1,2} \w{3}, \d\d:\d\d/
+      );
       expect(steps.map((s) => s.getAttribute("aria-current"))).toEqual([
         null,
         null,

@@ -7,6 +7,7 @@ import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
 import { type ComponentType, useMemo } from "react";
 
+import { useTimeFormat } from "../../app/time-format";
 import { formatDuration } from "../../i18n/duration";
 import { useListFormat } from "../../i18n/format-locale";
 import type { Standing } from "../../queries/proposal-standings";
@@ -82,6 +83,7 @@ const LINK = "hover:text-link transition-colors";
 
 export function ProposalsScreen(props: ProposalsScreenProps) {
   const { snapshot, links, now, localZone, onOpenDetails } = props;
+  const timeFormat = useTimeFormat();
   const event = toEvent(snapshot.event);
   const guestId = snapshot.me?.guestId ?? null;
   const eventName = snapshot.event.name;
@@ -94,7 +96,12 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
     <>
       {/* Level with the schedule, which sits right under the menu on phones. */}
       <div className="-mt-4 border-b border-line-subtle bg-surface sm:mt-0">
-        <PhaseBar event={event} now={now} localZone={localZone} />
+        <PhaseBar
+          event={event}
+          now={now}
+          localZone={localZone}
+          timeFormat={timeFormat}
+        />
         <div className="px-2 py-1.5 sm:px-3">
           <EventPagesNav
             current={PROPOSALS_PAGE}

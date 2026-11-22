@@ -2,7 +2,7 @@ import { i18n, type MessageDescriptor } from "@lingui/core";
 import { msg, t } from "@lingui/core/macro";
 import type { Event } from "@schellingboard/domain/event";
 import { EventPhase, phaseTimeline } from "@schellingboard/domain/phase";
-import { formatInLocalZone } from "@schellingboard/domain/time";
+import { formatInLocalZone, TIME_FORMAT } from "@schellingboard/domain/time";
 
 import { cx } from "./cx";
 import { CheckIcon } from "./icons";
@@ -28,6 +28,8 @@ const WHAT: Record<
 };
 const SCHEDULING_WITH_MEETINGS = msg`Vote counts show, sessions are scheduled, and attendees RSVP and book 1-on-1s.`;
 
+const DATE_FORMAT = "d MMM";
+
 const ARROW =
   "polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%, 6px 50%)";
 
@@ -39,10 +41,12 @@ export function PhaseBar({
   event,
   now,
   localZone,
+  timeFormat = TIME_FORMAT,
 }: {
   event: Event;
   now: Date;
   localZone: string | null;
+  timeFormat?: string;
 }) {
   const notify = useNotify();
   const steps = phaseTimeline(event, now);
@@ -58,7 +62,22 @@ export function PhaseBar({
     >
       {steps.map(({ phase, start, end, state, share }) => {
         const when = (date: Date) =>
-          formatInLocalZone(date, event.timezone, localZone);
+          formatInLocalZone(
+            date,
+            event.timezone,
+            localZone,
+            `${DATE_FORMAT}, ${timeFormat}`
+          );
+        const shown =
+          state === "current"
+            ? end
+              ? t`Ends ${when(end)}`
+              : start && t`Since ${when(start)}`
+            : state === "upcoming"
+              ? start && t`Starts ${when(start)}`
+              : state === "past"
+                ? end && t`Ended ${when(end)}`
+                : undefined;
         const what = i18n._(
           phase === EventPhase.SCHEDULING && event.meetingsEnabled
             ? SCHEDULING_WITH_MEETINGS
@@ -110,10 +129,10 @@ export function PhaseBar({
                     <span className="sr-only"> {t`(done)`}</span>
                   )}
                 </span>
-                {start && (
-                  <span className="mb-0.5 block text-[10px] font-normal leading-tight">
+                {shown && (
+                  <span className="mb-0.5 block truncate text-[10px] font-normal leading-tight">
                     <span className="sr-only">, </span>
-                    {when(start)}
+                    {shown}
                   </span>
                 )}
                 <span
