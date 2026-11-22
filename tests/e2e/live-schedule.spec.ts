@@ -64,10 +64,10 @@ test("another attendee's screen follows a session being created, moved and delet
 }) => {
   test.slow();
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
 
-  const bob = await openSchedule(browser, "/Conference-Gamma", /Bob Test/i);
+  const bob = await openSchedule(browser, "/Web-Unconference", /Bob Test/i);
   try {
     await switchToView(bob.page, "Agenda");
     const title = `E2E Live Session ${uniqueSuffix()}`;
@@ -113,10 +113,10 @@ test("a kiosk screen shows sessions as they are added and removed without a relo
 }) => {
   test.slow();
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
 
-  const kiosk = await openSchedule(browser, "/Conference-Gamma?kiosk=1");
+  const kiosk = await openSchedule(browser, "/Web-Unconference?kiosk=1");
   try {
     const title = `E2E Kiosk Session ${uniqueSuffix()}`;
 

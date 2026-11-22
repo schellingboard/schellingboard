@@ -9,7 +9,7 @@ import { selectUser } from "./helpers/user";
  * is how the schedule draws them. Booking one is covered by
  * meetings-request.spec.ts.
  *
- * Conference Gamma is the seeded event in its scheduling phase, and Zanele's
+ * Web Unconference is the seeded event in its scheduling phase, and Zanele's
  * first morning there holds two 1-on-1s in the 10:00 slot and three in the
  * 11:00 slot (scripts/seed/seed-database.ts) — shown from 10:10 and 11:10,
  * after the event's break, as sessions in those slots are.
@@ -23,7 +23,7 @@ test.describe("parallel 1-on-1s on the schedule", () => {
   }) => {
     await loginAndGoto(page, "/guests");
     await selectUser(page, VIEWER);
-    await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+    await page.getByRole("link", { name: "Web Unconference" }).first().click();
 
     const pair = page.getByRole("button", {
       name: "2 1-on-1s, 10:10 – 10:30 — 1 needs your reply",

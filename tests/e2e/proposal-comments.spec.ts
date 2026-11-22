@@ -9,18 +9,17 @@ import { selectUser } from "./helpers/user";
 // shared database, so two tests commenting on the same proposal would see
 // each other's comments.
 const MARKDOWN_PROPOSAL =
-  /Networking & Coffee Chat: Connect with Conference Beta Peers/;
-const EDIT_PROPOSAL = /Conference Beta Lightning Talks: Community Showcase/;
+  /Networking & Coffee Chat: Connect with Open Source Summit Peers/;
+const EDIT_PROPOSAL = /Open Source Summit Lightning Talks: Community Showcase/;
 const THREAD_PROPOSAL =
-  /Conference Beta Panel: Industry Leaders Share Their Insights/;
+  /Open Source Summit Panel: Industry Leaders Share Their Insights/;
 const TOMBSTONE_PROPOSAL =
-  /Networking & Coffee Chat: Connect with Conference Alpha Peers/;
-const ANONYMOUS_PROPOSAL =
-  /Conference Alpha Lightning Talks: Community Showcase/;
+  /Networking & Coffee Chat: Connect with Hackathon Peers/;
+const ANONYMOUS_PROPOSAL = /Hackathon Lightning Talks: Community Showcase/;
 const BRANCHING_PROPOSAL =
-  /Conference Gamma Panel: Industry Leaders Share Their Insights/;
+  /Web Unconference Panel: Industry Leaders Share Their Insights/;
 const LIKE_PROPOSAL =
-  /Networking & Coffee Chat: Connect with Conference Gamma Peers/;
+  /Networking & Coffee Chat: Connect with Web Unconference Peers/;
 
 async function openProposal(page: Page, title: RegExp) {
   await page.getByRole("row", { name: title }).locator("td").first().click();
@@ -40,7 +39,7 @@ test("posts a comment on a proposal and renders it as markdown @010-US1", async 
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
   await actAs(page, /Alice Test/i);
 
   const modal = await openProposal(page, MARKDOWN_PROPOSAL);
@@ -68,7 +67,7 @@ test("edits a comment, showing when it was edited, then deletes it @010-US4", as
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
   await actAs(page, /Alice Test/i);
 
   const modal = await openProposal(page, EDIT_PROPOSAL);
@@ -103,7 +102,7 @@ test("replies to a comment, collapses the thread, and permalinks to a reply @010
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
   await actAs(page, /Alice Test/i);
 
   const modal = await openProposal(page, THREAD_PROPOSAL);
@@ -161,7 +160,7 @@ test("keeps replies readable when their parent is deleted @010-US4", async ({
   browser,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await actAs(page, /Alice Test/i);
 
   const modal = await openProposal(page, TOMBSTONE_PROPOSAL);
@@ -174,7 +173,7 @@ test("keeps replies readable when their parent is deleted @010-US4", async ({
   const bobContext = await browser.newContext();
   const bob = await bobContext.newPage();
   await login(bob);
-  await bob.goto("/Conference-Alpha/proposals");
+  await bob.goto("/Hackathon/proposals");
   await actAs(bob, /Bob Test/i);
   const bobModal = await openProposal(bob, TOMBSTONE_PROPOSAL);
   await openReplyForm(bobModal);
@@ -200,7 +199,7 @@ test("likes a comment and shows who liked it @010-US6", async ({
   browser,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma/proposals");
+  await page.goto("/Web-Unconference/proposals");
   await actAs(page, /Alice Test/i);
 
   const modal = await openProposal(page, LIKE_PROPOSAL);
@@ -220,7 +219,7 @@ test("likes a comment and shows who liked it @010-US6", async ({
   const bobContext = await browser.newContext();
   const bob = await bobContext.newPage();
   await login(bob);
-  await bob.goto("/Conference-Gamma/proposals");
+  await bob.goto("/Web-Unconference/proposals");
   await actAs(bob, /Bob Test/i);
   const bobModal = await openProposal(bob, LIKE_PROPOSAL);
   await bobModal.getByRole("button", { name: "Like", exact: true }).click();
@@ -257,7 +256,7 @@ test("asks visitors without a name to select one before commenting @010-US1 @003
 }) => {
   await login(page);
 
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   const modal = await openProposal(page, ANONYMOUS_PROPOSAL);
 
   await expect(
@@ -270,7 +269,7 @@ test("nests sibling replies under the comment they answer @010-US5", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma/proposals");
+  await page.goto("/Web-Unconference/proposals");
 
   const modal = await openProposal(page, BRANCHING_PROPOSAL);
   await expect(modal.getByText("Who else is on the panel?")).toBeVisible();

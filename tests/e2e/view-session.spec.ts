@@ -9,7 +9,7 @@ test("hard-navigating to a session URL renders the modal without hydration error
 }) => {
   await login(page);
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 
   await page.getByRole("link", { name: KEYNOTE }).first().click();
@@ -45,11 +45,11 @@ test("the session panel keeps its address, and Close and Back return to the sche
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await page.getByRole("link", { name: KEYNOTE }).first().click();
   const panel = page.getByRole("dialog", { name: "Session details" });
   await expect(panel).toBeVisible();
-  await expect(page).toHaveURL(/\/Conference-Gamma\/sessions\/[^/?#]+$/);
+  await expect(page).toHaveURL(/\/Web-Unconference\/sessions\/[^/?#]+$/);
 
   await page.reload();
   await expect(panel).toBeVisible();
@@ -57,20 +57,20 @@ test("the session panel keeps its address, and Close and Back return to the sche
 
   await panel.getByRole("button", { name: "Close" }).click();
   await expect(panel).toBeHidden();
-  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule/);
+  await expect(page).toHaveURL(/\/Web-Unconference\/schedule/);
 
   await page.getByRole("link", { name: KEYNOTE }).first().click();
   await expect(panel).toBeVisible();
   await page.goBack();
   await expect(panel).toBeHidden();
-  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule/);
+  await expect(page).toHaveURL(/\/Web-Unconference\/schedule/);
 });
 
 test("an opened session link brings the session into view @007-US12", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
 
   const block = page.getByRole("link", { name: /Evening Wrap-up/ }).first();
   await block.click();
@@ -119,7 +119,7 @@ test("leaving a session modal whose RSVPs are still loading is quiet @007-US5", 
     await route.continue().catch(() => undefined);
   });
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await page.getByRole("link", { name: KEYNOTE }).first().click();
   await expect(
     page.getByRole("dialog", { name: "Session details" })
@@ -143,7 +143,7 @@ test("a session held in several rooms names each of them @007-US5 @004-US4", asy
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   // The agenda lists the session once; the grid has a block per room.
   await switchToView(page, "Agenda");
   await page.getByRole("link", { name: /Machine Learning Ethics/ }).click();

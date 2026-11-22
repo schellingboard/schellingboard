@@ -18,7 +18,7 @@ async function adminIsBehind(page: Page) {
 }
 
 for (const [where, path] of [
-  ["the schedule", "/Conference-Gamma"],
+  ["the schedule", "/Web-Unconference"],
   ["the other pages", "/"],
 ] as const) {
   test(`an outdated site is flagged in the footer of ${where} @014-US6`, async ({
@@ -47,7 +47,7 @@ for (const [where, path] of [
 
 test("a site that is up to date shows no flag @014-US6", async ({ page }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
 
   await expect(page.getByRole("button", { name: /what's new/i })).toBeVisible();
   await expect(

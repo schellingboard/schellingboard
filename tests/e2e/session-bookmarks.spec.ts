@@ -8,7 +8,7 @@ import { selectUser } from "./helpers/user";
 test("an attendee bookmarks a session and finds it again under My schedule @007-US9 @007-US3", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma");
+  await loginAndGoto(page, "/Web-Unconference");
   await switchToView(page, "Agenda");
   await selectUser(page, "Charlie Test");
 

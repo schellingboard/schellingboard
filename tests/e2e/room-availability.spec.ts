@@ -14,7 +14,7 @@ async function openGammaLocations(page: Page) {
   await page.goto("/admin");
   await page
     .getByRole("listitem")
-    .filter({ hasText: "Conference Gamma" })
+    .filter({ hasText: "Web Unconference" })
     .getByRole("link", { name: "Manage" })
     .click();
   await page
@@ -46,7 +46,7 @@ test("a room marked unavailable cannot be booked then @017-US4", async ({
   await expect(period).toBeVisible();
 
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(

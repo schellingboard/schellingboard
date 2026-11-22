@@ -15,7 +15,7 @@ test("proposal phase: tapping a greyed-out vote button says when voting opens @0
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   // Bob hosts none of Alpha's deterministic seed proposals, so the only thing
   // gating his vote buttons is the phase.
   await selectUser(page, /Bob Test/i);
@@ -24,7 +24,7 @@ test("proposal phase: tapping a greyed-out vote button says when voting opens @0
     .getByRole("link", { name: /Go to Quick Voting!/i })
     .click({ force: true });
   await expect(toast(page)).toContainText(/Voting will be enabled at/);
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals$/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals$/);
   await dismissToast(page);
 
   // On a proposal card the whole card is a link, so the tap must reach the
@@ -35,7 +35,7 @@ test("proposal phase: tapping a greyed-out vote button says when voting opens @0
   );
   await interested.click({ force: true });
   await expect(toast(page)).toContainText(/Voting will be enabled at/);
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals$/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals$/);
 });
 
 // The dev clock's picker takes local time, "YYYY-MM-DDTHH:mm".
@@ -50,7 +50,7 @@ test("after the event: a greyed-out control with no reason to give still does no
 }) => {
   await login(page);
   // ?dev=1 reveals the dev clock toolbar (enabled by SB_ENABLE_DEV_TOOLS).
-  await page.goto("/Conference-Alpha/proposals?dev=1");
+  await page.goto("/Hackathon/proposals?dev=1");
   await selectUser(page, /Bob Test/i);
 
   // Alpha ends some six weeks out; past it every phase is over and none is
@@ -71,12 +71,12 @@ test("voting phase: tapping a greyed-out Schedule button says when scheduling op
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
   // Bob hosts Beta's Lightning Talks, so its page offers him Schedule.
   await selectUser(page, /Bob Test/i);
 
   await page
-    .getByRole("link", { name: /Conference Beta Lightning Talks/ })
+    .getByRole("link", { name: /Open Source Summit Lightning Talks/ })
     .click();
   const proposal = page.getByRole("dialog");
   await expect(proposal).toBeVisible();

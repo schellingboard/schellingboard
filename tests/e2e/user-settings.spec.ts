@@ -8,7 +8,7 @@ test("header user menu reaches profile, edit profile, and settings; email prefer
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Amara Okafor/i);
 
   // Once a name is selected, the header chip opens a user menu.

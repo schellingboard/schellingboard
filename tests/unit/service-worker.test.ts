@@ -114,7 +114,7 @@ describe("the service worker", () => {
     const upgraded = boot((pathname) =>
       pathname.startsWith("/_spa/assets/") ? new Response("js") : html(build)
     );
-    await upgraded.navigate("/Conference-Gamma");
+    await upgraded.navigate("/Web-Unconference");
     await upgraded.dispatch("fetch", {
       request: {
         method: "GET",
@@ -124,7 +124,7 @@ describe("the service worker", () => {
     });
     build = '<script src="/_spa/assets/index-2.js"></script>shell-2';
 
-    await upgraded.navigate("/Conference-Gamma");
+    await upgraded.navigate("/Web-Unconference");
 
     const cache = [...upgraded.store.values()][0];
     expect([...cache.keys()].sort()).toEqual([
@@ -138,7 +138,7 @@ describe("the service worker", () => {
     const same = boot((pathname) =>
       pathname.startsWith("/_spa/assets/") ? new Response("js") : html(shell)
     );
-    await same.navigate("/Conference-Gamma");
+    await same.navigate("/Web-Unconference");
     await same.dispatch("fetch", {
       request: {
         method: "GET",
@@ -147,17 +147,17 @@ describe("the service worker", () => {
       },
     });
 
-    await same.navigate("/Conference-Gamma");
+    await same.navigate("/Web-Unconference");
 
     const cache = [...same.store.values()][0];
     expect([...cache.keys()]).toContain("/_spa/assets/messages-de-1.js");
   });
 
   it("serves the kept shell for a page of the SPA when the network is gone @014-US5", async () => {
-    await worker.navigate("/Conference-Gamma");
+    await worker.navigate("/Web-Unconference");
     worker.setOnline(false);
 
-    const { response } = await worker.navigate("/Conference-Gamma");
+    const { response } = await worker.navigate("/Web-Unconference");
 
     expect(await response!.text()).toContain("shell-1");
   });
@@ -165,10 +165,10 @@ describe("the service worker", () => {
   it("prefers the network, so a new build shows as soon as it is there", async () => {
     let build = shell;
     const upgraded = boot(() => html(build));
-    await upgraded.navigate("/Conference-Gamma");
+    await upgraded.navigate("/Web-Unconference");
     build = "shell-2";
 
-    const { response } = await upgraded.navigate("/Conference-Gamma");
+    const { response } = await upgraded.navigate("/Web-Unconference");
 
     expect(await response!.text()).toBe("shell-2");
   });
@@ -189,9 +189,9 @@ describe("the service worker", () => {
       value: true,
     });
     const gated = boot(() => redirected);
-    await gated.navigate("/Conference-Gamma");
+    await gated.navigate("/Web-Unconference");
     const broken = boot(() => html("nope", { status: 500 }));
-    await broken.navigate("/Conference-Gamma");
+    await broken.navigate("/Web-Unconference");
 
     const kept = (w: typeof gated) =>
       [...w.store.values()].reduce((n, cache) => n + cache.size, 0);
@@ -202,7 +202,7 @@ describe("the service worker", () => {
   it.each(["/api/v1/health", "/media/x", "/manifest.webmanifest"])(
     "leaves %s to the network",
     async (pathname) => {
-      await worker.navigate("/Conference-Gamma");
+      await worker.navigate("/Web-Unconference");
       const { answered } = await worker.navigate(pathname);
 
       expect(answered).toBe(false);

@@ -41,7 +41,7 @@ const location = (
 });
 
 const events = [
-  { id: "e1", name: "Conference Alpha" },
+  { id: "e1", name: "Hackathon" },
   { id: "e2", name: "Camp" },
 ];
 
@@ -105,7 +105,7 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
     expect(screen.getByRole("heading", { name: "Locations" })).toBeTruthy();
 
     const [hall, store] = within(region).getAllByRole("listitem");
-    expect(hall.textContent).toContain("max 25 · bookable · Conference Alpha");
+    expect(hall.textContent).toContain("max 25 · bookable · Hackathon");
     expect(within(hall).getByRole("img", { name: "Hall" })).toBeTruthy();
     expect(store.textContent).not.toContain("max");
     expect(within(store).getByTestId("location-placeholder")).toBeTruthy();
@@ -168,7 +168,7 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
       await userEvent.type(within(region).getByLabelText(/^Name/), "Attic");
       await userEvent.type(within(region).getByLabelText("Capacity"), "25");
       await userEvent.click(within(region).getByLabelText("Bookable"));
-      await userEvent.click(within(region).getByLabelText("Conference Alpha"));
+      await userEvent.click(within(region).getByLabelText("Hackathon"));
       await uploadImage(region);
       await userEvent.click(
         within(region).getByRole("button", { name: "Add location" })

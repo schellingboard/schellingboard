@@ -10,15 +10,15 @@ test("should allow voting on proposals with different choices @005-US1", async (
 }) => {
   await login(page);
 
-  // Go to proposals list for Conference Beta (voting phase)
-  await page.goto("/Conference-Beta/proposals");
+  // Go to proposals list for Open Source Summit (voting phase)
+  await page.goto("/Open-Source-Summit/proposals");
 
   // Select a user via the header name picker
   await selectUser(page, /Alice Test/i);
 
   // Choose a proposal created by Charlie Test
   const proposalRow = page.getByRole("row", {
-    name: /Networking & Coffee Chat: Connect with Conference Beta Peers/,
+    name: /Networking & Coffee Chat: Connect with Open Source Summit Peers/,
   });
 
   // Verify the row exists
@@ -58,8 +58,8 @@ test("should navigate to quick voting and allow voting on proposals @005-US2", a
 }) => {
   await login(page);
 
-  // Go to proposals list for Conference Beta (voting phase)
-  await page.goto("/Conference-Beta/proposals");
+  // Go to proposals list for Open Source Summit (voting phase)
+  await page.goto("/Open-Source-Summit/proposals");
 
   // Select a user via the header name picker
   await selectUser(page, /Bob Test/i);
@@ -68,7 +68,9 @@ test("should navigate to quick voting and allow voting on proposals @005-US2", a
   await page.getByRole("link", { name: /Go to Quick Voting!/i }).click();
 
   // Verify we're on the quick voting page
-  await expect(page).toHaveURL(/\/Conference-Beta\/proposals\/quick-voting$/);
+  await expect(page).toHaveURL(
+    /\/Open-Source-Summit\/proposals\/quick-voting$/
+  );
   await expect(page.getByText(/Quick Voting/i)).toBeVisible();
 
   // Bob always has something left to vote on: the three event-specific Beta
@@ -95,14 +97,14 @@ test("should navigate to quick voting and allow voting on proposals @005-US2", a
 
   // Navigate back to proposals overview
   await page.getByRole("link", { name: /← Proposals/i }).click();
-  await expect(page).toHaveURL(/\/Conference-Beta\/proposals$/);
+  await expect(page).toHaveURL(/\/Open-Source-Summit\/proposals$/);
 });
 
 test("shows a proposal's comments read-only while quick voting @005-US2", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
   await selectUser(page, "Marta Horvat");
   await page.getByRole("link", { name: /Go to Quick Voting!/i }).click();
 
@@ -117,7 +119,7 @@ test("opens the full proposal from Quick Voting and returns to the same place @0
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
   await selectUser(page, "Dmitri Volkov");
   await page.getByRole("link", { name: /Go to Quick Voting!/i }).click();
 
@@ -134,7 +136,9 @@ test("opens the full proposal from Quick Voting and returns to the same place @0
   await expect(modal.getByPlaceholder("Add a comment")).toBeVisible();
 
   await modal.getByRole("button", { name: "Close" }).click();
-  await expect(page).toHaveURL(/\/Conference-Beta\/proposals\/quick-voting$/);
+  await expect(page).toHaveURL(
+    /\/Open-Source-Summit\/proposals\/quick-voting$/
+  );
   await expect(title).toHaveText(current);
 });
 
@@ -142,7 +146,7 @@ test("votes from two users persist independently across reloads @005-US1", async
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta/proposals");
+  await page.goto("/Open-Source-Summit/proposals");
 
   // Create a throwaway proposal as Bob Test, who is prefilled as its host.
   // The host matters twice over: hosts get no voting buttons on their own
@@ -155,7 +159,7 @@ test("votes from two users persist independently across reloads @005-US1", async
   await page.getByRole("link", { name: /Add Proposal/i }).click();
   await page.getByLabel("Title").fill(title);
   await Promise.all([
-    page.waitForURL(/\/Conference-Beta\/proposals$/),
+    page.waitForURL(/\/Open-Source-Summit\/proposals$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
 
@@ -215,7 +219,7 @@ test("votes from two users persist independently across reloads @005-US1", async
 test("should show voting disabled state when not logged in as a user @005-US1", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Beta/proposals");
+  await loginAndGoto(page, "/Open-Source-Summit/proposals");
 
   // Find the first proposal row (skip header)
   const firstProposalRow = page.getByRole("row").nth(1);
@@ -241,7 +245,7 @@ test("should show voting disabled state when not logged in as a user @005-US1", 
   ).toHaveCount(0);
 });
 
-// Conference Gamma is in the scheduling phase, where the vote breakdown is
+// Web Unconference is in the scheduling phase, where the vote breakdown is
 // shown. Hana Kobayashi hosts the first proposal; nobody hosts the second.
 const HOSTED_PROPOSAL = "Writing Documentation People Actually Read";
 const HOSTLESS_PROPOSAL = "Ask Me Anything: Migrating a Legacy Monolith";
@@ -259,12 +263,12 @@ async function openProposal(page: Page, event: string, title: string) {
 }
 
 const openGammaProposal = (page: Page, title: string) =>
-  openProposal(page, "Conference-Gamma", title);
+  openProposal(page, "Web-Unconference", title);
 
 test("a host sees the vote breakdown of their own proposal @005-US3", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await loginAndGoto(page, "/Web-Unconference/proposals");
   await selectUser(page, "Hana Kobayashi");
 
   const modal = await openGammaProposal(page, HOSTED_PROPOSAL);
@@ -283,7 +287,7 @@ test("a host sees the vote breakdown of their own proposal @005-US3", async ({
 test("someone else's proposal keeps its vote breakdown private @005-US3", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await loginAndGoto(page, "/Web-Unconference/proposals");
   await selectUser(page, /Alice Test/i);
 
   const modal = await openGammaProposal(page, HOSTED_PROPOSAL);
@@ -296,7 +300,7 @@ test("someone else's proposal keeps its vote breakdown private @005-US3", async 
 test("a proposal nobody hosts shows its vote breakdown to everyone @005-US3", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await loginAndGoto(page, "/Web-Unconference/proposals");
   await selectUser(page, /Alice Test/i);
 
   const modal = await openGammaProposal(page, HOSTLESS_PROPOSAL);
@@ -308,12 +312,12 @@ test("a proposal nobody hosts shows its vote breakdown to everyone @005-US3", as
 
 // Seeded with a host (Charlie Test) but no votes at all — below the turnout
 // the estimate needs.
-const UNVOTED_PROPOSAL = "Conference Gamma Lightning Talks: Community Showcase";
+const UNVOTED_PROPOSAL = "Web Unconference Lightning Talks: Community Showcase";
 
 test("a proposal hardly anyone voted on gets no attendance guess @005-US4", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await loginAndGoto(page, "/Web-Unconference/proposals");
   await selectUser(page, /Charlie Test/i);
 
   const modal = await openGammaProposal(page, UNVOTED_PROPOSAL);
@@ -325,19 +329,19 @@ test("a proposal hardly anyone voted on gets no attendance guess @005-US4", asyn
   ).toHaveCount(0);
 });
 
-// Conference Beta is in the voting phase; Charlie Test hosts this proposal.
+// Open Source Summit is in the voting phase; Charlie Test hosts this proposal.
 const BETA_HOSTED_PROPOSAL =
-  "Networking & Coffee Chat: Connect with Conference Beta Peers";
+  "Networking & Coffee Chat: Connect with Open Source Summit Peers";
 
 test("a host sees the vote breakdown of their own proposal while voting @005-US3", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Beta/proposals");
+  await loginAndGoto(page, "/Open-Source-Summit/proposals");
   await selectUser(page, "Charlie Test");
 
   const modal = await openProposal(
     page,
-    "Conference-Beta",
+    "Open-Source-Summit",
     BETA_HOSTED_PROPOSAL
   );
 

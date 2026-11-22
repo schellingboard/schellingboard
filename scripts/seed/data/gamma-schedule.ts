@@ -1,4 +1,4 @@
-// Conference Gamma (scheduling phase) gets a realistic, mostly filled grid:
+// Web Unconference (scheduling phase) gets a realistic, mostly filled grid:
 // most sessions are scheduled from its seeded proposals (matched by title),
 // plus organizer/attendee extras. Times are Berlin clock times on event day
 // 0-2, day 2 running past midnight (09:00 → 03:00). Keep the slots that
@@ -216,7 +216,7 @@ export const gammaSessionConfigs: GammaSessionConfig[] = [
     title: "Closing Session & Farewell",
     fromProposal: false,
     description:
-      "Wrap-up of Conference Gamma:\n\n- Community announcements\n- A look back at the highlights of the last three days\n- Thank-yous to volunteers and speakers\n- A preview of next year's edition\n\nWe close with a group photo in front of the **Main Hall**.",
+      "Wrap-up of Web Unconference:\n\n- Community announcements\n- A look back at the highlights of the last three days\n- Thank-yous to volunteers and speakers\n- A preview of next year's edition\n\nWe close with a group photo in front of the **Main Hall**.",
     day: 2,
     start: [16, 0],
     end: [17, 0],

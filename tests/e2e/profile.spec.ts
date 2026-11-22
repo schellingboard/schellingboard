@@ -40,7 +40,7 @@ test.describe("Edit profile", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
     await selectUser(page, "Alice Test");
@@ -97,7 +97,7 @@ test.describe("Edit profile", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
     await selectUser(page, "Alice Test");
@@ -128,7 +128,7 @@ test.describe("Edit profile", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
     await selectUser(page, "Alice Test");
@@ -151,7 +151,7 @@ test.describe("Edit profile", () => {
 
   test("renders markdown in About me, safely @011-US1", async ({ page }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
@@ -201,7 +201,7 @@ test.describe("Edit profile", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
@@ -338,7 +338,7 @@ test.describe("Edit profile", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
     await selectUser(page, "Alice Test");
@@ -362,7 +362,7 @@ test.describe("Edit profile", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Alpha/proposals");
+    await page.goto("/Hackathon/proposals");
 
     await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
@@ -410,7 +410,7 @@ test("summarizes validation errors next to the Save button @011-US1", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
 
   await selectUser(page, "Alice Test");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();
@@ -461,7 +461,7 @@ test("the profile form asks before discarding changes, then closes @011-US1", as
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, "Alice Test");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();
   await page.getByRole("link", { name: /Edit profile/i }).click();
@@ -483,7 +483,7 @@ test("the profile form opens from its address and closes to the directory @011-U
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, "Alice Test");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();
   await page.getByRole("link", { name: /Edit profile/i }).click();
@@ -617,7 +617,7 @@ test("sorts the attendee directory by recently updated @011-US3", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
 
   await selectUser(page, "Samuel Adeyemi");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();

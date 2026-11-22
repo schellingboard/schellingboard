@@ -112,8 +112,8 @@ function eventSlugs(dbPath: string) {
         id: string;
         slug: string;
       };
-    const gamma = row("Conference Gamma");
-    const beta = row("Conference Beta");
+    const gamma = row("Web Unconference");
+    const beta = row("Open Source Summit");
     return {
       gamma: { slug: gamma.slug, eventId: gamma.id },
       beta: { slug: beta.slug, eventId: beta.id },

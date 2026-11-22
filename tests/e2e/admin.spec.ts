@@ -116,7 +116,7 @@ test.describe("Admin UI", () => {
     // /admin is no longer a dashboard; it redirects to the events list.
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin\/events$/);
-    await expect(page.getByText("Conference Alpha")).toBeVisible();
+    await expect(page.getByText("Hackathon")).toBeVisible();
 
     // The nav links straight to the sections; there is no "Dashboard" entry.
     const nav = page.getByRole("navigation", { name: "Admin" });
@@ -245,16 +245,14 @@ test.describe("Admin UI", () => {
     const addForm = page
       .locator("form")
       .filter({ has: page.getByRole("button", { name: "Add user" }) });
-    const alpha = addForm.getByRole("checkbox", { name: "Conference Alpha" });
+    const alpha = addForm.getByRole("checkbox", { name: "Hackathon" });
 
     await alpha.check();
     for (const name of [first, second]) {
       await page.getByLabel("Name", { exact: true }).fill(name);
       await addForm.getByRole("button", { name: "Add user" }).click();
       const row = await findUser(page, name);
-      await expect(
-        row.getByRole("link", { name: "Conference Alpha" })
-      ).toBeVisible();
+      await expect(row.getByRole("link", { name: "Hackathon" })).toBeVisible();
       await expect(alpha).toBeChecked();
     }
 
@@ -264,18 +262,16 @@ test.describe("Admin UI", () => {
       .getByRole("listitem")
       .filter({ has: page.getByRole("button", { name: "Save" }) });
     await expect(
-      editRow.getByRole("checkbox", { name: "Conference Alpha" })
+      editRow.getByRole("checkbox", { name: "Hackathon" })
     ).toBeChecked();
-    await editRow.getByRole("checkbox", { name: "Conference Alpha" }).uncheck();
-    await editRow.getByRole("checkbox", { name: "Conference Beta" }).check();
+    await editRow.getByRole("checkbox", { name: "Hackathon" }).uncheck();
+    await editRow.getByRole("checkbox", { name: "Open Source Summit" }).check();
     await editRow.getByRole("button", { name: "Save" }).click();
 
     await expect(
-      row.getByRole("link", { name: "Conference Beta" })
+      row.getByRole("link", { name: "Open Source Summit" })
     ).toBeVisible();
-    await expect(
-      row.getByRole("link", { name: "Conference Alpha" })
-    ).toHaveCount(0);
+    await expect(row.getByRole("link", { name: "Hackathon" })).toHaveCount(0);
 
     for (const name of [first, second]) {
       const mine = await findUser(page, name);
@@ -452,8 +448,8 @@ test.describe("Admin UI", () => {
 
     // Pick an event through the searchable multi-select (opens on focus).
     await page.getByLabel("Assign to events").click();
-    await page.keyboard.type("Alpha");
-    await page.getByRole("option", { name: "Conference Alpha" }).click();
+    await page.keyboard.type("Hack");
+    await page.getByRole("option", { name: "Hackathon" }).click();
     await page.keyboard.press("Escape");
 
     await page.getByRole("button", { name: "Import" }).click();
@@ -472,9 +468,7 @@ test.describe("Admin UI", () => {
     await expect(page).toHaveURL(/[?&]q=/);
     const row = users.getByRole("listitem").filter({ hasText: newEmail });
     await expect(row.getByText(newName)).toBeVisible();
-    await expect(
-      row.getByRole("link", { name: "Conference Alpha" })
-    ).toBeVisible();
+    await expect(row.getByRole("link", { name: "Hackathon" })).toBeVisible();
 
     // Clean up so the shared seed stays stable for other tests.
     await row.getByRole("button", { name: "Delete", exact: true }).click();
@@ -564,11 +558,9 @@ test.describe("Admin UI", () => {
     await expect(page).not.toHaveURL(/[?&]q=/);
 
     // Each user links to the events they are assigned to.
-    await userItem("Bob Test")
-      .getByRole("link", { name: "Conference Alpha" })
-      .click();
+    await userItem("Bob Test").getByRole("link", { name: "Hackathon" }).click();
     await expect(
-      page.getByRole("heading", { name: "Conference Alpha" })
+      page.getByRole("heading", { name: "Hackathon" })
     ).toBeVisible();
   });
 });
@@ -586,7 +578,7 @@ test.describe("Admin UI events", () => {
     await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
 
     // Seeded events are listed
-    await expect(page.getByText("Conference Alpha")).toBeVisible();
+    await expect(page.getByText("Hackathon")).toBeVisible();
 
     // Create a new event
     const unique = uniqueSuffix();
@@ -1119,7 +1111,7 @@ test.describe("Admin UI guest assignment", () => {
 
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Guests");
@@ -1146,10 +1138,10 @@ test.describe("Admin UI guest assignment", () => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
-    // Conference Alpha has all three seeded guests assigned.
+    // Hackathon has all three seeded guests assigned.
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Guests");
@@ -1327,7 +1319,7 @@ test.describe("Admin UI locations", () => {
 
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Locations");
@@ -1419,10 +1411,10 @@ test.describe("Admin UI proposals", () => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
-    // Conference Alpha is seeded with proposals; open its detail page
+    // Hackathon is seeded with proposals; open its detail page
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Proposals");
@@ -1432,7 +1424,7 @@ test.describe("Admin UI proposals", () => {
 
     // A known seeded, event-specific proposal with a known host
     const row = proposals.getByRole("listitem").filter({
-      hasText: "Conference Alpha Lightning Talks: Community Showcase",
+      hasText: "Hackathon Lightning Talks: Community Showcase",
     });
     await expect(row).toBeVisible();
     await expect(row).toContainText("Alice Test");
@@ -1465,7 +1457,7 @@ test.describe("Admin UI proposals", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Proposals");
@@ -1487,7 +1479,7 @@ test.describe("Admin UI proposals", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Proposals");
@@ -1495,8 +1487,7 @@ test.describe("Admin UI proposals", () => {
     const proposals = page.getByRole("region", { name: "Proposals" });
     // Use the seeded Panel proposal (not asserted by the list test) and revert
     // at the end so the shared seed data stays intact.
-    const original =
-      "Conference Alpha Panel: Industry Leaders Share Their Insights";
+    const original = "Hackathon Panel: Industry Leaders Share Their Insights";
     const unique = uniqueSuffix();
     const edited = `Panel EDITED ${unique}`;
 
@@ -1536,13 +1527,13 @@ test.describe("Admin UI proposals", () => {
 
   test("deletes a proposal via named confirm @018-US1", async ({ page }) => {
     // Create a fresh proposal so we never permanently delete seeded data
-    await loginAndGoto(page, "/Conference-Alpha/proposals");
+    await loginAndGoto(page, "/Hackathon/proposals");
     await selectUser(page, /Bob Test/i);
     await page.getByRole("link", { name: /Add Proposal/i }).click();
     const title = `E2E Delete Test ${uniqueSuffix()}`;
     await page.getByLabel("Title").fill(title);
     await Promise.all([
-      page.waitForURL(/\/Conference-Alpha\/proposals$/),
+      page.waitForURL(/\/Hackathon\/proposals$/),
       page.getByRole("button", { name: "Submit" }).click(),
     ]);
 
@@ -1551,7 +1542,7 @@ test.describe("Admin UI proposals", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Proposals");
@@ -1587,10 +1578,10 @@ test.describe("Admin UI sessions", () => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
-    // Conference Gamma is seeded with an opening keynote (read-only assertion).
+    // Web Unconference is seeded with an opening keynote (read-only assertion).
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Gamma" })
+      .filter({ hasText: "Web Unconference" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1599,7 +1590,7 @@ test.describe("Admin UI sessions", () => {
     await expect(sessions).toBeVisible();
 
     const row = sessions.getByRole("listitem").filter({
-      hasText: "Opening Keynote - Conference Gamma",
+      hasText: "Opening Keynote - Web Unconference",
     });
     await expect(row).toBeVisible();
     // Keynote is hosted by a seeded guest and placed in the first location
@@ -1631,7 +1622,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Gamma" })
+      .filter({ hasText: "Web Unconference" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1651,16 +1642,16 @@ test.describe("Admin UI sessions", () => {
   }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
-    // Conference Alpha's keynote is not asserted by other specs; edit + revert.
+    // Hackathon's keynote is not asserted by other specs; edit + revert.
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
 
     const sessions = page.getByRole("region", { name: "Sessions" });
-    const original = "Opening Keynote - Conference Alpha";
+    const original = "Opening Keynote - Hackathon";
     const edited = `Keynote EDITED ${uniqueSuffix()}`;
 
     await sessions
@@ -1694,7 +1685,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1749,7 +1740,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1776,7 +1767,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1836,7 +1827,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1864,7 +1855,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Alpha" })
+      .filter({ hasText: "Hackathon" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1921,17 +1912,17 @@ test.describe("Admin UI sessions", () => {
   test("deletes a session via named confirm @018-US2", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
-    // Conference Beta's keynote is not referenced by other specs, so it is
+    // Open Source Summit's keynote is not referenced by other specs, so it is
     // safe to permanently delete from the shared seed.
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Beta" })
+      .filter({ hasText: "Open Source Summit" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
 
     const sessions = page.getByRole("region", { name: "Sessions" });
-    const title = "Opening Keynote - Conference Beta";
+    const title = "Opening Keynote - Open Source Summit";
     const row = sessions.getByRole("listitem").filter({ hasText: title });
     await expect(row).toBeVisible();
 
@@ -1955,7 +1946,7 @@ test.describe("Admin UI sessions", () => {
     // guaranteed a clean "no prior RSVP" state on the keynote by the seed and
     // is used by no other spec (Bob Test's keynote slot belongs to
     // rsvp.spec.ts).
-    await loginAndGoto(page, "/Conference-Gamma");
+    await loginAndGoto(page, "/Web-Unconference");
     // Open the header name picker, then filter to Yuki (who sorts last and
     // would otherwise fall outside the combobox's visible options).
     await page.getByRole("button", { name: /your name/i }).click();
@@ -1975,7 +1966,7 @@ test.describe("Admin UI sessions", () => {
     await page.goto("/admin/events");
     await page
       .getByRole("listitem")
-      .filter({ hasText: "Conference Gamma" })
+      .filter({ hasText: "Web Unconference" })
       .getByRole("link", { name: "Manage" })
       .click();
     await openEventTab(page, "Sessions");
@@ -1983,7 +1974,7 @@ test.describe("Admin UI sessions", () => {
     const sessions = page.getByRole("region", { name: "Sessions" });
     const row = sessions
       .getByRole("listitem")
-      .filter({ hasText: "Opening Keynote - Conference Gamma" });
+      .filter({ hasText: "Opening Keynote - Web Unconference" });
     await expect(row).toBeVisible();
 
     // Expand the RSVPs disclosure and remove Yuki Tanaka
@@ -2083,14 +2074,12 @@ test.describe("Admin UI locations", () => {
     await region.getByLabel("Name*").fill(nameA);
     await region.getByLabel("Capacity").fill("25");
     await region.getByLabel("Bookable").check();
-    await region.getByLabel("Conference Alpha").check();
+    await region.getByLabel("Hackathon").check();
     await region.getByRole("button", { name: "Add location" }).click();
 
     const rowA = region.getByRole("listitem").filter({ hasText: nameA });
     await expect(rowA).toBeVisible();
-    await expect(
-      rowA.getByText("max 25 · bookable · Conference Alpha")
-    ).toBeVisible();
+    await expect(rowA.getByText("max 25 · bookable · Hackathon")).toBeVisible();
 
     // Create a second location; new locations are appended at the end
     await region.getByRole("button", { name: "New location" }).click();

@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 
 /**
- * Midnight Berlin on Conference Gamma's day `day` (0-based). The seed lays
+ * Midnight Berlin on Web Unconference's day `day` (0-based). The seed lays
  * Gamma out from the instant global setup ran it, not from when a test runs:
  * a suite crossing Berlin midnight would otherwise look one day too late.
  */

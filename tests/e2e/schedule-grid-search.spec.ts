@@ -19,7 +19,7 @@ test("searching the grid fades what doesn't match and folds days without a match
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Zanele Khumalo");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   const search = page.getByRole("searchbox", { name: "Search sessions" });
 
   // Only the API design session's description says "comparative".
@@ -63,7 +63,7 @@ test.describe("in a short window", () => {
   }) => {
     await loginAndGoto(page, "/guests");
     await selectUser(page, "Zanele Khumalo");
-    await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+    await page.getByRole("link", { name: "Web Unconference" }).first().click();
     const search = page.getByRole("searchbox", { name: "Search sessions" });
     const next = page.getByRole("button", { name: "Next match" });
     const previous = page.getByRole("button", { name: "Previous match" });
@@ -103,7 +103,7 @@ test("a filter chosen in the agenda carries over to the grid @007-US3", async ({
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Charlie Test");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   await switchToView(page, "Agenda");
   await filterChip(page, "My schedule").click();
   await filterChip(page, "Choose what My schedule shows").click();
@@ -127,7 +127,7 @@ test("the My schedule menu opens over the grid and its options can be clicked @0
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Charlie Test");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
 
   await filterChip(page, "My schedule").click();
   await filterChip(page, "Choose what My schedule shows").click();
@@ -144,7 +144,7 @@ test("a search survives opening a session, closing it and a reload @007-US3", as
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Zanele Khumalo");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   const search = page.getByRole("searchbox", { name: "Search sessions" });
 
   await page.getByRole("link", { name: /API Design/ }).click();

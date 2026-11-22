@@ -80,24 +80,24 @@ const manageGamma = async (page: Page) => {
   await adminLogin(page);
   await page
     .getByRole("listitem")
-    .filter({ hasText: "Conference Gamma" })
+    .filter({ hasText: "Web Unconference" })
     .getByRole("link", { name: "Manage" })
     .click();
-  await page.getByRole("heading", { name: "Conference Gamma" }).waitFor();
+  await page.getByRole("heading", { name: "Web Unconference" }).waitFor();
 };
 
 const openGammaOnPhone = async (page: Page) => {
   await page.getByRole("button", { name: "Open menu" }).click();
-  await page.getByRole("link", { name: "Conference Gamma" }).click();
+  await page.getByRole("link", { name: "Web Unconference" }).click();
   await page.getByRole("group", { name: "Schedule view" }).waitFor();
 };
 
 export const shots: Shot[] = [
   shot("home-multi-event", async () => {}),
-  shot("proposals-browse", (page) => openProposals(page, "Conference Alpha")),
-  shot("proposals-vote", (page) => openProposals(page, "Conference Beta")),
+  shot("proposals-browse", (page) => openProposals(page, "Hackathon")),
+  shot("proposals-vote", (page) => openProposals(page, "Open Source Summit")),
   shot("quick-voting", async (page) => {
-    await openProposals(page, "Conference Beta");
+    await openProposals(page, "Open Source Summit");
     await page.getByRole("link", { name: /Quick Voting/ }).click();
     await page.waitForURL(/quick-voting/);
     // A proposal with a discussion shows the comments below it.
@@ -109,26 +109,26 @@ export const shots: Shot[] = [
     await expect(heading).toBeVisible();
   }),
   shot("proposal-edit", async (page) => {
-    await openProposals(page, "Conference Alpha");
+    await openProposals(page, "Hackathon");
     await page.getByText("My proposals", { exact: true }).click();
     await page.getByRole("link", { name: "Edit" }).first().click();
     await page.getByRole("heading", { name: /Edit proposal/ }).waitFor();
   }),
-  shot("proposals-results", (page) => openProposals(page, "Conference Gamma")),
+  shot("proposals-results", (page) => openProposals(page, "Web Unconference")),
   shot("proposal-vote-breakdown", async (page) => {
-    await openProposals(page, "Conference Gamma");
+    await openProposals(page, "Web Unconference");
     await page.getByText("My proposals", { exact: true }).click();
     await page.getByRole("cell").first().click();
     await page.getByText("Vote breakdown").waitFor();
   }),
-  shot("schedule-grid", (page) => openEvent(page, "Conference Gamma")),
+  shot("schedule-grid", (page) => openEvent(page, "Web Unconference")),
   shot("event-details", async (page) => {
-    await openEvent(page, "Conference Gamma");
+    await openEvent(page, "Web Unconference");
     await page.getByRole("button", { name: "Event details" }).click();
     await page.getByRole("dialog", { name: "Event details" }).waitFor();
   }),
   shot("session-details", async (page) => {
-    await openEvent(page, "Conference Gamma");
+    await openEvent(page, "Web Unconference");
     await page
       .getByText("Benchmarking API Versioning", { exact: false })
       .first()
@@ -136,7 +136,7 @@ export const shots: Shot[] = [
     await page.getByRole("dialog").waitFor();
   }),
   shot("add-session", async (page) => {
-    await openEvent(page, "Conference Gamma");
+    await openEvent(page, "Web Unconference");
     await page.getByRole("link", { name: /add/i }).first().click();
     await page.getByRole("dialog", { name: "Session form" }).waitFor();
   }),
@@ -173,13 +173,13 @@ export const shots: Shot[] = [
         .setZone("Europe/Berlin")
         .plus({ days: 14 })
         .set({ hour: 14, minute: 35, second: 0, millisecond: 0 });
-      await page.goto("/Conference-Gamma?dev=1");
+      await page.goto("/Web-Unconference?dev=1");
       await page
         .getByLabel("Pick date and time")
         .fill(dayOne.toFormat("yyyy-MM-dd'T'HH:mm"));
       await page.getByText(dayOne.toFormat("yyyy-MM-dd")).waitFor();
       await page.waitForLoadState("networkidle");
-      await page.goto("/Conference-Gamma?kiosk=1");
+      await page.goto("/Web-Unconference?kiosk=1");
       await page.getByTestId("now-line").waitFor();
       await page.waitForTimeout(1500);
     },
@@ -202,7 +202,7 @@ export const shots: Shot[] = [
       .fill("Would love to hear how you got developer tooling adopted.");
   }),
   shot("meeting-answer", async (page) => {
-    await openEvent(page, "Conference Gamma");
+    await openEvent(page, "Web Unconference");
     await page
       .getByRole("link", { name: /needs your reply/ })
       .first()
@@ -210,11 +210,11 @@ export const shots: Shot[] = [
     await page.getByRole("button", { name: "Accept" }).waitFor();
   }),
   shot("meetings-schedule-column", async (page) => {
-    await openEvent(page, "Conference Gamma");
+    await openEvent(page, "Web Unconference");
     await scrollGridTo(page, "12:00");
   }),
   shot("meeting-book-from-grid", async (page) => {
-    await openEvent(page, "Conference Gamma");
+    await openEvent(page, "Web Unconference");
     await scrollGridTo(page, "12:00");
     await page
       .getByRole("button", { name: /^Arrange a 1-on-1 at 14:(30|40)/ })

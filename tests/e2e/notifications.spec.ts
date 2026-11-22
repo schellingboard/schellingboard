@@ -144,7 +144,7 @@ test("acts on the ticked notifications and nothing else @013-US2", async ({
   await expect(bell(page)).toHaveAccessibleName("Notifications");
 });
 
-// Conference Gamma is in the scheduling phase, so only its schedule has
+// Web Unconference is in the scheduling phase, so only its schedule has
 // sessions. Carlos Silva hosts this one and no other spec touches either, so
 // his badge and its comment thread are this test's alone.
 const GREEN_SESSION =
@@ -161,7 +161,7 @@ test("closing a session opened from a notification stays on the schedule @013-US
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
 
   await actAs(page, "Anna Kowalska");
   const commented = await openSession(page, GREEN_SESSION);

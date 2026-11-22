@@ -91,7 +91,7 @@ test("times follow the chosen 12-hour or 24-hour format @014-US7", async ({
   await format.getByRole("button", { name: "12-hour" }).click();
 
   await page.goto("/");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   await expect(page.getByText("9 am", { exact: true }).first()).toBeVisible();
 
   await page.goto("/settings");
@@ -100,6 +100,6 @@ test("times follow the chosen 12-hour or 24-hour format @014-US7", async ({
     .getByRole("button", { name: "24-hour" })
     .click();
   await page.goto("/");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   await expect(page.getByText("09:00", { exact: true }).first()).toBeVisible();
 });

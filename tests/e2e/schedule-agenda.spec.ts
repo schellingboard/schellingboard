@@ -7,7 +7,7 @@ import { selectUser } from "./helpers/user";
 // The agenda view: behind its own toolbar button, the grid staying the default
 // everywhere.
 
-const KEYNOTE = /Opening Keynote - Conference Gamma/;
+const KEYNOTE = /Opening Keynote - Web Unconference/;
 
 test.describe("on a phone-sized screen", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -16,7 +16,7 @@ test.describe("on a phone-sized screen", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Gamma");
+    await page.goto("/Web-Unconference");
     await expect(viewButton(page, "Grid")).toHaveAttribute(
       "aria-pressed",
       "true"
@@ -38,7 +38,7 @@ test.describe("on a phone-sized screen", () => {
   test("a narrowed agenda leads back to its search from further down @007-US3", async ({
     page,
   }) => {
-    await loginAndGoto(page, "/Conference-Gamma");
+    await loginAndGoto(page, "/Web-Unconference");
     await switchToView(page, "Agenda");
     const search = page.getByRole("searchbox", { name: "Search sessions" });
     await search.fill("Main Hall");
@@ -56,7 +56,7 @@ test("the agenda groups sessions by start time and opens their details @007-US2 
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await switchToView(page, "Agenda");
   // The seeded keynote is an organizer's, starting at 09:00 without a break.
   const nineOClock = page.getByRole("region", { name: "09:00" }).first();
@@ -75,7 +75,7 @@ test("the viewer's own 1-on-1s are listed at their time @012-US5", async ({
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Zanele Khumalo");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   await switchToView(page, "Agenda");
 
   const tenOClock = page.getByRole("region", { name: "10:10" }).first();
@@ -105,7 +105,7 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match @007-US
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Zanele Khumalo");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   await switchToView(page, "Agenda");
   const search = page.getByRole("searchbox", { name: "Search sessions" });
   const apiDesign = page.getByRole("link", { name: /API Design/ });
@@ -137,7 +137,7 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match @007-US
 test("My schedule narrows the agenda to the viewer's own sessions @007-US3", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma");
+  await loginAndGoto(page, "/Web-Unconference");
   await switchToView(page, "Agenda");
   // Filtering by "mine" needs a name to go on.
   await expect(
@@ -187,7 +187,7 @@ test("the viewer's own 1-on-1s stay listed under My schedule @007-US3 @012-US5",
 }) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Zanele Khumalo");
-  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await page.getByRole("link", { name: "Web Unconference" }).first().click();
   await switchToView(page, "Agenda");
 
   await filterChip(page, "My schedule").click();
@@ -212,7 +212,7 @@ test.describe("while the event is running", () => {
   test("the agenda marks the current time and Now jumps to it @007-US4", async ({
     page,
   }) => {
-    await openGammaScheduleDuringEvent(page, "/Conference-Gamma");
+    await openGammaScheduleDuringEvent(page, "/Web-Unconference");
     await switchToView(page, "Agenda");
 
     const nowLine = page.getByTestId("now-line");

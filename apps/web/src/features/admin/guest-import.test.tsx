@@ -9,7 +9,7 @@ import { UserImportScreen } from "./guest-import";
 
 afterEach(cleanup);
 
-const events = [{ id: "e1", name: "Conference Alpha" }];
+const events = [{ id: "e1", name: "Hackathon" }];
 
 const setup = (handler: (call: FakeCall) => Response) => {
   const { api, calls } = fakeApi(handler);
@@ -34,7 +34,7 @@ describe("the user import screen", { tags: ["016-US2", "016-US3"] }, () => {
     );
     await userEvent.click(screen.getByLabelText("Assign to events"));
     await userEvent.click(
-      await screen.findByRole("option", { name: "Conference Alpha" })
+      await screen.findByRole("option", { name: "Hackathon" })
     );
     await userEvent.click(screen.getByRole("button", { name: "Import" }));
 

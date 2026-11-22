@@ -317,7 +317,7 @@ test("a profile opened from outside the directory has no list to read through @0
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
 
   await page.getByRole("button", { name: /your name/i }).click();
@@ -332,7 +332,7 @@ test("a profile opened from outside the directory has no list to read through @0
   ).toHaveCount(0);
 
   await profile.getByRole("button", { name: "Close" }).click();
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals/);
 });
 
 test("a reloaded profile still has the directory behind it @011-US4", async ({

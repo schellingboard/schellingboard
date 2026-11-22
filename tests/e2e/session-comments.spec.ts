@@ -10,7 +10,7 @@ import {
 import { expect, test } from "./helpers/fixtures";
 import { selectUser } from "./helpers/user";
 
-// Conference Gamma is in the scheduling phase, so only its schedule has
+// Web Unconference is in the scheduling phase, so only its schedule has
 // sessions. Each test claims its own session: the suite runs in parallel
 // against one shared database, so two tests commenting on the same session
 // would see each other's comments.
@@ -42,7 +42,7 @@ test("posts a comment on a session and renders it as markdown @010-US2", async (
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   // Bob hasn't RSVP'd here, so his only link in the modal will be as the
   // comment's author.
   await actAs(page, /Bob Test/i);
@@ -78,7 +78,7 @@ test("edits a comment, showing when it was edited, then deletes it @010-US4", as
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await actAs(page, /Alice Test/i);
 
   const modal = await openSession(page, EDIT_SESSION);
@@ -113,7 +113,7 @@ test("replies to a comment, collapses the thread, and permalinks to a reply @010
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await actAs(page, /Alice Test/i);
 
   const modal = await openSession(page, THREAD_SESSION);
@@ -174,7 +174,7 @@ test("keeps replies readable when their parent is deleted @010-US4", async ({
   browser,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await actAs(page, /Alice Test/i);
 
   const modal = await openSession(page, TOMBSTONE_SESSION);
@@ -187,7 +187,7 @@ test("keeps replies readable when their parent is deleted @010-US4", async ({
   const bobContext = await browser.newContext();
   const bob = await bobContext.newPage();
   await login(bob);
-  await bob.goto("/Conference-Gamma");
+  await bob.goto("/Web-Unconference");
   await actAs(bob, /Bob Test/i);
   const bobModal = await openSession(bob, TOMBSTONE_SESSION);
   await openReplyForm(bobModal);
@@ -226,7 +226,7 @@ test("likes a comment and shows who liked it @010-US6", async ({
   test.slow();
 
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await actAs(page, /Alice Test/i);
 
   const modal = await openSession(page, LIKE_SESSION);
@@ -246,7 +246,7 @@ test("likes a comment and shows who liked it @010-US6", async ({
   const bobContext = await browser.newContext();
   const bob = await bobContext.newPage();
   await login(bob);
-  await bob.goto("/Conference-Gamma");
+  await bob.goto("/Web-Unconference");
   await actAs(bob, /Bob Test/i);
   const bobModal = await openSession(bob, LIKE_SESSION);
   await bobModal.getByRole("button", { name: "Like", exact: true }).click();
@@ -276,7 +276,7 @@ test("asks visitors without a name to select one before commenting @010-US2 @003
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
 
   const modal = await openSession(page, CLOSING_SESSION);
 
@@ -290,7 +290,7 @@ test("nests sibling replies under the comment they answer @010-US5", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await actAs(page, /Alice Test/i);
 
   const modal = await openSession(page, SIBLINGS_SESSION);
@@ -322,7 +322,7 @@ test("asks before Escape discards an unsent comment @010-US7", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await actAs(page, /Bob Test/i);
 
   const modal = await openSession(page, CLOSING_SESSION);

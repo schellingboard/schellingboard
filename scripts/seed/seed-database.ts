@@ -139,38 +139,13 @@ function insertChunked<T>(
 function generateEventDates(today: Date) {
   const phaseDuration = 14;
   const middleOffset = 7;
-  // Lead time between the start of scheduling work and the event itself.
+  // Lead time between the start of scheduling work and the first event.
   // The scheduling phase stays open through the whole live event, so
   // schedulingPhaseEnd always equals the event's end date.
   const schedulingLeadTime = 21;
 
-  // Event 1: Currently in proposal phase
-  const e1PropStart = new Date(today);
-  e1PropStart.setDate(today.getDate() - middleOffset);
-  const e1PropEnd = new Date(e1PropStart);
-  e1PropEnd.setDate(e1PropStart.getDate() + phaseDuration);
-  const e1VoteStart = new Date(e1PropEnd);
-  const e1VoteEnd = new Date(e1VoteStart);
-  e1VoteEnd.setDate(e1VoteStart.getDate() + phaseDuration);
-  const e1SchedStart = new Date(e1VoteEnd);
-  // Align the event with the seeded Day windows (09:00–18:00 Berlin) so the
-  // exclusive schedulingPhaseEnd doesn't cut off the last day early.
-  const e1Start = berlinTime(e1SchedStart, schedulingLeadTime, 9, 0);
-  const e1End = berlinTime(e1Start, 2, 18, 0);
-  const e1SchedEnd = new Date(e1End);
-
-  // Event 2: Currently in voting phase
-  const e2VoteStart = new Date(today);
-  e2VoteStart.setDate(today.getDate() - middleOffset);
-  const e2VoteEnd = new Date(e2VoteStart);
-  e2VoteEnd.setDate(e2VoteStart.getDate() + phaseDuration);
-  const e2PropStart = new Date(e2VoteStart);
-  e2PropStart.setDate(e2VoteStart.getDate() - phaseDuration);
-  const e2PropEnd = new Date(e2VoteStart);
-  const e2SchedStart = new Date(e2VoteEnd);
-  const e2Start = berlinTime(e2SchedStart, schedulingLeadTime, 9, 0);
-  const e2End = berlinTime(e2Start, 2, 18, 0);
-  const e2SchedEnd = new Date(e2End);
+  // The three events are one community's week at the same venue, held back to
+  // back in reverse phase order: Gamma first, then Beta, then Alpha.
 
   // Event 3: Currently in scheduling phase
   const e3SchedStart = new Date(today);
@@ -181,18 +156,48 @@ function generateEventDates(today: Date) {
   const e3PropStart = new Date(e3VoteStart);
   e3PropStart.setDate(e3VoteStart.getDate() - phaseDuration);
   const e3PropEnd = new Date(e3VoteStart);
+  // Align the events with the seeded Day windows (09:00–18:00 Berlin) so the
+  // exclusive schedulingPhaseEnd doesn't cut off the last day early.
   const e3Start = berlinTime(e3SchedStart, schedulingLeadTime, 9, 0);
   // Gamma's last day runs into the small hours (see the day seeding below), so
-  // the event — and with it the scheduling phase — ends at 03:00 the morning
-  // after day 2, not at 18:00.
+  // the event ends at 03:00 the morning after day 2, not at 18:00.
   const e3End = berlinTime(e3Start, 3, 3, 0);
   const e3SchedEnd = new Date(e3End);
 
+  // Event 2: Currently in voting phase; starts the day after Gamma's party.
+  const e2VoteStart = new Date(today);
+  e2VoteStart.setDate(today.getDate() - middleOffset);
+  const e2VoteEnd = new Date(e2VoteStart);
+  e2VoteEnd.setDate(e2VoteStart.getDate() + phaseDuration);
+  const e2PropStart = new Date(e2VoteStart);
+  e2PropStart.setDate(e2VoteStart.getDate() - phaseDuration);
+  const e2PropEnd = new Date(e2VoteStart);
+  const e2SchedStart = new Date(e2VoteEnd);
+  const e2Start = berlinTime(e3Start, 4, 9, 0);
+  const e2End = berlinTime(e2Start, 2, 18, 0);
+  const e2SchedEnd = new Date(e2End);
+
+  // Event 1: Currently in proposal phase; starts the day after Beta. Its
+  // voting is a week shorter, or scheduling would start after the event.
+  const e1PropStart = new Date(today);
+  e1PropStart.setDate(today.getDate() - middleOffset);
+  const e1PropEnd = new Date(e1PropStart);
+  e1PropEnd.setDate(e1PropStart.getDate() + phaseDuration);
+  const e1VoteStart = new Date(e1PropEnd);
+  const e1VoteEnd = new Date(e1VoteStart);
+  e1VoteEnd.setDate(e1VoteStart.getDate() + middleOffset);
+  const e1SchedStart = new Date(e1VoteEnd);
+  const e1Start = berlinTime(e2End, 1, 9, 0);
+  const e1End = berlinTime(e1Start, 2, 18, 0);
+  const e1SchedEnd = new Date(e1End);
+
+  // Code and tests call the three events Alpha, Beta and Gamma, in phase order.
   return [
     {
-      name: "Conference Alpha",
-      description: "Event currently in proposal phase",
-      icon: "AcademicCapIcon",
+      name: "Hackathon",
+      description:
+        "Dev Week ends with three days of building things together, right after the Open Source Summit. Bring a project that needs hands or an idea you want to try; the programme is whatever attendees propose.",
+      icon: "WrenchIcon",
       start: e1Start,
       end: e1End,
       proposalPhaseStart: e1PropStart,
@@ -203,12 +208,12 @@ function generateEventDates(today: Date) {
       schedulingPhaseEnd: e1SchedEnd,
     },
     {
-      name: "Conference Beta",
+      name: "Open Source Summit",
       // Markdown: seeded descriptions mix markdown and plain text so both
       // render paths stay exercised in dev and e2e environments.
       description:
-        "Event currently in **voting** phase — cast your votes and check the [event website](https://test-event-2.example.com) for updates.",
-      icon: "BeakerIcon",
+        "The middle of Dev Week: three days on **maintaining, funding and growing open source projects**, starting the morning after the Web Unconference party. Vote for the sessions you want to see, and find travel tips on the [Dev Week website](https://devweek.example.com).",
+      icon: "UserGroupIcon",
       start: e2Start,
       end: e2End,
       proposalPhaseStart: e2PropStart,
@@ -219,9 +224,9 @@ function generateEventDates(today: Date) {
       schedulingPhaseEnd: e2SchedEnd,
     },
     {
-      name: "Conference Gamma",
+      name: "Web Unconference",
       description:
-        "Event currently in **scheduling phase**.\n\n### Quick links\n\n- [Venue map](https://test-event-3.example.com/map)\n- [Code of conduct](https://test-event-3.example.com/coc)",
+        "Dev Week opens with three days of talks, workshops and hallway conversations about building for the web, ending with a party on the last night. The Open Source Summit and the Hackathon follow at the same venue.\n\n### Quick links\n\n- [Venue map](https://devweek.example.com/map)\n- [Code of conduct](https://devweek.example.com/coc)",
       icon: "GlobeAltIcon",
       start: e3Start,
       end: e3End,
@@ -389,13 +394,13 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
 
   // Events
   console.log("  🎪 Creating test events...");
-  const eventRows = eventConfigs.map((config, index) => ({
+  const eventRows = eventConfigs.map((config) => ({
     id: nanoid(),
     name: config.name,
     slug: eventNameToSlug(config.name),
     description: config.description,
     icon: config.icon,
-    website: `https://test-event-${index + 1}.example.com`,
+    website: `https://devweek.example.com/${eventNameToSlug(config.name).toLowerCase()}`,
     proposalPhaseStart: config.proposalPhaseStart.toISOString(),
     proposalPhaseEnd: config.proposalPhaseEnd.toISOString(),
     votingPhaseStart: config.votingPhaseStart.toISOString(),
@@ -409,6 +414,14 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
     meetingsEnabled: true,
   }));
   db.insert(schema.events).values(eventRows).run();
+  db.insert(schema.siteSettings)
+    .values({
+      id: "singleton",
+      title: "Dev Week",
+      description:
+        "One week, one venue, three events: Web Unconference, Open Source Summit and Hackathon. Pick an event to see its proposals and schedule.",
+    })
+    .run();
   console.log(`  ✅ Created ${eventRows.length} events`);
 
   // Link all guests (the site admin too) and locations to all events
@@ -427,14 +440,14 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   db.insert(schema.eventLocations).values(eventLocationRows).run();
 
   // Days (3 per event, 09:00–18:00 Berlin, bookable 09:00–17:30 Berlin).
-  // Exception: Conference Gamma's last day is a party night that runs to 03:00
+  // Exception: Web Unconference's last day is a party night that runs to 03:00
   // the next morning, bookable until 02:30 — the fixture for scheduling
   // sessions after midnight, on the night with no following day entry.
   console.log("  📅 Creating test days...");
   const dayRows = eventRows.flatMap((ev, eventIndex) => {
     const config = eventConfigs[eventIndex];
     return [0, 1, 2].map((dayIndex) => {
-      const lateNight = ev.name === "Conference Gamma" && dayIndex === 2;
+      const lateNight = ev.name === "Web Unconference" && dayIndex === 2;
       return {
         id: nanoid(),
         start: berlinTime(config.start, dayIndex, 9, 0).toISOString(),
@@ -460,7 +473,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
     `  ✅ Created ${dayRows.length} days across ${eventRows.length} events`
   );
 
-  // Conference Gamma's shared moments: an opening keynote everyone is invited
+  // Web Unconference's shared moments: an opening keynote everyone is invited
   // to, and coffee every afternoon. The hard "Lunch Break" blockers stay.
   const gammaConfig0 = eventConfigs[2];
   const gammaDays = dayRows.filter((d) => d.eventId === eventRows[2].id);
@@ -653,7 +666,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
     }
   }
 
-  // Conference Gamma is mid-scheduling: most of its proposals get scheduled
+  // Web Unconference is mid-scheduling: most of its proposals get scheduled
   // as sessions below (gammaSessionConfigs). Align each scheduled proposal's
   // hosts and duration with its session so the data stays consistent — and so
   // the vote seeding below skips the real hosts.
@@ -712,7 +725,10 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
 
   eventRows.forEach((ev, eventIndex) => {
     const eventName = eventConfigs[eventIndex].name;
-    if (eventName !== "Conference Beta" && eventName !== "Conference Gamma") {
+    if (
+      eventName !== "Open Source Summit" &&
+      eventName !== "Web Unconference"
+    ) {
       return;
     }
 
@@ -839,7 +855,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   const branching = proposalRows.find(
     (p) =>
       p.title ===
-      "Conference Gamma Panel: Industry Leaders Share Their Insights"
+      "Web Unconference Panel: Industry Leaders Share Their Insights"
   );
   if (branching) {
     const asker = guestRows[3].id;
@@ -894,7 +910,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   );
 
   // Sessions: one keynote + lunch blockers per event, plus a filled-out
-  // schedule for Conference Gamma (scheduling phase).
+  // schedule for Web Unconference (scheduling phase).
   console.log("  🎯 Creating test sessions...");
   const sessionRows: (typeof schema.sessions.$inferInsert)[] = [];
   const sessionHostRows: (typeof schema.sessionHosts.$inferInsert)[] = [];
@@ -950,7 +966,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
     }
   });
 
-  // Conference Gamma's scheduled sessions (see gammaSessionConfigs)
+  // Web Unconference's scheduled sessions (see gammaSessionConfigs)
   const gammaConfig = eventConfigs[2];
   for (const cfg of gammaSessionConfigs) {
     const proposal = cfg.fromProposal
@@ -1025,7 +1041,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
     `  ✅ Created ${sessionRows.length} sessions across ${eventRows.length} events`
   );
 
-  // RSVPs (Conference Gamma only — the server rejects RSVP changes outside
+  // RSVPs (Web Unconference only — the server rejects RSVP changes outside
   // the scheduling phase). Guests skip sessions they host and sessions
   // overlapping one they already RSVP'd to. Bob Test, Maria Papadopoulou and Yuki
   // Tanaka never RSVP the Opening Keynote: rsvp.spec.ts (Bob, Maria) and the

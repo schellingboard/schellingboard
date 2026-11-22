@@ -52,7 +52,7 @@ beforeAll(async () => {
   setupTestDb();
   await seedTestData("large");
   resetRepositories();
-  const event = await getRepositories().events.findByName("Conference Gamma");
+  const event = await getRepositories().events.findByName("Web Unconference");
   eventId = event!.id;
   const c = await createAdminAuthCookie();
   cookie = `${c.name}=${c.value}`;

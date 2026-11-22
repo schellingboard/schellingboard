@@ -9,7 +9,7 @@ import { expect, test } from "./helpers/fixtures";
 // Kiosk mode (?kiosk=1) is meant for large screens at the venue. The now line
 // itself is drawn on every schedule (see now-line.spec.ts); what kiosk mode
 // adds is keeping it scrolled into view, and sticking across navigation. The
-// tests time-travel into Conference Gamma's first day so there is a line to
+// tests time-travel into Web Unconference's first day so there is a line to
 // scroll to — see helpers/dev-clock.ts, which the timezone below comes from.
 // That the line follows the fake clock rather than the real one is asserted by
 // the same time travel: without it no line exists to be in the viewport.
@@ -18,14 +18,14 @@ test.use({ timezoneId: "Europe/Berlin" });
 test("kiosk mode auto-scrolls the now line into view @007-US7", async ({
   page,
 }) => {
-  await openGammaScheduleDuringEvent(page, "/Conference-Gamma?kiosk=1");
+  await openGammaScheduleDuringEvent(page, "/Web-Unconference?kiosk=1");
   await expect(page.getByTestId("now-line")).toBeInViewport();
 });
 
 test("kiosk mode persists via cookie after navigating without the parameter @007-US7", async ({
   page,
 }) => {
-  await openGammaScheduleDuringEvent(page, "/Conference-Gamma?kiosk=1");
+  await openGammaScheduleDuringEvent(page, "/Web-Unconference?kiosk=1");
   await expect(page.getByTestId("now-line")).toBeInViewport();
 
   // Neither link below carries ?kiosk=1, yet the display should stay in
@@ -39,7 +39,7 @@ test("kiosk mode persists via cookie after navigating without the parameter @007
     .getByRole("navigation", { name: "Event pages" })
     .getByRole("link", { name: "Schedule" })
     .click();
-  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule$/);
+  await expect(page).toHaveURL(/\/Web-Unconference\/schedule$/);
 
   await expect(page.getByTestId("now-line")).toBeInViewport();
 });
@@ -47,7 +47,7 @@ test("kiosk mode persists via cookie after navigating without the parameter @007
 test("?kiosk=0 clears the cookie and leaves kiosk mode @007-US7", async ({
   page,
 }) => {
-  await openGammaScheduleDuringEvent(page, "/Conference-Gamma?kiosk=1");
+  await openGammaScheduleDuringEvent(page, "/Web-Unconference?kiosk=1");
   await expect(page.getByTestId("now-line")).toBeInViewport();
 
   // Leave via a client-side link first and wait for it to settle: a hard
@@ -61,7 +61,7 @@ test("?kiosk=0 clears the cookie and leaves kiosk mode @007-US7", async ({
   await expect(
     page.getByRole("heading", { name: /Session Proposals/ })
   ).toBeVisible();
-  await page.goto("/Conference-Gamma?kiosk=0");
+  await page.goto("/Web-Unconference?kiosk=0");
 
   // The cookie is cleared by an effect that only runs once the page has
   // hydrated. Navigating away before that lands would leave the cookie behind,
@@ -74,7 +74,7 @@ test("?kiosk=0 clears the cookie and leaves kiosk mode @007-US7", async ({
 
   // Nothing outside kiosk mode brings the now line into view, so the schedule
   // now opens at the start of the day and stays there.
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await page.waitForTimeout(2000);
   await expect(page.getByTestId("now-line")).not.toBeInViewport();
 });
@@ -85,7 +85,7 @@ test("kiosk mode scrolls to the now line once it appears @007-US7", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma?kiosk=1&dev=1");
+  await page.goto("/Web-Unconference?kiosk=1&dev=1");
 
   // The real clock is not inside any event day, so nothing is drawn yet.
   await expect(page.getByTestId("now-line")).toHaveCount(0);

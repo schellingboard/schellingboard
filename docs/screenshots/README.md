@@ -91,7 +91,7 @@ What each shot shows. Recapture them all when the UI changes materially.
 - `admin-event-settings.webp` — Admin event configuration form (name, dates, timezone, rules)
 - `admin-meetings.webp` — The **Meetings** section of the same form: 1-on-1s enabled, the suggested
   meeting points, and the cap on open requests
-- `admin-statistics.webp` — The **Statistics** tab of Conference Gamma: filter, section navigation
+- `admin-statistics.webp` — The **Statistics** tab of Web Unconference: filter, section navigation
   and the headline numbers
 
 ### Mobile (Galaxy Note 9)

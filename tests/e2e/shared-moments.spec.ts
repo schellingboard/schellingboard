@@ -29,7 +29,7 @@ test("the text view lists a shared moment among the sessions, even under My sche
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
   await switchToView(page, "Agenda");
 
@@ -48,7 +48,7 @@ test("a slot inside a shared moment stays bookable, with a notice @007-US15", as
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
 
   const pill = page.getByRole("button", {

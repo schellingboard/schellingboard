@@ -35,7 +35,7 @@ const guest = (
   ...extra,
 });
 
-const events = [{ id: "e1", name: "Conference Alpha" }];
+const events = [{ id: "e1", name: "Hackathon" }];
 
 const problemWith = (status: number, code: string, errors: unknown[]) =>
   Response.json(
@@ -97,7 +97,7 @@ describe("the admin users screen", { tags: ["016-US1"] }, () => {
     expect(alice.textContent).toContain("Alice");
     expect(
       within(alice)
-        .getByRole("link", { name: "Conference Alpha" })
+        .getByRole("link", { name: "Hackathon" })
         .getAttribute("href")
     ).toBe("/admin/events/e1");
     expect(bob.textContent).toContain("bob");
@@ -353,7 +353,7 @@ describe("assigning users to events", { tags: ["016-US3"] }, () => {
     });
 
     await userEvent.click(
-      within(region).getByRole("checkbox", { name: "Conference Alpha" })
+      within(region).getByRole("checkbox", { name: "Hackathon" })
     );
     await userEvent.type(within(region).getByLabelText("Name"), "Zed");
     await userEvent.click(
@@ -366,7 +366,7 @@ describe("assigning users to events", { tags: ["016-US3"] }, () => {
     });
     expect(
       within(region).getByRole<HTMLInputElement>("checkbox", {
-        name: "Conference Alpha",
+        name: "Hackathon",
       }).checked
     ).toBe(true);
   });
@@ -379,7 +379,7 @@ describe("assigning users to events", { tags: ["016-US3"] }, () => {
     await userEvent.click(within(region).getByRole("button", { name: "Edit" }));
     const row = within(region.querySelector("li")!);
     const box = row.getByRole<HTMLInputElement>("checkbox", {
-      name: "Conference Alpha",
+      name: "Hackathon",
     });
     expect(box.checked).toBe(true);
     await userEvent.click(box);

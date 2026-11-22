@@ -8,7 +8,7 @@ test("an attendee switches the app to German and back @022-US1", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Chiara Bianchi/i);
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();

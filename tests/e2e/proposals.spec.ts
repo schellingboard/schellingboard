@@ -24,7 +24,7 @@ async function editFromList(page: Page, title: string) {
 test("should auto-focus the title input for new proposals @004-US1", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await loginAndGoto(page, "/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
   await page.getByRole("link", { name: /Add Proposal/i }).click();
   await expect(page.getByLabel("Title")).toBeFocused();
@@ -36,7 +36,7 @@ test("should create a new session proposal, edit it, and add hosts @004-US1 @004
   await login(page);
 
   // Go to proposals list first (optional, helps ensure baseline loaded)
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
   // Generate a unique title to avoid collisions between runs
   const proposalTitle = `Playwright Test Proposal ${uniqueSuffix()}`;
@@ -62,7 +62,7 @@ test("should create a new session proposal, edit it, and add hosts @004-US1 @004
 
   // Submit
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
 
@@ -89,7 +89,7 @@ test("should create a new session proposal, edit it, and add hosts @004-US1 @004
 
   // Submit the edited form
   await page.getByRole("button", { name: /Submit/i }).click();
-  await page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/);
+  await page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/);
 
   // Verify the hosts appear in the proposals list
   const updatedRow = page.getByRole("row", { name: new RegExp(proposalTitle) });
@@ -102,7 +102,7 @@ test("a proposal form in the panel survives a reload and asks before Back discar
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
 
   await page.getByRole("link", { name: /Add Proposal/i }).click();
@@ -121,21 +121,21 @@ test("a proposal form in the panel survives a reload and asks before Back discar
   await page.goBack();
   await page.getByRole("button", { name: "Discard" }).click();
   await expect(form).toHaveCount(0);
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals(\?.*)?$/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals(\?.*)?$/);
 });
 
 test("the panel's Back arrow from an edit asks once, then shows the proposal @004-US2", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
 
   const proposalTitle = `Playwright Back Proposal ${uniqueSuffix()}`;
   await page.getByRole("link", { name: /Add Proposal/i }).click();
   await page.getByLabel("Title").fill(proposalTitle);
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
 
@@ -162,7 +162,7 @@ test("the user menu stays reachable above an open panel @003-US2", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
   await page.getByRole("link", { name: /Add Proposal/i }).click();
   await expect(
@@ -180,14 +180,14 @@ test("cancelling a proposal edit keeps it unchanged @004-US2", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
 
   const proposalTitle = `Playwright Cancel Proposal ${uniqueSuffix()}`;
   await page.getByRole("link", { name: /Add Proposal/i }).click();
   await page.getByLabel("Title").fill(proposalTitle);
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
 
@@ -197,7 +197,7 @@ test("cancelling a proposal edit keeps it unchanged @004-US2", async ({
   await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page.getByText("Discard your changes?")).toBeVisible();
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: "Discard" }).click(),
   ]);
 
@@ -210,7 +210,7 @@ test("should delete a proposal from its edit page @004-US3", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
 
   // Create a throwaway proposal so seeded data stays untouched
@@ -218,7 +218,7 @@ test("should delete a proposal from its edit page @004-US3", async ({
   await page.getByRole("link", { name: /Add Proposal/i }).click();
   await page.getByLabel("Title").fill(proposalTitle);
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
   await expect(
@@ -233,7 +233,7 @@ test("should delete a proposal from its edit page @004-US3", async ({
   await page.getByRole("button", { name: "Delete", exact: true }).click();
   await expect(page.getByText("Delete session proposal?")).toBeVisible();
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page
       .getByRole("dialog", { name: "Delete session proposal?" })
       .getByRole("button", { name: "Delete" })
@@ -254,7 +254,7 @@ test("a non-host cannot edit or delete another guest's proposal @004-US2 @004-US
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   const proposalTitle = `Playwright Ownership Proposal ${uniqueSuffix()}`;
 
   // Alice creates a proposal; she's prefilled as its only host.
@@ -267,7 +267,7 @@ test("a non-host cannot edit or delete another guest's proposal @004-US2 @004-US
       .getByText("Alice Test")
   ).toBeVisible();
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
   const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
@@ -306,7 +306,7 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
 }) => {
   await login(page);
 
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
 
   const proposalTitle = "Hands-on Docker and Kubernetes";
   const proposalLink = page.getByRole("link", { name: proposalTitle });
@@ -318,7 +318,7 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
 
   await expect(modal).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(1);
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals\/[^/?#]+$/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals\/[^/?#]+$/);
 
   // Verify the proposal title is displayed as a heading within the modal
   await expect(
@@ -345,7 +345,7 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
   await expect(closeButton).not.toBeVisible();
 
   // Verify we're back on the proposals list page by checking URL
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals(\?q=.*)?$/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals(\?q=.*)?$/);
 
   // Test opening the modal again to verify it can be reopened
   await searchList(page, proposalTitle);
@@ -367,7 +367,7 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
 test("filters the proposal list by search, matching whole descriptions as plain text @004-US5", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await loginAndGoto(page, "/Hackathon/proposals");
 
   const kubernetes = page.getByRole("row", {
     name: /Hands-on Docker and Kubernetes/,
@@ -413,7 +413,7 @@ test("filters the proposal list by search, matching whole descriptions as plain 
 test("the proposal list keeps its search and sort through a reload and Back @004-US5", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await loginAndGoto(page, "/Hackathon/proposals");
   const kubernetes = page.getByRole("row", {
     name: /Hands-on Docker and Kubernetes/,
   });
@@ -436,7 +436,7 @@ test("the proposal list keeps its search and sort through a reload and Back @004
     .getByRole("navigation", { name: "Event pages" })
     .getByRole("link", { name: "Schedule" })
     .click();
-  await expect(page).toHaveURL(/\/Conference-Alpha\/schedule$/);
+  await expect(page).toHaveURL(/\/Hackathon\/schedule$/);
   await page.goBack();
   await expect(page.getByLabel("Sort by")).toHaveValue("title-asc");
 });
@@ -445,7 +445,7 @@ test("the proposal list comes back to where it was scrolled after Back @004-US5"
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 300 });
-  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await loginAndGoto(page, "/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
   await expect(
     page.getByRole("row", { name: /Hands-on Docker and Kubernetes/ })
@@ -466,7 +466,7 @@ test("the proposal list comes back to where it was scrolled after Back @004-US5"
     .getByRole("navigation", { name: "Event pages" })
     .getByRole("link", { name: "Schedule" })
     .dispatchEvent("click");
-  await expect(page).toHaveURL(/\/Conference-Alpha\/schedule$/);
+  await expect(page).toHaveURL(/\/Hackathon\/schedule$/);
   await page.goBack();
 
   await expect(
@@ -480,10 +480,10 @@ test("the proposal list comes back to where it was scrolled after Back @004-US5"
 test("filters the proposal list down to your own proposals @004-US5", async ({
   page,
 }) => {
-  // Conference Gamma, so the throwaway proposals the tests above create and
-  // delete in Conference Alpha can't shift the count this one reads. Hana
+  // Web Unconference, so the throwaway proposals the tests above create and
+  // delete in Hackathon can't shift the count this one reads. Hana
   // Kobayashi hosts the first of these; nobody hosts the second.
-  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await loginAndGoto(page, "/Web-Unconference/proposals");
   await selectUser(page, "Hana Kobayashi");
 
   const hers = page.getByRole("row", {
@@ -517,7 +517,7 @@ test("filters the proposal list down to your own proposals @004-US5", async ({
 test("sorts proposals by title in both directions @004-US5", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await loginAndGoto(page, "/Hackathon/proposals");
 
   // Rows with data cells only: the header row's cells are columnheaders.
   const rows = page
@@ -547,14 +547,14 @@ test("sorts proposals by title in both directions @004-US5", async ({
 test("sorts proposals by when they were last updated @004-US5", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await loginAndGoto(page, "/Hackathon/proposals");
   await selectUser(page, /Bob Test/i);
 
   const addProposal = async (title: string) => {
     await page.getByRole("link", { name: /Add Proposal/i }).click();
     await page.getByLabel("Title").fill(title);
     await page.getByRole("button", { name: /Submit/i }).click();
-    await page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/);
+    await page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/);
   };
   const suffix = uniqueSuffix();
   const older = `Edited later ${suffix}`;
@@ -585,7 +585,7 @@ test("sorts proposals by when they were last updated @004-US5", async ({
     .click();
   await page.getByLabel("Description").fill("Now with a description.");
   await page.getByRole("button", { name: /Submit/i }).click();
-  await page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/);
+  await page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/);
 
   await page.getByLabel("Sort by").selectOption({ label: "Recently updated" });
   await expect.poll(olderComesFirst).toBe(true);
@@ -595,7 +595,7 @@ test("a host asks for a co-host and a volunteer joins @004-US6 @004-US7", async 
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   const proposalTitle = `Playwright Cohost Proposal ${uniqueSuffix()}`;
 
   await selectUser(page, /Bob Test/i);
@@ -606,12 +606,12 @@ test("a host asks for a co-host and a volunteer joins @004-US6 @004-US7", async 
     .getByLabel("Who are you looking for?")
     .fill("Someone to run the demo");
   await Promise.all([
-    page.waitForURL(/\/Conference-Alpha\/proposals(\?.*)?$/),
+    page.waitForURL(/\/Hackathon\/proposals(\?.*)?$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
 
   await selectUser(page, /Alice Test/i);
-  await page.goto("/Conference-Alpha/proposals");
+  await page.goto("/Hackathon/proposals");
   const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
   // Seeded with a host who asked for nobody.
   const hosted = page.getByRole("row", {

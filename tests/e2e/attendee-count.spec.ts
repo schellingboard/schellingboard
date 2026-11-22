@@ -44,7 +44,7 @@ const dialog = (page: Page) =>
 // sessions so the server-side gate is open from first paint. Also used to
 // change identity mid-test: selectUser logs out and back in on its own.
 async function landAs(page: Page, who: string, day = 0) {
-  await page.goto("/Conference-Gamma?dev=1");
+  await page.goto("/Web-Unconference?dev=1");
   await selectUser(page, who);
   await setDevClock(page, lateOnGammaDay(day));
 }

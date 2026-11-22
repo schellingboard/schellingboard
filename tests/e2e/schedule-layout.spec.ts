@@ -17,7 +17,7 @@ test.use({ viewport: { width: 500, height: 800 } });
 
 test.beforeEach(async ({ page }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   // The event name lives in the site header now; the schedule toolbar's view
   // toggle is the readiness signal that the grid has rendered.
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
@@ -40,7 +40,7 @@ test("event details open in the side panel, survive a reload, and the proposals 
   await panel.getByRole("button", { name: "Close" }).click();
   await expect(panel).toHaveCount(0);
   await expect(venueMapLink).not.toBeVisible();
-  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule$/);
+  await expect(page).toHaveURL(/\/Web-Unconference\/schedule$/);
 
   // The proposals page offers the same switch and the same details.
   await page
@@ -48,7 +48,9 @@ test("event details open in the side panel, survive a reload, and the proposals 
     .getByRole("link", { name: "Proposals" })
     .click();
   await expect(
-    page.getByRole("heading", { name: /Conference Gamma: Session Proposals/ })
+    page.getByRole("heading", {
+      name: /Web Unconference: Session Proposals/,
+    })
   ).toBeAttached();
   await page.getByRole("button", { name: "Event details" }).click();
   await expect(panel.getByRole("link", { name: "Venue map" })).toBeVisible();

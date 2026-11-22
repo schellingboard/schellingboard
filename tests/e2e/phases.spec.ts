@@ -3,9 +3,9 @@ import { expect, test } from "./helpers/fixtures";
 import { selectUser } from "./helpers/user";
 
 // Phase-dependent UI, one seeded event per phase:
-//   Conference Alpha — proposal phase
-//   Conference Beta  — voting phase
-//   Conference Gamma — scheduling phase
+//   Hackathon — proposal phase
+//   Open Source Summit  — voting phase
+//   Web Unconference — scheduling phase
 // Assertions target the deterministic event-specific "Lightning Talks" seed
 // proposals, which other parallel tests never modify.
 //
@@ -19,15 +19,15 @@ test("proposal phase: proposing is open, voting is not yet available @006-US1 @0
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Alpha");
+  await page.goto("/Hackathon");
   // The schedule is not available yet — the event page routes to proposals
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals$/);
+  await expect(page).toHaveURL(/\/Hackathon\/proposals$/);
 
   // Even with a user selected, voting is not available because of the phase:
   // every vote button on a proposal row is disabled and quick voting is too
   await selectUser(page, /Bob Test/i);
   const row = page.getByRole("row", {
-    name: /Conference Alpha Lightning Talks/,
+    name: /Hackathon Lightning Talks/,
   });
   await expect(row).toBeVisible();
   await expect(row.getByRole("button", { name: "❤️" })).toBeDisabled();
@@ -54,8 +54,8 @@ test("voting phase: proposing and voting are open, the schedule is read-only @00
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Beta");
-  await expect(page).toHaveURL(/\/Conference-Beta\/proposals$/);
+  await page.goto("/Open-Source-Summit");
+  await expect(page).toHaveURL(/\/Open-Source-Summit\/proposals$/);
 
   // Proposing needs a name selected, so pick one before asking whether the
   // phase allows it — otherwise this asserts the identity gate, not the phase.
@@ -65,7 +65,7 @@ test("voting phase: proposing and voting are open, the schedule is read-only @00
   ).not.toHaveClass(/cursor-not-allowed/);
 
   const row = page.getByRole("row", {
-    name: /Conference Beta Lightning Talks/,
+    name: /Open Source Summit Lightning Talks/,
   });
   await expect(row.getByRole("button", { name: "❤️" })).toBeEnabled();
 
@@ -84,7 +84,7 @@ test("dev fake clock: time travel moves a proposal-phase event into voting @006-
 }) => {
   await login(page);
   // ?dev=1 reveals the dev clock toolbar (enabled by SB_ENABLE_DEV_TOOLS).
-  await page.goto("/Conference-Alpha/proposals?dev=1");
+  await page.goto("/Hackathon/proposals?dev=1");
   // Bob is not a host of Alpha's Lightning Talks, so the only thing gating his
   // vote button is the phase (Alice hosts it and would never see one).
   await selectUser(page, /Bob Test/i);
@@ -93,14 +93,14 @@ test("dev fake clock: time travel moves a proposal-phase event into voting @006-
   await expect(toolbar).toBeVisible();
 
   const row = page.getByRole("row", {
-    name: /Conference Alpha Lightning Talks/,
+    name: /Hackathon Lightning Talks/,
   });
   // Proposal phase: the interested-vote button is there but not yet usable.
   await expect(row.getByRole("button", { name: "❤️" })).toBeDisabled();
 
-  // Alpha's voting phase opens 7 days out; jump +14 days to land inside it.
+  // Alpha's voting phase runs from 7 to 14 days out; jump +8 days into it.
   await page.getByRole("button", { name: "+7d" }).click();
-  await page.getByRole("button", { name: "+7d" }).click();
+  await page.getByRole("button", { name: "+1d" }).click();
 
   // The same row now offers an enabled interested-vote button.
   await expect(row.getByRole("button", { name: "❤️" })).toBeEnabled();
@@ -110,7 +110,7 @@ test("scheduling phase: grid is interactive, proposing and voting are over @006-
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
   // The grid offers free slots for adding sessions
   await expect(
@@ -118,7 +118,7 @@ test("scheduling phase: grid is interactive, proposing and voting are over @006-
   ).toBeVisible();
 
   // On the proposals page, proposing and voting are closed
-  await page.goto("/Conference-Gamma/proposals");
+  await page.goto("/Web-Unconference/proposals");
   await selectUser(page, /Alice Test/i);
   await expect(page.getByRole("link", { name: /Add Proposal/i })).toHaveClass(
     /opacity-50|cursor-not-allowed/
@@ -127,7 +127,7 @@ test("scheduling phase: grid is interactive, proposing and voting are over @006-
     page.getByRole("link", { name: /Go to Quick Voting!/i })
   ).toHaveClass(/opacity-50|cursor-not-allowed/);
   const row = page.getByRole("row", {
-    name: /Conference Gamma Lightning Talks/,
+    name: /Web Unconference Lightning Talks/,
   });
   await expect(row).toBeVisible();
   // Alice hosts none of Gamma's Lightning Talks, so this really is the phase

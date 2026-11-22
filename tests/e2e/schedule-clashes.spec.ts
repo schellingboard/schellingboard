@@ -8,7 +8,7 @@ import { selectUser } from "./helpers/user";
 test("the Clashes chip lists what overlaps in your schedule @007-US11", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma");
+  await loginAndGoto(page, "/Web-Unconference");
   await switchToView(page, "Agenda");
   await selectUser(page, "Zanele Khumalo");
 

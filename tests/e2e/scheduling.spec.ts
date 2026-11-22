@@ -13,7 +13,7 @@ import { dismissToast, toast } from "./helpers/toast";
 import { uniqueSuffix } from "./helpers/unique";
 import { selectUser } from "./helpers/user";
 
-// All tests run in Conference Gamma (scheduling phase). Each test creates its
+// All tests run in Web Unconference (scheduling phase). Each test creates its
 // own uniquely-titled session on the LAST event day at a fixed location and
 // start time, so parallel tests (including add-session.spec.ts, which takes
 // the first free "+" slot on day 1) never compete for the same slot.
@@ -26,7 +26,7 @@ async function createSessionViaForm(
   location: RegExp,
   startTime: string
 ) {
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
 
   // Reach the form the way a real user does: click a free "+" slot, then
@@ -145,7 +145,7 @@ test("a host can cap attendance below the room's own maximum @008-US4", async ({
   await login(page);
   const title = `E2E Capped Session ${uniqueSuffix()}`;
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(
@@ -203,7 +203,7 @@ test("a day running past midnight says so, and its late slots name the day @008-
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(
@@ -231,7 +231,7 @@ test("occupied start times are not offered in the same location but are in other
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(
@@ -274,7 +274,7 @@ test("an already scheduled proposal says the schedule won't follow it @008-US1 @
 }) => {
   // Seeded in Gamma's Main Hall, hosted by Isabella Rossi.
   const title = "Design Systems: Creating Consistency at Scale";
-  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await loginAndGoto(page, "/Web-Unconference/proposals");
   await selectUser(page, "Isabella Rossi");
   const row = page.getByRole("row", { name: new RegExp(title) });
 

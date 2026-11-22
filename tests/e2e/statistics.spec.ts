@@ -3,7 +3,7 @@ import fs from "fs";
 import { adminLogin } from "./helpers/admin";
 import { expect, test } from "./helpers/fixtures";
 
-// Read-only on the seeded Conference Gamma, so it can run beside the other specs.
+// Read-only on the seeded Web Unconference, so it can run beside the other specs.
 test("reads the statistics, leaves a location and a host out and downloads the tables @021-US1 @021-US2 @021-US3", async ({
   page,
 }) => {
@@ -12,8 +12,8 @@ test("reads the statistics, leaves a location and a host out and downloads the t
     .getByRole("navigation", { name: "Admin" })
     .getByRole("link", { name: "Statistics" })
     .click();
-  await page.getByRole("combobox", { name: "Event" }).fill("gamma");
-  await page.getByRole("option", { name: "Conference Gamma" }).click();
+  await page.getByRole("combobox", { name: "Event" }).fill("web");
+  await page.getByRole("option", { name: "Web Unconference" }).click();
 
   await expect(page.getByText("Excluding blockers")).toBeVisible();
   const headline = page.getByRole("list", { name: "Headline numbers" });

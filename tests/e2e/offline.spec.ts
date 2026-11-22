@@ -10,7 +10,7 @@ test("the schedule opens without a connection and says it may be out of date @01
   context,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(
     page.getByRole("link", { name: /Opening Keynote/ })
   ).toBeVisible();
@@ -44,7 +44,7 @@ test("a schedule left open offers a reload after the server is upgraded @014-US5
   context,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(
     page.getByRole("link", { name: /Opening Keynote/ })
   ).toBeVisible();
@@ -97,7 +97,7 @@ test("a chunk the app loaded later stays cached when the app is reloaded @014-US
     .toBeGreaterThan(2);
   const before = await cachedAssets();
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(
     page.getByRole("link", { name: /Opening Keynote/ })
   ).toBeVisible();
@@ -112,7 +112,7 @@ test("a language the attendee has not used yet still opens offline @022-US1", as
   context,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(
     page.getByRole("link", { name: /Opening Keynote/ })
   ).toBeVisible();

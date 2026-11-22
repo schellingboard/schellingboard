@@ -42,8 +42,8 @@ test.describe("Admin site settings", () => {
       page.getByRole("link", { name: `${unique} Admin` })
     ).toBeVisible();
 
-    // Restore the default so the rest of the suite is unaffected.
-    await page.getByLabel("Title").fill("Example Conference Weekend");
+    // Restore the seeded title so the rest of the suite is unaffected.
+    await page.getByLabel("Title").fill("Dev Week");
     await page.getByRole("button", { name: "Save settings" }).click();
     await expect(page.getByText("Settings saved.")).toBeVisible();
   });
@@ -54,7 +54,7 @@ test.describe("Admin site settings", () => {
     // No map by default: the schedule nav has no map button.
     // Leaving before the proposals page has loaded aborts the next goto.
     const site = page.waitForResponse("**/api/v1/site");
-    await loginAndGoto(page, "/Conference-Alpha");
+    await loginAndGoto(page, "/Hackathon");
     await site;
     await expect(
       page.getByRole("heading", { name: /Session Proposals/ })

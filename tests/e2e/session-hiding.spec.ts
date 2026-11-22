@@ -8,7 +8,7 @@ import { selectUser } from "./helpers/user";
 test("an attendee hides a session, finds it under Hidden and shows it again @007-US10", async ({
   page,
 }) => {
-  await loginAndGoto(page, "/Conference-Gamma");
+  await loginAndGoto(page, "/Web-Unconference");
   await switchToView(page, "Agenda");
   await selectUser(page, "Charlie Test");
   await expect(filterChip(page, "Hidden")).toBeHidden();

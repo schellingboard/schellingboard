@@ -10,7 +10,7 @@ test("a newly added session appears on the overview and can be opened @008-US1 @
 }) => {
   await login(page);
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
   await selectUser(page, /Alice Test/i);
 
@@ -61,7 +61,7 @@ test("the session form asks before discarding, and opens again from its address 
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   const form = page.getByRole("dialog", { name: "Session form" });
@@ -83,7 +83,7 @@ test("the session form warns when a host is busy at the chosen time @008-US1", a
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
   await selectUser(page, /Charlie Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   const form = page.getByRole("dialog", { name: "Session form" });

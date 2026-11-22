@@ -9,13 +9,13 @@ import { expect, test } from "./helpers/fixtures";
 // The red now line and the toolbar's "Now" button are for everyone, not just
 // kiosk displays (see kiosk.spec.ts for what kiosk mode adds on top). The
 // seeded events lie ~2 weeks out, so these time-travel with the dev fake clock
-// to a moment inside Conference Gamma's first day.
+// to a moment inside Web Unconference's first day.
 test.use({ timezoneId: "Europe/Berlin" });
 
 test("the Now button jumps to the current time on the schedule @007-US4", async ({
   page,
 }) => {
-  await openGammaScheduleDuringEvent(page, "/Conference-Gamma");
+  await openGammaScheduleDuringEvent(page, "/Web-Unconference");
 
   const nowLine = page.getByTestId("now-line");
   await expect(nowLine).toBeAttached();
@@ -36,7 +36,7 @@ test("no now line or Now button outside the event's days @007-US4", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/Web-Unconference");
 
   // The real clock is two weeks before the event starts.
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
@@ -48,7 +48,7 @@ test("the now line follows the dev fake clock, not the real clock @007-US4 @020-
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma?dev=1");
+  await page.goto("/Web-Unconference?dev=1");
 
   await expect(page.getByText("Dev clock")).toBeVisible();
   await expect(page.getByTestId("now-line")).toHaveCount(0);

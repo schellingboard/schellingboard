@@ -21,24 +21,24 @@ test.describe("Basic Sanity Checks", () => {
   }) => {
     // Should show all three test events
     await expect(
-      page.getByRole("heading", { name: "Conference Alpha" })
+      page.getByRole("heading", { name: "Hackathon" })
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Conference Beta" })
+      page.getByRole("heading", { name: "Open Source Summit" })
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Conference Gamma" })
+      page.getByRole("heading", { name: "Web Unconference" })
     ).toBeVisible();
 
-    // Should show phase descriptions
+    // Should show the event descriptions
     await expect(
-      page.getByText("Event currently in proposal phase")
+      page.getByText(/Dev Week ends with three days of building/)
     ).toBeVisible();
     await expect(
-      page.getByText("Event currently in voting phase")
+      page.getByText(/maintaining, funding and growing open source/)
     ).toBeVisible();
     await expect(
-      page.getByText("Event currently in scheduling phase")
+      page.getByText(/Dev Week opens with three days/)
     ).toBeVisible();
   });
 
@@ -46,19 +46,19 @@ test.describe("Basic Sanity Checks", () => {
     page,
   }) => {
     await page
-      .locator("text=Conference Alpha")
+      .locator("text=Hackathon")
       .locator("..")
       .getByRole("link", { name: "View event" })
       .click();
 
     await expect(
       page.getByRole("heading", {
-        name: /Conference Alpha: Session Proposals/,
+        name: /Hackathon: Session Proposals/,
       })
     ).toBeVisible();
     await expect(
       page
-        .getByText("Conference Alpha Lightning Talks: Community Showcase")
+        .getByText("Hackathon Lightning Talks: Community Showcase")
         .locator("visible=true")
     ).toBeVisible();
   });
@@ -67,19 +67,19 @@ test.describe("Basic Sanity Checks", () => {
     page,
   }) => {
     await page
-      .locator("text=Conference Beta")
+      .locator("text=Open Source Summit")
       .locator("..")
       .getByRole("link", { name: "View event" })
       .click();
 
     await expect(
       page.getByRole("heading", {
-        name: /Conference Beta: Session Proposals/,
+        name: /Open Source Summit: Session Proposals/,
       })
     ).toBeVisible();
     await expect(
       page
-        .getByText("Conference Beta Lightning Talks: Community Showcase")
+        .getByText("Open Source Summit Lightning Talks: Community Showcase")
         .locator("visible=true")
     ).toBeVisible();
   });
@@ -88,14 +88,14 @@ test.describe("Basic Sanity Checks", () => {
     page,
   }) => {
     await page
-      .locator("text=Conference Gamma")
+      .locator("text=Web Unconference")
       .locator("..")
       .getByRole("link", { name: "View event" })
       .click();
 
     await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
     await expect(
-      page.getByText("Opening Keynote - Conference Gamma")
+      page.getByText("Opening Keynote - Web Unconference")
     ).toBeVisible();
   });
 });
@@ -105,7 +105,7 @@ test("opens an event from the phone's menu @002-US2", async ({ page }) => {
   await login(page);
 
   await page.getByRole("button", { name: "Open menu" }).click();
-  await page.getByRole("link", { name: "Conference Gamma" }).click();
+  await page.getByRole("link", { name: "Web Unconference" }).click();
 
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 });
