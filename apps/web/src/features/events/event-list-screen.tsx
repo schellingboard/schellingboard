@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { compareEventsByStart } from "@schellingboard/domain/event";
+import type { Event } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
 
 import type { EventSummary } from "../../app/use-events";
@@ -26,13 +26,14 @@ export function EventListScreen({
   params: URLSearchParams;
   onParams: OnParams;
 }) {
-  const sorted = events
-    .map((summary) => ({ summary, event: toEvent(summary) }))
-    .sort((a, b) => compareEventsByStart(a.event, b.event));
   const { visible, pager, top } = usePaging<
-    (typeof sorted)[number],
+    { summary: EventSummary; event: Event },
     HTMLDivElement
-  >(sorted, params, onParams);
+  >(
+    events.map((summary) => ({ summary, event: toEvent(summary) })),
+    params,
+    onParams
+  );
   return (
     <div ref={top} className="mx-auto max-w-2xl">
       <h1 className="text-4xl font-bold mt-5">{site.title}</h1>

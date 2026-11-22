@@ -7233,7 +7233,7 @@ msgstr "Version {shown} — what's new, update available"
 msgid "Version:"
 msgstr "Version:"
 
-#: src/features/events/event-list-screen.tsx:73
+#: src/features/events/event-list-screen.tsx:74
 msgid "View event"
 msgstr "View event"
 

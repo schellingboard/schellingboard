@@ -2,11 +2,12 @@ import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { useEffect, useState } from "react";
 
+import { byStart } from "../replica/selectors";
 import type { NavItem } from "./nav-bar";
 
 export type EventSummary = Snapshot["event"];
 
-/** Every event, and the server's clock as it answered; both undefined until it has. */
+/** Every event, soonest first, and the server's clock as it answered; both undefined until it has. */
 export function useEventList(api: ApiClient): {
   events: EventSummary[];
   now: Date | undefined;
@@ -21,7 +22,8 @@ export function useEventList(api: ApiClient): {
       .GET("/api/v1/events")
       .then(({ data }) => {
         if (stale) return;
-        if (data) setList({ events: data.events, now: new Date(data.now) });
+        if (data)
+          setList({ events: byStart(data.events), now: new Date(data.now) });
         else setFailed(true);
       })
       .catch(() => setFailed(true));

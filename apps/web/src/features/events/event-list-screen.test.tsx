@@ -37,7 +37,7 @@ describe("the event list", () => {
     expect(heading("No icon").querySelector("svg")).toBeNull();
   });
 
-  it("shows the site and each event, soonest first, with a link to it", () => {
+  it("shows the site and each event, in the given order, with a link to it", () => {
     render(
       <EventListScreen
         site={site}
@@ -68,7 +68,7 @@ describe("the event list", () => {
     const names = screen
       .getAllByRole("heading", { level: 2 })
       .map((h) => h.textContent);
-    expect(names).toEqual(["Early con", "Late con", "Undated con"]);
+    expect(names).toEqual(["Late con", "Early con", "Undated con"]);
     const early = screen.getByText("Early con").parentElement as HTMLElement;
     expect(within(early).getByText("Jun 1")).toBeTruthy();
     expect(

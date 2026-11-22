@@ -1,6 +1,11 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { LoggedProposal } from "@schellingboard/domain/change";
-import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
+import {
+  compareEventsByStart,
+  type Day,
+  type Event,
+  type SharedMoment,
+} from "@schellingboard/domain/event";
 import type { Guest } from "@schellingboard/domain/guest";
 import type {
   Location,
@@ -30,6 +35,12 @@ export function toEvent(e: Snapshot["event"]): Event {
     schedulingPhaseEnd: optionalDate(e.schedulingPhaseEnd),
   };
 }
+
+export const byStart = <T extends Snapshot["event"]>(events: T[]): T[] =>
+  events
+    .map((summary) => ({ summary, event: toEvent(summary) }))
+    .sort((a, b) => compareEventsByStart(a.event, b.event))
+    .map(({ summary }) => summary);
 
 function toDay(d: Snapshot["days"][number]): Day {
   return {

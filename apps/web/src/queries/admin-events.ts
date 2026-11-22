@@ -2,6 +2,7 @@ import type { ApiClient } from "@schellingboard/api-client";
 import type { eventViewSchema } from "@schellingboard/contracts/event";
 
 import { problemCode } from "../commands/problem";
+import { byStart } from "../replica/selectors";
 import { createObservable } from "./store";
 
 export type AdminEvent = (typeof eventViewSchema)["_output"];
@@ -13,7 +14,7 @@ export type AdminEventsState =
 
 export type AdminEventsQuery = ReturnType<typeof createAdminEventsQuery>;
 
-/** Every event, past ones included; `load` again after a change. */
+/** Every event, past ones included, soonest first; `load` again after a change. */
 export function createAdminEventsQuery({ api }: { api: ApiClient }) {
   const state = createObservable<AdminEventsState>({ status: "loading" });
   let latest = 0;
@@ -27,7 +28,7 @@ export function createAdminEventsQuery({ api }: { api: ApiClient }) {
         if (mine !== latest) return;
         state.set(
           data
-            ? { status: "ready", events: data.events, now: data.now }
+            ? { status: "ready", events: byStart(data.events), now: data.now }
             : { status: "error", code: problemCode(error, response.status) }
         );
       } catch {
