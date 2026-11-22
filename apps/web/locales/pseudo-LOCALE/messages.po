@@ -1101,6 +1101,10 @@ msgstr ""
 msgid "Add a comment"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:510
+msgid "Add a conversation starter"
+msgstr ""
+
 #: src/features/admin/event-moments.tsx:416
 msgid "Add a day first; shared moments belong to days."
 msgstr ""
@@ -6425,15 +6429,6 @@ msgstr ""
 msgid "Submitting..."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:460
-#: src/features/people/profile-form.tsx:464
-msgid "Suggest a different prompt"
-msgstr ""
-
-#: src/features/people/profile-form.tsx:510
-msgid "Suggest a prompt"
-msgstr ""
-
 #: src/features/admin/event-meetings.tsx:330
 #: src/features/admin/event-meetings.tsx:334
 msgid "Suggested meeting points"
@@ -6442,6 +6437,11 @@ msgstr ""
 #. Name of an event icon
 #: src/ui/event-icons.ts:132
 msgid "Sun"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:460
+#: src/features/people/profile-form.tsx:464
+msgid "Swap for another random prompt"
 msgstr ""
 
 #: src/app/theme.tsx:84

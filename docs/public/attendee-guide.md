@@ -520,8 +520,8 @@ About me, conversation-starter answers, and contact details all accept Markdown,
 address you paste in becomes clickable on its own. A conversation-starter answer can have several
 lines; start lines with `-` for a list.
 
-Beyond the core questions, **Suggest a prompt** adds a random conversation starter. Type in its
-field to pick another by name, for instance when you arrive and leave, to share rides.
+Beyond the core questions, **Add a conversation starter** adds one at random. Type in its field to
+pick another by name, for instance when you arrive and leave, to share rides.
 
 If your profile changed while you had the form open, for example from another tab or because an
 organizer renamed you, your save is refused rather than undoing that change. Copy your edits, reload

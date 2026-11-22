@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **"Add a conversation starter"** replaces "Suggest a prompt" on the profile form, which read as
+  proposing a new question to the organizers.
 - **Browser tabs show your site title**: the title set in Settings replaces "SchellingBoard".
 - **A compact event icon picker**: organizers see only the icons; hovering one shows its name.
 - **Clearer dates in the phase bar**: each phase says when it starts, ends or ended, date first, in

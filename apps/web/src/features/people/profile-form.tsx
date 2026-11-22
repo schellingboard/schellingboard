@@ -457,11 +457,11 @@ export function ProfileForm({
                         ].map((p) => ({ value: p, label: promptLabel(p) }))}
                       />
                     </div>
-                    <Tooltip content={t`Suggest a different prompt`}>
+                    <Tooltip content={t`Swap for another random prompt`}>
                       <button
                         type="button"
                         className={TEXT_BUTTON}
-                        aria-label={t`Suggest a different prompt`}
+                        aria-label={t`Swap for another random prompt`}
                         onClick={() => {
                           const pick = pickUnusedPrompt(
                             prompts.map((p) => p.prompt)
@@ -507,7 +507,7 @@ export function ProfileForm({
                 ]);
             }}
           >
-            <Trans>Suggest a prompt</Trans>
+            <Trans>Add a conversation starter</Trans>
           </button>
         </Section>
 

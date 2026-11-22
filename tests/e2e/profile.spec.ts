@@ -250,12 +250,14 @@ test.describe("Edit profile", () => {
         .evaluateAll((inputs) =>
           inputs.map((input) => (input as HTMLInputElement).value)
         );
-    await page.getByRole("button", { name: "Suggest a prompt" }).click();
+    await page
+      .getByRole("button", { name: "Add a conversation starter" })
+      .click();
     const [suggestedPrompt, ...extraBefore] = await visiblePoolPrompts();
     expect(suggestedPrompt).toBeDefined();
     expect(extraBefore).toEqual([]);
     await page
-      .getByRole("button", { name: "Suggest a different prompt" })
+      .getByRole("button", { name: "Swap for another random prompt" })
       .click();
     await expect.poll(visiblePoolPrompts).not.toEqual([suggestedPrompt]);
     // Left unanswered, so it must not appear on the saved profile.

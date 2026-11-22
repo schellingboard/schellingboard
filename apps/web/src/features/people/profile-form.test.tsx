@@ -141,7 +141,7 @@ describe("editing my profile", { tags: ["011-US1"] }, () => {
     const { calls } = setup();
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Suggest a prompt" })
+      screen.getByRole("button", { name: "Add a conversation starter" })
     );
     await userEvent.click(screen.getByRole("combobox", { name: "Prompt 1" }));
     await userEvent.click(
@@ -164,7 +164,7 @@ describe("editing my profile", { tags: ["011-US1"] }, () => {
     setup();
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Suggest a prompt" })
+      screen.getByRole("button", { name: "Add a conversation starter" })
     );
     const prompt = screen.getByRole<HTMLInputElement>("combobox", {
       name: "Prompt 1",

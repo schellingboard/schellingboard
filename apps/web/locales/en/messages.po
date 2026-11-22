@@ -1101,6 +1101,10 @@ msgstr "Active members voted, RSVPed, proposed, hosted, commented or offered 1-o
 msgid "Add a comment"
 msgstr "Add a comment"
 
+#: src/features/people/profile-form.tsx:510
+msgid "Add a conversation starter"
+msgstr "Add a conversation starter"
+
 #: src/features/admin/event-moments.tsx:416
 msgid "Add a day first; shared moments belong to days."
 msgstr "Add a day first; shared moments belong to days."
@@ -6425,15 +6429,6 @@ msgstr "Submitting adds another session. To change a scheduled one, open it and 
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/features/people/profile-form.tsx:460
-#: src/features/people/profile-form.tsx:464
-msgid "Suggest a different prompt"
-msgstr "Suggest a different prompt"
-
-#: src/features/people/profile-form.tsx:510
-msgid "Suggest a prompt"
-msgstr "Suggest a prompt"
-
 #: src/features/admin/event-meetings.tsx:330
 #: src/features/admin/event-meetings.tsx:334
 msgid "Suggested meeting points"
@@ -6443,6 +6438,11 @@ msgstr "Suggested meeting points"
 #: src/ui/event-icons.ts:132
 msgid "Sun"
 msgstr "Sun"
+
+#: src/features/people/profile-form.tsx:460
+#: src/features/people/profile-form.tsx:464
+msgid "Swap for another random prompt"
+msgstr "Swap for another random prompt"
 
 #: src/app/theme.tsx:84
 msgctxt "Colour theme"
