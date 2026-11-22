@@ -130,7 +130,8 @@ export const shots: Shot[] = [
   shot("session-details", async (page) => {
     await openEvent(page, "Web Unconference");
     await page
-      .getByText("Benchmarking API Versioning", { exact: false })
+      .getByText("Live Demo: Incident Response from Scratch")
+      .locator("visible=true")
       .first()
       .click();
     await page.getByRole("dialog").waitFor();
@@ -147,7 +148,7 @@ export const shots: Shot[] = [
   shot("participant-profile", async (page) => {
     await page.getByRole("link", { name: "Attendees" }).click();
     await page.getByRole("heading", { name: "Attendees" }).waitFor();
-    await page.getByText("Aiko Abebe").first().click();
+    await page.getByText("Ahmad Karimi").first().click();
     await page.getByText("About me").waitFor();
   }),
   shot("edit-profile", async (page) => {
@@ -211,13 +212,13 @@ export const shots: Shot[] = [
   }),
   shot("meetings-schedule-column", async (page) => {
     await openEvent(page, "Web Unconference");
-    await scrollGridTo(page, "12:00");
+    await scrollGridTo(page, "12 PM");
   }),
   shot("meeting-book-from-grid", async (page) => {
     await openEvent(page, "Web Unconference");
-    await scrollGridTo(page, "12:00");
+    await scrollGridTo(page, "12 PM");
     await page
-      .getByRole("button", { name: /^Arrange a 1-on-1 at 14:(30|40)/ })
+      .getByRole("link", { name: /^Arrange a 1-on-1 at 2:(30|40) PM/ })
       .first()
       .click();
     await page.getByText(/Who.s free at/).waitFor();
@@ -251,8 +252,12 @@ export const shots: Shot[] = [
     "mobile-session-details",
     async (page) => {
       await openGammaOnPhone(page);
-      await page.getByText("Edge Rendering in Production").first().click();
-      await page.getByText("Closed Session", { exact: true }).waitFor();
+      await page
+        .getByText("The Future of AI: Transforming Industries")
+        .locator("visible=true")
+        .first()
+        .click();
+      await page.getByRole("dialog").waitFor();
     },
     { kind: "mobile" }
   ),
