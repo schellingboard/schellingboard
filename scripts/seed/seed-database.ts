@@ -283,6 +283,8 @@ function clearAll() {
   db.delete(schema.sessionProposals).run();
   db.delete(schema.sharedMoments).run();
   db.delete(schema.days).run();
+  db.delete(schema.guestLabels).run();
+  db.delete(schema.eventLabels).run();
   db.delete(schema.eventGuests).run();
   db.delete(schema.eventLocations).run();
   db.delete(schema.events).run();
@@ -438,6 +440,71 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
     db.insert(schema.eventGuests).values(chunk)
   );
   db.insert(schema.eventLocations).values(eventLocationRows).run();
+
+  // Different people at each event, so the site-wide directory shows no one
+  // with the same badge twice.
+  const wearersByEvent: Record<
+    string,
+    { organizer: string[]; photographer: string[]; welfare: string[] }
+  > = {
+    "Web Unconference": {
+      organizer: ["Wei Chen", "Amara Okafor"],
+      photographer: ["Lars Eriksson"],
+      welfare: ["Fatima Al-Farsi"],
+    },
+    "Open Source Summit": {
+      organizer: ["Hiroshi Yamamoto"],
+      photographer: ["Aisha Diallo"],
+      welfare: ["Sofía Martínez"],
+    },
+    Hackathon: {
+      organizer: ["Kwame Mensah"],
+      photographer: ["Diego Fernández"],
+      welfare: ["Elif Yılmaz"],
+    },
+  };
+  const labelRows = eventRows.flatMap((ev) => {
+    const people = wearersByEvent[ev.name];
+    return [
+      {
+        name: "Organizer",
+        description:
+          "Runs this event. Ask them about anything, from rooms to the schedule.",
+        color: "red",
+        wearers: people?.organizer ?? [],
+      },
+      {
+        name: "Photographer",
+        description:
+          "Takes photos in sessions. Tell them if you'd rather not be in a picture.",
+        color: "blue",
+        wearers: people?.photographer ?? [],
+      },
+      {
+        name: "Welfare",
+        description:
+          "Talk to them, in confidence, if something feels wrong or you need help.",
+        color: "green",
+        wearers: people?.welfare ?? [],
+      },
+    ].map(({ wearers, ...label }, position) => ({
+      label: { id: nanoid(), eventId: ev.id, position, ...label },
+      wearers,
+    }));
+  });
+  db.insert(schema.eventLabels)
+    .values(labelRows.map((row) => row.label))
+    .run();
+  db.insert(schema.guestLabels)
+    .values(
+      labelRows.flatMap(({ label, wearers }) =>
+        wearers.map((name) => ({
+          eventLabelId: label.id,
+          guestId: guestIdByName(name),
+        }))
+      )
+    )
+    .run();
 
   // Days (3 per event, 09:00–18:00 Berlin, bookable 09:00–17:30 Berlin).
   // Exception: Web Unconference's last day is a party night that runs to 03:00
