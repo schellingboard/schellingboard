@@ -40,6 +40,13 @@ versioned per minor release, so `v3.2.1` republishes the `3.2` documentation.
    patch release branched off that tag needs it. See
    [Release-upgrade tests](testing.md#release-upgrade-tests).
 
+   **Check whether screenshots need recapturing.** Compare the changelog against
+   `docs/screenshots/`: any changed screen, new feature with a UI, or footer version shown in a shot
+   means a recapture. Run `make screenshots ARGS="name ..."` for the affected shots, or all of them
+   after broad UI changes, and review the images. See
+   [`docs/screenshots/README.md`](https://github.com/schellingboard/schellingboard/blob/main/docs/screenshots/README.md).
+   Add shots for new features to `scripts/screenshots/shots.ts`.
+
    Commit and merge this like any other change.
 
 2. **Tag the resulting commit on `main` and push the tag** — the point of no return, since it
