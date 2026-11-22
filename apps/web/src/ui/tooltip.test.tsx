@@ -24,6 +24,25 @@ describe("Tooltip", () => {
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
+  it("opens above a trigger near the bottom of the window", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(100);
+    render(
+      <Tooltip content="More">
+        <a href="/x">Trigger</a>
+      </Tooltip>
+    );
+    const trigger = screen.getByRole("link").parentElement!;
+    const bottom = window.innerHeight - 10;
+    vi.spyOn(trigger, "getBoundingClientRect").mockReturnValue(
+      DOMRect.fromRect({ x: 20, y: bottom - 20, width: 50, height: 20 })
+    );
+    fireEvent.mouseEnter(trigger);
+    act(() => void vi.advanceTimersByTime(600));
+    const panel = screen.getByRole("tooltip");
+    expect(panel.style.top).toBe(`${bottom - 20 - 6 - 100}px`);
+    vi.restoreAllMocks();
+  });
+
   it("stays shut when a tap, not a mouse, crossed the trigger", () => {
     render(
       <Tooltip content="More">

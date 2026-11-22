@@ -66,11 +66,21 @@ export function Tooltip({
     if (!open || !trigger.current || !panel.current) return;
     const anchor = trigger.current.getBoundingClientRect();
     const width = panel.current.offsetWidth;
+    const height = panel.current.offsetHeight;
+    const viewport = document.documentElement;
+    const right = viewport.clientWidth || window.innerWidth;
+    const bottom = viewport.clientHeight || window.innerHeight;
     const left = Math.min(
       Math.max(EDGE_PX, anchor.left),
-      Math.max(EDGE_PX, window.innerWidth - width - EDGE_PX)
+      Math.max(EDGE_PX, right - width - EDGE_PX)
     );
-    setPosition({ top: anchor.bottom + GAP_PX, left });
+    const below = anchor.bottom + GAP_PX;
+    const flip =
+      below + height > bottom - EDGE_PX && anchor.top > bottom - anchor.bottom;
+    const top = flip
+      ? Math.max(EDGE_PX, anchor.top - GAP_PX - height)
+      : Math.max(EDGE_PX, Math.min(below, bottom - height - EDGE_PX));
+    setPosition({ top, left });
   }, [open]);
 
   useEffect(() => {

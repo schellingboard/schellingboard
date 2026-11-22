@@ -101,6 +101,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   link or a list button, undo used to leave the text as it was.
 - **Code blocks show as code**: text between ``` lines in descriptions, profiles and comments now
   shows as a code block with a copy button. It used to fall apart into ordinary paragraphs.
+- **Hover cards stay on screen**: a person's card or a hint near the bottom of the window now opens
+  above its name instead of being cut off.
 
 ### Internal
 
