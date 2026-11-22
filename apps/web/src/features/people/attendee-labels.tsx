@@ -20,7 +20,7 @@ export function AttendeeLabels({
         as="span"
         toggleable={tappable}
         content={hint ? <p className="p-2 text-sm">{hint}</p> : undefined}
-        triggerClassName="max-w-full"
+        triggerClassName="flex max-w-full"
       >
         <LabelBadge name={label.name} color={label.color} />
       </Tooltip>
