@@ -1,56 +1,53 @@
 # Releasing a New Version
 
 Pushing the tag is the whole release: it triggers
-[`.github/workflows/release.yml`](https://github.com/schellingboard/schellingboard/blob/main/.github/workflows/release.yml),
-which builds the image, runs the E2E suite against it, publishes it to Docker Hub and opens the
-GitHub release — and
-[`docs.yml`](https://github.com/schellingboard/schellingboard/blob/main/.github/workflows/docs.yml),
-which rebuilds the docs site and serves `docs/public/` as of that tag at its root. Docs are
-versioned per minor release, so `v3.2.1` republishes the `3.2` documentation.
+[`release.yml`](https://github.com/schellingboard/schellingboard/blob/main/.github/workflows/release.yml)
+(build the image, run E2E against it, publish to Docker Hub, open the GitHub release) and
+[`docs.yml`](https://github.com/schellingboard/schellingboard/blob/main/.github/workflows/docs.yml)
+(rebuild the docs site, serving `docs/public/` as of that tag at its root). Docs are versioned per
+minor release, so `v3.2.1` republishes the `3.2` documentation.
 
-1. **Finalize the changelog** — in `CHANGELOG.md`, rename `## [Unreleased]` to
-   `## [X.Y.Z] - YYYY-MM-DD` (no `v` prefix in the header), and replace the `[Unreleased]` compare
-   link at the bottom of the file with the new version's, pointing from the previous release's
-   endpoint to the new tag (`vX.Y.Z`). Do _not_ add a fresh `## [Unreleased]` section here — the
-   released tag should carry no empty section, since that is what the documentation site publishes.
-   Step 4 reopens it afterwards.
+## Checklist
 
-   **Release the in-app notes in the same commit** — in `packages/domain/src/release-notes.ts`, the
-   first entry of `releaseNotes` is the one being prepared: replace its `version: "Unreleased"` with
-   this version and add the `date`, and rename the same key in `releaseHighlights`
-   (`apps/web/src/app/release-highlights.ts`). Nothing else moves. `make test` fails until the
-   newest release the changelog names has an entry.
+- [ ] Changelog: `[Unreleased]` renamed to `[X.Y.Z] - date`, compare link updated
+- [ ] In-app release notes released, highlights re-read against the changelog
+- [ ] `make dump-release-db VERSION=vX.Y.Z` run
+- [ ] Screenshots checked, recaptured where the UI changed
+- [ ] Release commit merged to `main`
+- [ ] Optional: `make test-e2e-docker` on the release commit
+- [ ] Tag pushed (point of no return)
+- [ ] Release workflow green
+- [ ] Changelog and in-app notes reopened
 
-   **Re-read those highlights against the finalized changelog first.** They were written one at a
-   time, before it was known what else the release would hold, so they are a draft, not a record:
-   check that they are still the 3-5 changes an attendee or organizer would call this release's
-   highlights, and rewrite or replace any that are not.
+## Steps
 
-   **Record the release's database in the same commit**, so future releases are tested against an
-   upgrade from it:
+1. **Prepare the release commit.** All of the following go in one commit.
 
-   ```bash
-   make dump-release-db VERSION=vX.Y.Z
-   ```
+   - **Changelog**: in `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (no `v`
+     prefix) and point the `[Unreleased]` compare link at the new version: previous release to
+     `vX.Y.Z`. Do _not_ add a fresh `[Unreleased]` section yet; the tag must carry none, because the
+     docs site publishes it. Step 4 reopens it.
+   - **In-app notes**: in `packages/domain/src/release-notes.ts`, replace the first entry's
+     `version: "Unreleased"` with this version and add its `date`. Rename the same key in
+     `apps/web/src/app/release-highlights.ts`. `make test` fails until the newest changelog release
+     has an entry.
+   - **Highlights**: re-read them against the finalized changelog. They were written one at a time
+     and are a draft. Keep only the 3-5 changes an attendee or organizer would call the release's
+     highlights; rewrite or replace the rest.
+   - **Release database**: run `make dump-release-db VERSION=vX.Y.Z` so future releases are tested
+     against an upgrade from this one. It writes no dump when there is no new migration, only the
+     `tests/fixtures/upgrade/releases.json` entry. `make test` fails until the entry exists, and
+     being inside the tag, patch releases branched off it get it too. See
+     [Release-upgrade tests](testing.md#release-upgrade-tests).
+   - **Screenshots**: compare the changelog against `docs/screenshots/`. A changed screen, a new
+     feature with a UI, or a footer version shown in a shot means a recapture. Run
+     `make screenshots ARGS="name ..."` for the affected shots, or all after broad UI changes, and
+     review the images. Add shots for new UI features to `scripts/screenshots/shots.ts`. See
+     [`docs/screenshots/README.md`](https://github.com/schellingboard/schellingboard/blob/main/docs/screenshots/README.md).
 
-   It writes no dump when the release ships no migration, only the
-   `tests/fixtures/upgrade/releases.json` entry pointing at the dump that already covers the
-   upgrade. `make test` fails until the version the changelog now names appears there, so the
-   fixture cannot be forgotten — and being in the release commit, it is inside the tag, where a
-   patch release branched off that tag needs it. See
-   [Release-upgrade tests](testing.md#release-upgrade-tests).
+   Commit and merge it like any other change.
 
-   **Check whether screenshots need recapturing.** Compare the changelog against
-   `docs/screenshots/`: any changed screen, new feature with a UI, or footer version shown in a shot
-   means a recapture. Run `make screenshots ARGS="name ..."` for the affected shots, or all of them
-   after broad UI changes, and review the images. See
-   [`docs/screenshots/README.md`](https://github.com/schellingboard/schellingboard/blob/main/docs/screenshots/README.md).
-   Add shots for new features to `scripts/screenshots/shots.ts`.
-
-   Commit and merge this like any other change.
-
-2. **Tag the resulting commit on `main` and push the tag** — the point of no return, since it
-   publishes the documentation:
+2. **Tag the commit on `main` and push the tag.** This publishes the documentation.
 
    ```bash
    jj git fetch
@@ -61,18 +58,17 @@ versioned per minor release, so `v3.2.1` republishes the `3.2` documentation.
    #      git push origin v3.0.0
    ```
 
-   Optionally run `make test-e2e-docker` on the release commit first. The release workflow runs it
-   too, and refuses to publish anything if it fails — running it locally only buys you the chance to
-   fix a failure before the tag is public.
+   Optionally run `make test-e2e-docker` on the release commit first. The workflow runs it too and
+   publishes nothing if it fails; running it locally only lets you fix a failure before the tag is
+   public.
 
-3. **Watch the release workflow.** It takes around fifteen minutes, most of it the E2E suite against
-   the image.
+3. **Watch the release workflow.** It takes about fifteen minutes, mostly E2E against the image.
 
-4. **Reopen the changelog** — in a follow-up commit on `main`, add an empty `## [Unreleased]`
-   section above `## [X.Y.Z]` and an `[Unreleased]` compare link from `vX.Y.Z` to `HEAD`. **Reopen
-   the in-app notes too** — in `packages/domain/src/release-notes.ts`, add a new first entry with
-   `version: "Unreleased"` and no `date`, above the one just released, and an empty `Unreleased`
-   list in `releaseHighlights`. Drop the highlights of releases the modal no longer shows.
+4. **Reopen the changelog.** In a follow-up commit on `main`: add an empty `## [Unreleased]` above
+   `## [X.Y.Z]`, with an `[Unreleased]` compare link from `vX.Y.Z` to `HEAD`. In
+   `packages/domain/src/release-notes.ts`, add a new first entry with `version: "Unreleased"` and no
+   `date`, and add an empty `Unreleased` list to `releaseHighlights`. Drop highlights of releases
+   the modal no longer shows.
 
 ## What the release workflow does
 
