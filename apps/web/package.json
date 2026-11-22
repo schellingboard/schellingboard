@@ -25,6 +25,7 @@
   "devDependencies": {
     "@lingui/cli": "6.12.0",
     "@lingui/conf": "6.12.0",
+    "@lingui/format-po": "6.12.0",
     "@lingui/vite-plugin": "6.12.0",
     "@tailwindcss/vite": "4.3.5",
     "@testing-library/dom": "10.4.2",
