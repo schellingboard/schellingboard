@@ -2909,7 +2909,7 @@ msgstr ""
 msgid "Edited {editedAt}"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:108
+#: src/features/admin/event-guests.tsx:109
 #: src/features/admin/guests-screen.tsx:164
 #: src/features/admin/guests-screen.tsx:280
 #: src/features/people/contact-labels.ts:6
@@ -3175,7 +3175,7 @@ msgstr ""
 msgid "Filter by Has profile (active)"
 msgstr ""
 
-#: src/features/people/label-menu.tsx:29
+#: src/features/people/label-menu.tsx:30
 msgid "Filter by label"
 msgstr ""
 
@@ -3358,7 +3358,7 @@ msgstr ""
 msgid "Group"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:99
+#: src/features/admin/event-guests.tsx:100
 #: src/features/admin/event-layout.tsx:18
 msgid "Guests"
 msgstr ""
@@ -3732,7 +3732,7 @@ msgstr ""
 msgid "Join as co-host"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:114
+#: src/features/admin/event-guests.tsx:115
 msgid "Join link"
 msgstr ""
 
@@ -3792,12 +3792,12 @@ msgstr ""
 msgid "Kind"
 msgstr ""
 
-#: src/features/people/label-menu.tsx:30
+#: src/features/people/label-menu.tsx:31
 #: src/features/people/profile-form.tsx:604
 msgid "Label"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:112
+#: src/features/admin/event-guests.tsx:113
 #: src/features/admin/event-labels.tsx:243
 #: src/features/admin/event-labels.tsx:245
 msgid "Labels"
@@ -4325,7 +4325,7 @@ msgid "n/a"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:144
-#: src/features/admin/event-guests.tsx:106
+#: src/features/admin/event-guests.tsx:107
 #: src/features/admin/event-labels.tsx:70
 #: src/features/admin/event-locations.tsx:34
 #: src/features/admin/event-meetings.tsx:219
@@ -4572,7 +4572,7 @@ msgstr ""
 msgid "No sessions match."
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:104
+#: src/features/admin/event-guests.tsx:105
 #: src/features/admin/guests-screen.tsx:559
 msgid "No users match."
 msgstr ""
@@ -4633,7 +4633,7 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
-#: src/ui/people-picker.tsx:135
+#: src/ui/people-picker.tsx:155
 msgid "Nothing found."
 msgstr ""
 
@@ -5347,7 +5347,7 @@ msgid "Remove"
 msgstr ""
 
 #. placeholder {0}: p.name
-#: src/ui/people-picker.tsx:92
+#: src/ui/people-picker.tsx:106
 msgid "Remove {0}"
 msgstr ""
 
@@ -5699,7 +5699,7 @@ msgstr ""
 msgid "Search {tableTitle}"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:103
+#: src/features/admin/event-guests.tsx:104
 #: src/features/admin/guests-screen.tsx:558
 msgid "Search name or email…"
 msgstr ""

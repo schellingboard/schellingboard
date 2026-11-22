@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Compact label fields**: the label field in the admin guest list and the label filter on the
+  attendee page are as high as the controls around them.
 - **The menu and the admin pages list events in date order**, the same as the home page.
 - **Messages at the bottom of the screen go away by themselves**: only those asking you to check
   something stay until dismissed. Hovering or focusing one keeps it open.

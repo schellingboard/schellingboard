@@ -49,13 +49,14 @@ function GuestLabels({
   };
 
   return (
-    <div className="min-w-48 space-y-1">
+    <div className="w-56 space-y-1">
       <PeoplePicker
         people={labels}
         selected={shown ?? worn}
         onChange={(ids) => void change(ids)}
         ariaLabel={t`Labels of ${name}`}
         placeholder={t`Add a label…`}
+        compact
       />
       {error && (
         <p role="alert" className="text-sm text-danger-fg">

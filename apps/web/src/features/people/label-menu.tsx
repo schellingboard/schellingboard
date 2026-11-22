@@ -21,8 +21,9 @@ export function LabelMenu({
     })
   );
   return (
-    <div className="w-64 max-w-full">
+    <div className="w-56 max-w-full">
       <PeoplePicker
+        compact
         people={options}
         selected={selected}
         onChange={onChange}

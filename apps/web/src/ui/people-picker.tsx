@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type KeyboardEvent, useId, useRef, useState } from "react";
 
+import { cx } from "./cx";
 import { XMarkIcon } from "./icons";
 
 export type Person = { id: string; name: string };
@@ -25,6 +26,7 @@ export function PeoplePicker({
   describedBy,
   placeholder,
   ariaLabel,
+  compact,
 }: {
   people: Person[];
   selected: string[];
@@ -35,6 +37,8 @@ export function PeoplePicker({
   describedBy?: string;
   placeholder?: string;
   ariaLabel?: string;
+  /** One line, as high as a button; long names end in an ellipsis. */
+  compact?: boolean;
 }) {
   const listId = useId();
   const root = useRef<HTMLDivElement>(null);
@@ -80,15 +84,25 @@ export function PeoplePicker({
         if (!root.current?.contains(e.relatedTarget)) setOpen(false);
       }}
     >
-      <div className="flex min-h-12 flex-wrap items-center gap-1 rounded-md border border-line bg-surface-raised px-3 py-2 focus-within:ring-2 focus-within:ring-brand-accent">
+      <div
+        className={cx(
+          "flex items-center gap-1 rounded-md border border-line bg-surface-raised focus-within:ring-2 focus-within:ring-brand-accent",
+          compact ? "h-9 px-2" : "min-h-12 flex-wrap px-3 py-2"
+        )}
+      >
         {chips.map((p) => (
           <span
             key={p.id}
-            className="flex items-center gap-1 text-nowrap rounded bg-surface-muted px-2 py-1 text-sm"
+            title={compact ? p.name : undefined}
+            className={cx(
+              "flex items-center gap-1 text-nowrap rounded bg-surface-muted text-sm",
+              compact ? "min-w-0 px-1.5 py-0.5" : "px-2 py-1"
+            )}
           >
-            {p.name}
+            <span className="truncate">{p.name}</span>
             <button
               type="button"
+              className="shrink-0"
               aria-label={t`Remove ${p.name}`}
               onClick={() => onChange(selected.filter((s) => s !== p.id))}
             >
@@ -110,7 +124,10 @@ export function PeoplePicker({
           aria-invalid={invalid ? true : undefined}
           aria-describedby={describedBy}
           autoComplete="off"
-          className="min-w-8 flex-1 border-none bg-transparent px-0 py-1 text-base sm:text-sm outline-none placeholder:text-fg-subtle focus:ring-0"
+          className={cx(
+            "flex-1 border-none bg-transparent px-0 text-base outline-none placeholder:text-fg-subtle focus:ring-0",
+            compact ? "min-w-12 py-0 sm:text-sm" : "min-w-8 py-1 sm:text-sm"
+          )}
           value={query}
           placeholder={chips.length === 0 ? placeholder : undefined}
           onChange={(e) => {
@@ -128,7 +145,10 @@ export function PeoplePicker({
           id={listId}
           role="listbox"
           aria-multiselectable="true"
-          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-surface-raised py-1 text-sm shadow-lg ring-1 ring-line-subtle"
+          className={cx(
+            "absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-surface-raised py-1 text-sm shadow-lg ring-1 ring-line-subtle",
+            compact ? "w-max min-w-full max-w-xs" : "w-full"
+          )}
         >
           {options.length === 0 && query !== "" ? (
             <li className="px-4 py-2 text-fg-muted">
@@ -141,7 +161,7 @@ export function PeoplePicker({
                 id={`${listId}-${i}`}
                 role="option"
                 aria-selected={selected.includes(p.id)}
-                className={`flex cursor-pointer items-center justify-between px-4 py-2 ${i === active ? "bg-brand-tint-hover text-brand-fg" : "text-fg"}`}
+                className={`flex cursor-pointer items-center justify-between gap-3 px-4 py-2 ${i === active ? "bg-brand-tint-hover text-brand-fg" : "text-fg"}`}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => toggle(p)}
               >

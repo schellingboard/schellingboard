@@ -2909,7 +2909,7 @@ msgstr "Bearbeitet"
 msgid "Edited {editedAt}"
 msgstr "Bearbeitet {editedAt}"
 
-#: src/features/admin/event-guests.tsx:108
+#: src/features/admin/event-guests.tsx:109
 #: src/features/admin/guests-screen.tsx:164
 #: src/features/admin/guests-screen.tsx:280
 #: src/features/people/contact-labels.ts:6
@@ -3175,7 +3175,7 @@ msgstr "Nach „Hat Profil“ filtern"
 msgid "Filter by Has profile (active)"
 msgstr "Nach „Hat Profil“ filtern (aktiv)"
 
-#: src/features/people/label-menu.tsx:29
+#: src/features/people/label-menu.tsx:30
 msgid "Filter by label"
 msgstr "Nach Label filtern"
 
@@ -3358,7 +3358,7 @@ msgstr "Erdgeschoss, neben der Rezeption"
 msgid "Group"
 msgstr "Gruppe"
 
-#: src/features/admin/event-guests.tsx:99
+#: src/features/admin/event-guests.tsx:100
 #: src/features/admin/event-layout.tsx:18
 msgid "Guests"
 msgstr "Gäste"
@@ -3732,7 +3732,7 @@ msgstr "{eventName} beitreten"
 msgid "Join as co-host"
 msgstr "Als Co-Host beitreten"
 
-#: src/features/admin/event-guests.tsx:114
+#: src/features/admin/event-guests.tsx:115
 msgid "Join link"
 msgstr "Beitrittslink"
 
@@ -3792,12 +3792,12 @@ msgstr "Halte das unter 100 Zeichen"
 msgid "Kind"
 msgstr "Art"
 
-#: src/features/people/label-menu.tsx:30
+#: src/features/people/label-menu.tsx:31
 #: src/features/people/profile-form.tsx:604
 msgid "Label"
 msgstr "Label"
 
-#: src/features/admin/event-guests.tsx:112
+#: src/features/admin/event-guests.tsx:113
 #: src/features/admin/event-labels.tsx:243
 #: src/features/admin/event-labels.tsx:245
 msgid "Labels"
@@ -4325,7 +4325,7 @@ msgid "n/a"
 msgstr "k. A."
 
 #: src/features/admin/event-config.tsx:144
-#: src/features/admin/event-guests.tsx:106
+#: src/features/admin/event-guests.tsx:107
 #: src/features/admin/event-labels.tsx:70
 #: src/features/admin/event-locations.tsx:34
 #: src/features/admin/event-meetings.tsx:219
@@ -4572,7 +4572,7 @@ msgstr "Keine Sessions"
 msgid "No sessions match."
 msgstr "Keine Sessions passen."
 
-#: src/features/admin/event-guests.tsx:104
+#: src/features/admin/event-guests.tsx:105
 #: src/features/admin/guests-screen.tsx:559
 msgid "No users match."
 msgstr "Keine Personen passen."
@@ -4633,7 +4633,7 @@ msgstr "Wird nicht aktualisiert: möglicherweise veraltet"
 msgid "Note"
 msgstr "Notiz"
 
-#: src/ui/people-picker.tsx:135
+#: src/ui/people-picker.tsx:155
 msgid "Nothing found."
 msgstr "Nichts gefunden."
 
@@ -5347,7 +5347,7 @@ msgid "Remove"
 msgstr "Entfernen"
 
 #. placeholder {0}: p.name
-#: src/ui/people-picker.tsx:92
+#: src/ui/people-picker.tsx:106
 msgid "Remove {0}"
 msgstr "{0} entfernen"
 
@@ -5699,7 +5699,7 @@ msgstr "Suchen"
 msgid "Search {tableTitle}"
 msgstr "{tableTitle} durchsuchen"
 
-#: src/features/admin/event-guests.tsx:103
+#: src/features/admin/event-guests.tsx:104
 #: src/features/admin/guests-screen.tsx:558
 msgid "Search name or email…"
 msgstr "Name oder E-Mail suchen …"
