@@ -24,16 +24,25 @@ const NO_STORE = "no-store";
 const escapeAttribute = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
+const escapeText = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
 /** The build id rides in the shell so a cached copy still says which build it is. */
 export async function serveSpaShell(
   dir: string,
-  buildId: string
+  buildId: string,
+  title?: string
 ): Promise<Response> {
   try {
-    const html = (await readFile(path.join(dir, "index.html"), "utf8")).replace(
+    let html = (await readFile(path.join(dir, "index.html"), "utf8")).replace(
       "</head>",
       `<meta name="sb-build" content="${escapeAttribute(buildId)}"></head>`
     );
+    if (title)
+      html = html.replace(
+        /<title>[^<]*<\/title>/,
+        () => `<title>${escapeText(title)}</title>`
+      );
     return new Response(html, {
       headers: {
         "content-type": TYPES[".html"],

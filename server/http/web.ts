@@ -166,5 +166,6 @@ web.all("*", async (c) => {
   const served = ["/api", "/media"].some((r) => underRoot(pathname, r));
   if (served || (c.req.method !== "GET" && c.req.method !== "HEAD"))
     return problemResponse({ status: 404, code: "route.notFound" });
-  return serveSpaShell(spaDir(), getBuildId());
+  const { title } = await pageReads().siteSettings();
+  return serveSpaShell(spaDir(), getBuildId(), title);
 });

@@ -4048,8 +4048,8 @@ msgstr "Zum Site-Admin machen"
 msgid "Manage"
 msgstr "Verwalten"
 
-#: src/app/map-button.tsx:36
-#: src/app/map-button.tsx:37
+#: src/app/map-button.tsx:22
+#: src/app/map-button.tsx:23
 #: src/features/admin/settings-screen.tsx:102
 msgid "Map"
 msgstr "Karte"
@@ -6091,7 +6091,7 @@ msgstr "{title} anzeigen als"
 msgid "Show all"
 msgstr "Alle anzeigen"
 
-#: src/app/map-button.tsx:30
+#: src/app/map-button.tsx:16
 msgid "Show map"
 msgstr "Karte anzeigen"
 

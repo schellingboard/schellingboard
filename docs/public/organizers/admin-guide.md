@@ -32,7 +32,8 @@ recorded under their name.
 One global row shown when there's more than one event (see
 [multi-event installs](how-it-works.md#multi-event-installs)):
 
-- **Title** (required) and **Description** (Markdown) for the landing page.
+- **Title** (required) and **Description** (Markdown) for the landing page. The title also names the
+  browser tab and the installed app.
 - **Map image** — JPEG/PNG/WebP, max 5 MB.
 
 ## Events

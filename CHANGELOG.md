@@ -53,6 +53,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Browser tabs show your site title**: the title set in Settings replaces "SchellingBoard".
 - **A compact event icon picker**: organizers see only the icons; hovering one shows its name.
 - **Clearer dates in the phase bar**: each phase says when it starts, ends or ended, date first, in
   your 12- or 24-hour clock.

@@ -171,6 +171,22 @@ describe("web: public files", () => {
   });
 });
 
+describe("web: page title", () => {
+  it("is the site title from the settings", async () => {
+    await getRepositories().settings.update({
+      title: "Rationality Camp",
+      description: "",
+    });
+    await fs.writeFile(
+      path.join(dist.dir, "index.html"),
+      "<html><head><title>SchellingBoard</title></head><body>shell</body></html>"
+    );
+    const site = await createAuthCookie();
+    const html = await (await throughWeb("/", {}, [site])).text();
+    expect(html).toContain("<title>Rationality Camp</title>");
+  });
+});
+
 describe("web: manifest", () => {
   it("names the app after the site title, so the installed icon says whose event it is", async () => {
     await getRepositories().settings.update({

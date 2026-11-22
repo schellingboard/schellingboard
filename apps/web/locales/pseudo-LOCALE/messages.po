@@ -4048,8 +4048,8 @@ msgstr ""
 msgid "Manage"
 msgstr ""
 
-#: src/app/map-button.tsx:36
-#: src/app/map-button.tsx:37
+#: src/app/map-button.tsx:22
+#: src/app/map-button.tsx:23
 #: src/features/admin/settings-screen.tsx:102
 msgid "Map"
 msgstr ""
@@ -6091,7 +6091,7 @@ msgstr ""
 msgid "Show all"
 msgstr ""
 
-#: src/app/map-button.tsx:30
+#: src/app/map-button.tsx:16
 msgid "Show map"
 msgstr ""
 

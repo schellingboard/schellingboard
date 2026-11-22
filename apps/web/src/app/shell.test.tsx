@@ -82,11 +82,11 @@ describe("Shell", () => {
     expect(screen.getByRole("contentinfo")).toBeTruthy();
   });
 
-  describe("the site map", { tags: ["015-US5"] }, () => {
-    const showWith = (mapImageUrl: string) => {
+  describe("the site settings", { tags: ["015-US5"] }, () => {
+    const showWith = (mapImageUrl: string, title = "T") => {
       const { api, calls } = fakeApi((call) =>
         call.path === "/api/v1/site"
-          ? Response.json({ title: "T", description: "", mapImageUrl })
+          ? Response.json({ title, description: "", mapImageUrl })
           : Response.json({ guestId: null })
       );
       render(
@@ -104,6 +104,13 @@ describe("Shell", () => {
       );
       return calls;
     };
+
+    it("name the browser tab, also when the page came from a cache", async () => {
+      document.title = "SchellingBoard";
+      showWith("", "Dev Week");
+
+      await waitFor(() => expect(document.title).toBe("Dev Week"));
+    });
 
     it("opens the uploaded map from a nav button", async () => {
       showWith("/media/map.png");

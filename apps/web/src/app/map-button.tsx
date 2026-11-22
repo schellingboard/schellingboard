@@ -1,26 +1,12 @@
 import { t } from "@lingui/core/macro";
-import type { ApiClient } from "@schellingboard/api-client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Dialog } from "../ui/dialog";
 import { MapIcon } from "../ui/icons";
 
 /** The site's uploaded map, when there is one. */
-export function MapButton({ api }: { api: ApiClient }) {
-  const [url, setUrl] = useState("");
+export function MapButton({ url }: { url?: string | null }) {
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    let stale = false;
-    api
-      .GET("/api/v1/site")
-      .then(({ data }) => {
-        if (!stale && data) setUrl(data.mapImageUrl ?? "");
-      })
-      .catch(() => {});
-    return () => {
-      stale = true;
-    };
-  }, [api]);
 
   if (!url) return null;
   return (

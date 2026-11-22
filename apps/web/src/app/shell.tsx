@@ -16,6 +16,7 @@ import { MapButton } from "./map-button";
 import { NavBar, type NavItem } from "./nav-bar";
 import { ReloadOffer } from "./reload-offer";
 import type { AppServices } from "./services";
+import { useSite } from "./site";
 import { ThemeProvider } from "./theme";
 import { TimeFormatProvider } from "./time-format";
 import { UnreadProvider } from "./unread-count";
@@ -34,6 +35,7 @@ export function ShellFrame({
 }: ShellProps) {
   const health = useHealth(api);
   const update = useUpdateStatus(api);
+  const site = useSite(api);
   const viewer = useViewer();
   const kiosk = useKioskMode(new URLSearchParams(search));
   return (
@@ -41,7 +43,7 @@ export function ShellFrame({
       nav={
         <NavBar items={events} currentPath={currentPath}>
           <HeaderLinks signedIn={!!viewer.guestId} />
-          <MapButton api={api} />
+          <MapButton url={site?.mapImageUrl} />
           <UserMenu viewer={viewer} guests={guests} />
         </NavBar>
       }

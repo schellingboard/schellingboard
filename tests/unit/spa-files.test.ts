@@ -40,6 +40,14 @@ describe("the SPA shell", () => {
     expect(html.indexOf("sb-build")).toBeLessThan(html.indexOf("</head>"));
   });
 
+  it("carries the site title as the page title, escaped", async () => {
+    const html = await (
+      await serveSpaShell(dir, "b1", "Code & <Coffee>")
+    ).text();
+    expect(html).toContain("<title>Code &amp; &lt;Coffee&gt;</title>");
+    expect(html).not.toContain("<title>x</title>");
+  });
+
   it("answers 503 rather than an empty page when the app was not built", async () => {
     const res = await serveSpaShell(path.join(dir, "missing"), "b1");
     expect(res.status).toBe(503);
