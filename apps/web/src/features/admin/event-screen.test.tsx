@@ -220,11 +220,11 @@ describe("the event details form", { tags: ["015-US2"] }, () => {
     expect(calls[1].body).toMatchObject({ icon: null });
   });
 
-  it("draws every icon option next to its name", () => {
+  it("draws every icon option as the icon alone, named only for assistive tech", () => {
     setup();
     const options = screen.getAllByRole("radio");
-    const icons = options.filter((o) => o.querySelector("svg"));
-    expect(icons).toHaveLength(options.length - 1);
+    expect(options.every((o) => o.querySelector("svg"))).toBe(true);
+    expect(options.map((o) => o.textContent)).toEqual(options.map(() => ""));
     expect(screen.getByRole("radio", { name: "Rocket Launch" })).toBeTruthy();
   });
 

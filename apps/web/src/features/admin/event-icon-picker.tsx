@@ -4,6 +4,8 @@ import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 import { cx } from "../../ui/cx";
 import { EventIcon } from "../../ui/event-icon";
 import { eventIconLabel } from "../../ui/event-icons";
+import { NoSymbolIcon } from "../../ui/icons";
+import { Tooltip } from "../../ui/tooltip";
 
 function Option({
   label,
@@ -17,21 +19,27 @@ function Option({
   onSelect: () => void;
 }) {
   return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      onClick={onSelect}
-      className={cx(
-        "flex items-center gap-1.5 rounded-md border px-2 py-1 text-sm",
-        selected
-          ? "border-brand-accent bg-brand-tint text-brand-fg"
-          : "border-line text-fg-subtle hover:bg-surface-muted"
-      )}
-    >
-      <EventIcon name={icon} className="h-5 w-5 shrink-0" />
-      {label}
-    </button>
+    <Tooltip content={label}>
+      <button
+        type="button"
+        role="radio"
+        aria-checked={selected}
+        aria-label={label}
+        onClick={onSelect}
+        className={cx(
+          "flex items-center rounded-md border p-1.5",
+          selected
+            ? "border-brand-accent bg-brand-tint text-brand-fg"
+            : "border-line text-fg-subtle hover:bg-surface-muted"
+        )}
+      >
+        {icon ? (
+          <EventIcon name={icon} className="h-5 w-5 shrink-0" />
+        ) : (
+          <NoSymbolIcon className="h-5 w-5 shrink-0" />
+        )}
+      </button>
+    </Tooltip>
   );
 }
 

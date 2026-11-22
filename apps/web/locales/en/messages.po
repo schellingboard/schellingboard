@@ -4515,7 +4515,7 @@ msgstr "No host yet — someone would like to see this offered"
 msgid "No hosts"
 msgstr "No hosts"
 
-#: src/features/admin/event-icon-picker.tsx:54
+#: src/features/admin/event-icon-picker.tsx:62
 msgid "No icon"
 msgstr "No icon"
 

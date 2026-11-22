@@ -42,7 +42,7 @@ One global row shown when there's more than one event (see
   `admin`, `api`, `login`, and `media` can't be used as event names.
 - **Description** (Markdown), **Website**, **Timezone** (required, type to search — all dates/times
   for this event are edited in this zone), **Icon** (shown beside the event's name in the menu and
-  on the home page).
+  on the home page; hover an icon to see its name).
 - **Help for proposers** (Markdown) — the text behind the **Need ideas?** button on the proposals
   page and the new-proposal form. It starts as a default list of prompts; **Reset to default**
   brings it back.
