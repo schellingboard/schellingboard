@@ -2,18 +2,19 @@
 # rebuilds. Nothing compiles: better-sqlite3 and sharp ship prebuilt addons.
 FROM node:26-trixie-slim AS deps
 WORKDIR /app
-COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=oven/bun:1.4 /usr/local/bin/bun /usr/local/bin/bun
 COPY package.json bun.lock ./
 # A frozen install fails unless every workspace's manifest is present.
 COPY packages/domain/package.json packages/domain/
 COPY packages/contracts/package.json packages/contracts/
 COPY packages/api-client/package.json packages/api-client/
 COPY apps/web/package.json apps/web/
-RUN bun install --frozen-lockfile
+# Hoisted: the runner copies packages by their top-level path, which an isolated install does not have.
+RUN bun install --frozen-lockfile --linker hoisted
 
 FROM node:26-trixie-slim AS builder
 WORKDIR /app
-COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=oven/bun:1.4 /usr/local/bin/bun /usr/local/bin/bun
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Passed by scripts/docker-build.sh; empty builds show no version in the footer.

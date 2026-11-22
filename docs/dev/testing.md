@@ -185,6 +185,9 @@ oldest version still covered.
 
 ## Testing the Docker image
 
+The image installs with `--linker hoisted` while dev and CI install isolated; only this tier (not
+part of `make precommit`) catches a break there.
+
 `make test-e2e` runs the suite against the server built on the host, which is not what we ship. The
 image runs `node dist/server/main.mjs`, as a different user, with the database, migrations and
 uploads on a mounted `/data` volume. `make test-e2e-docker` runs the same suite against a container

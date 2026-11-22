@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check i18n-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration i18n-extract i18n-compile test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help audit dev mailpit build start lint typecheck commit-check arch openapi openapi-check i18n-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration i18n-extract i18n-compile test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -89,6 +89,9 @@ start: install
 
 lint: install
 	NODE_OPTIONS=--max-old-space-size=8192 bun x eslint --max-warnings 0 .
+
+audit: install
+	bun audit --audit-level=high
 
 typecheck: install
 	bun x tsc --noEmit
