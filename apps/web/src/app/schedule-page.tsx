@@ -112,7 +112,9 @@ function Loaded(view: EventView) {
         }
         onHashChange={setHash}
         sync={<SyncIndicator store={store} />}
-        footer={<Footer version={health?.version} update={update} inline />}
+        footer={
+          <Footer api={api} version={health?.version} update={update} inline />
+        }
         onReload={hardReload}
       />
     </>

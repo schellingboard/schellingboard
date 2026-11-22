@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { fakeApi } from "../commands/fake-api";
 import { FormatLocaleContext } from "../i18n/format-locale";
 import { Footer } from "./footer";
 import { ThemeProvider } from "./theme";
@@ -33,7 +34,11 @@ const show = (version: string | undefined, update?: UpdateStatus | null) =>
   render(
     <FormatLocaleContext.Provider value="en-GB">
       <ThemeProvider>
-        <Footer version={version} update={update} />
+        <Footer
+          api={fakeApi(() => new Response(null)).api}
+          version={version}
+          update={update}
+        />
       </ThemeProvider>
     </FormatLocaleContext.Provider>
   );

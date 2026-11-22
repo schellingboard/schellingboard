@@ -15,8 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **SchellingBoard in German, Spanish and Portuguese**
   ([#1328](https://github.com/schellingboard/schellingboard/issues/1328)): choose Deutsch, Español
-  or Português in Settings; the app, emails and notifications follow, and your choice stays with
-  your name.
+  or Português in Settings or the page footer; the app, emails and notifications follow, and your
+  choice stays with your name.
 - **Labels for attendees** ([#629](https://github.com/schellingboard/schellingboard/issues/629)):
   organizers tag people (Orga team, Volunteer, Sponsor); badges show on profiles and in the
   directory, where you can filter and search by label.

@@ -618,9 +618,10 @@ reach your phone or laptop when the site isn't open.
   you're keeping free. Not shown when none of your events offers them. See [1-on-1s](#1-on-1s).
 - **Account security** — where you protect your name, change your password or turn protection off,
   and sign out other browsers. See [Protect your name](#protect-your-name).
-- **Language** — Automatic (follows your browser), English or Deutsch. It applies to the whole app
-  and to the emails and notifications you get, and follows your name to your other devices. The
-  event descriptions, session titles and comments people wrote stay as they wrote them.
+- **Language** — Automatic (follows your browser), English, Deutsch, Español or Português. It
+  applies to the whole app and to the emails and notifications you get, and follows your name to
+  your other devices. Also available at the very bottom of every page. The event descriptions,
+  session titles and comments people wrote stay as they wrote them.
 - **Appearance** — System, Light or Dark, also available at the very bottom of every page.
   **System** follows your phone or laptop, so the site turns dark in the evening if your device
   does. The choice is remembered per device, not per name, and works before you've picked a name.

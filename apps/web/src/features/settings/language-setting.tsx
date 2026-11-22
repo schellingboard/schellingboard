@@ -6,10 +6,7 @@ import { useRef } from "react";
 import type { SettingsCalls } from "../../commands/settings";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { useStoredLocale } from "../../i18n";
-import { LOCALES } from "../../i18n/locales";
-
-const languageName = (locale: string) =>
-  new Intl.DisplayNames([locale], { type: "language" }).of(locale) ?? locale;
+import { languageName, LOCALES } from "../../i18n/locales";
 
 /** Which language the signed-in guest reads the app in, or the browser's. */
 export function LanguageSetting({

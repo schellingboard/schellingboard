@@ -52,7 +52,10 @@ export type Viewer = {
   refresh: () => Promise<void>;
 };
 
-const ViewerContext = createContext<Viewer | null>(null);
+export const ViewerContext = createContext<Viewer | null>(null);
+
+/** For chrome that also renders before anyone can be signed in. */
+export const useOptionalViewer = () => useContext(ViewerContext);
 
 export function useViewer(): Viewer {
   const viewer = useContext(ViewerContext);
@@ -89,7 +92,7 @@ export function ViewerProvider({
           }
           if (decided.current) return;
           remembered.write(data.guestId);
-          setStored(data.locale);
+          if (data.guestId) setStored(data.locale);
           setGuestId(data.guestId);
         })
         .catch(() => {
@@ -145,7 +148,7 @@ export function ViewerProvider({
       if (guestId && data.guestId !== guestId) await persistence.clear();
       decided.current = true;
       remembered.write(data.guestId);
-      setStored(data.locale);
+      if (data.guestId) setStored(data.locale);
       setGuestId(data.guestId);
     } catch {
       // Offline: the known viewer stands until the next load asks again.

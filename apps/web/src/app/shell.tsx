@@ -47,7 +47,7 @@ export function ShellFrame({
           <UserMenu viewer={viewer} guests={guests} />
         </NavBar>
       }
-      footer={<Footer version={health?.version} update={update} />}
+      footer={<Footer api={api} version={health?.version} update={update} />}
     >
       <ReloadOffer api={api} kiosk={kiosk} onReload={hardReload} />
       <ErrorBoundary resetKey={currentPath}>{children}</ErrorBoundary>

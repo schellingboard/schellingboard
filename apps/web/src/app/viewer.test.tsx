@@ -300,6 +300,24 @@ describe("ViewerProvider", () => {
     expect(localStorage.getItem("sb-locale")).toBeNull();
   });
 
+  it("keeps the language chosen on this device while nobody is signed in", async () => {
+    localStorage.setItem("sb-locale", "de");
+    const { api } = fakeApi(() =>
+      Response.json({ guestId: null, locale: null })
+    );
+    render(
+      <I18nProvider>
+        <ViewerProvider api={api} persistence={{ clear }}>
+          <Probe onViewer={() => {}} />
+        </ViewerProvider>
+      </I18nProvider>
+    );
+
+    await screen.findByText("as null");
+
+    expect(localStorage.getItem("sb-locale")).toBe("de");
+  });
+
   it("keeps the development pseudo-locale when the server answers", async () => {
     localStorage.clear();
     localStorage.setItem("sb-pseudo", "1");

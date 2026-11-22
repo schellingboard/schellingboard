@@ -82,7 +82,10 @@ export function SiteLoginPage({ services }: { services: AppServices }) {
   const target = safeRedirectPath(params.get("redirect"), "/");
   return (
     <NoticeProvider>
-      <Layout nav={null} footer={<Footer version={health?.version} />}>
+      <Layout
+        nav={null}
+        footer={<Footer api={api} version={health?.version} />}
+      >
         <SiteLoginScreen calls={calls} onEntered={() => hardNavigate(target)} />
       </Layout>
     </NoticeProvider>

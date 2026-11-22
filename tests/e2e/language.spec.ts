@@ -15,7 +15,10 @@ test("an attendee switches the app to German and back @022-US1", async ({
   await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
 
   try {
-    await page.getByRole("combobox", { name: "Language" }).selectOption("de");
+    await page
+      .getByRole("main")
+      .getByRole("combobox", { name: "Language" })
+      .selectOption("de");
     await expect(
       page.getByRole("heading", { name: "Einstellungen" })
     ).toBeVisible();
@@ -26,12 +29,32 @@ test("an attendee switches the app to German and back @022-US1", async ({
       page.getByRole("heading", { name: "Einstellungen" })
     ).toBeVisible();
 
-    await page.getByRole("combobox", { name: "Sprache" }).selectOption("");
+    await page
+      .getByRole("main")
+      .getByRole("combobox", { name: "Sprache" })
+      .selectOption("");
     await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
   } finally {
     // A failed run must not leave her in German for the next one.
     await page
+      .getByRole("main")
       .getByRole("combobox", { name: /^(Language|Sprache)$/ })
       .selectOption("");
   }
+});
+
+test("anyone switches the language from the footer @022-US1", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/");
+  const footer = page.getByRole("contentinfo");
+
+  await footer.getByRole("combobox", { name: "Language" }).selectOption("de");
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+  await footer.getByRole("combobox", { name: "Sprache" }).selectOption("en");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
 });

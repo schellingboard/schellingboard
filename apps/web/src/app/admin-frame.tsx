@@ -224,7 +224,7 @@ export function AdminFrame({
               )}
             </div>
           </main>
-          <Footer version={health?.version} update={update} />
+          <Footer api={api} version={health?.version} update={update} />
         </div>
       </NoticeProvider>
     </ThemeProvider>

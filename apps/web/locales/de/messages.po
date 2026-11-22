@@ -1443,6 +1443,7 @@ msgstr "Teilnehmende stimmen über die Vorschläge ab."
 msgid "Authors"
 msgstr "Verfassende"
 
+#: src/app/language-select.tsx
 #: src/app/time-format.tsx
 msgid "Automatic"
 msgstr "Automatisch"
@@ -3764,6 +3765,7 @@ msgid "Labels of {name}"
 msgstr "Labels von {name}"
 
 #. Chart axis: one bar per language
+#: src/app/language-select.tsx
 #: src/features/admin/stats-figures.tsx
 #: src/features/people/profile-form.tsx
 #: src/features/settings/language-setting.tsx

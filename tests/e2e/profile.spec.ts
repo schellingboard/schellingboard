@@ -274,7 +274,10 @@ test.describe("Edit profile", () => {
     );
 
     await page.getByRole("button", { name: "Add language" }).click();
-    await page.getByRole("combobox", { name: "Language" }).fill("Italian");
+    await page
+      .getByRole("combobox", { name: "Language" })
+      .last()
+      .fill("Italian");
     await page.keyboard.press("Escape");
 
     await page.getByRole("button", { name: "Add contact" }).click();

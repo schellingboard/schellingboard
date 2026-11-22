@@ -1,6 +1,7 @@
 import { i18n } from "@lingui/core";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
+import type { ApiClient } from "@schellingboard/api-client";
 import {
   releaseNotes,
   SHOWN_RELEASES,
@@ -12,6 +13,7 @@ import { useFormatLocale } from "../i18n/format-locale";
 import { Dialog } from "../ui/dialog";
 import { InlineMarkdown } from "../ui/inline-markdown";
 import { Tooltip } from "../ui/tooltip";
+import { LanguageSelect } from "./language-select";
 import { releaseHighlights } from "./release-highlights";
 import { ThemeSelect } from "./theme";
 import type { UpdateStatus } from "./updates";
@@ -32,10 +34,12 @@ const BRAND = "SchellingBoard";
 const link = "text-link hover:underline";
 
 export function Footer({
+  api,
   version,
   update,
   inline,
 }: {
+  api: ApiClient;
   version: string | undefined;
   /** Only the admin is told; everyone else gets null. */
   update?: UpdateStatus | null;
@@ -85,7 +89,10 @@ export function Footer({
             </button>
           </Tooltip>
         </div>
-        <ThemeSelect />
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <LanguageSelect api={api} />
+          <ThemeSelect />
+        </div>
         <div className="flex flex-wrap items-center justify-end gap-1 md:justify-self-end">
           <span className="hidden sm:block">{t`Powered by`}</span>
           <a
