@@ -453,7 +453,7 @@ describe("ScheduleScreen toolbar", () => {
     }
   );
 
-  it("links the proposals only for an event with phases", () => {
+  it("switches to the proposals only for an event with phases", () => {
     const phaseless: Snapshot = {
       ...snap,
       event: { ...snap.event, schedulingPhaseStart: null },
@@ -466,9 +466,17 @@ describe("ScheduleScreen toolbar", () => {
     };
     cleanup();
     screenAt("", { snapshot: phased });
+    const pages = screen.getByRole("navigation", { name: "Event pages" });
     expect(
-      screen.getByRole("link", { name: "Proposals" }).getAttribute("href")
+      within(pages)
+        .getByRole("link", { name: "Proposals" })
+        .getAttribute("href")
     ).toBe("/conf/proposals");
+    expect(
+      within(pages)
+        .getByRole("link", { name: "Schedule" })
+        .getAttribute("aria-current")
+    ).toBe("page");
   });
 
   it("shows the sync slot and footer inside the scrolling content", () => {

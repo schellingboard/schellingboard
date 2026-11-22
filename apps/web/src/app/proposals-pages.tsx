@@ -12,6 +12,7 @@ import { LOCAL_ZONE } from "./local-zone";
 import { landOnPanel } from "./panel-history";
 import { likerFrom, useCommentSource } from "./use-comment-actions";
 import { useHistoryEntry } from "./use-history-entry";
+import { usePanel } from "./use-panel";
 import { useVoting } from "./use-proposal-actions";
 import { useUrlSearchParams } from "./use-url-search-params";
 
@@ -35,6 +36,11 @@ function List(view: EventView) {
   useViewProposalRedirect(slug, links.proposals);
   const { params, change } = useUrlSearchParams();
   useScrollRestoration(null, useHistoryEntry());
+  const { open } = usePanel();
+  const openDetails = useCallback(
+    () => open({ kind: "event", slug }),
+    [open, slug]
+  );
 
   return (
     <>
@@ -45,6 +51,7 @@ function List(view: EventView) {
         localZone={LOCAL_ZONE}
         standings={standings}
         onVote={vote}
+        onOpenDetails={openDetails}
         params={params}
         onParamsChange={change}
       />

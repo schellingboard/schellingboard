@@ -13,7 +13,6 @@ import type { Standing } from "../../queries/proposal-standings";
 import { ownVotesFrom, toEvent } from "../../replica/selectors";
 import { cx } from "../../ui/cx";
 import {
-  CalendarDaysIcon,
   CalendarIcon,
   ChartBarIcon,
   CheckCircleIcon,
@@ -32,6 +31,7 @@ import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { usePaging } from "../../ui/use-paging";
 import { useSearchParamText } from "../../ui/use-search-param-text";
+import { EventPagesNav, PROPOSALS_PAGE } from "../events/event-pages-nav";
 import { PersonLink } from "../people/person-link";
 import type { ProposalLinks } from "./links";
 import {
@@ -64,6 +64,7 @@ export type ProposalsScreenProps = {
   standings: ReadonlyMap<string, Standing>;
   /** Null withdraws. A failure is reported as a notice, not returned. */
   onVote: (proposalId: string, choice: VoteChoice | null) => void;
+  onOpenDetails: () => void;
   /** Search, filter and sort live in these, which the owner of the address bar passes in. */
   params: URLSearchParams;
   onParamsChange: (
@@ -80,7 +81,7 @@ const FILTER_HOST_WANTED = "hostWanted";
 const LINK = "hover:text-link transition-colors";
 
 export function ProposalsScreen(props: ProposalsScreenProps) {
-  const { snapshot, links, now, localZone } = props;
+  const { snapshot, links, now, localZone, onOpenDetails } = props;
   const event = toEvent(snapshot.event);
   const guestId = snapshot.me?.guestId ?? null;
   const eventName = snapshot.event.name;
@@ -91,16 +92,25 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
 
   return (
     <>
-      <PhaseBar event={event} now={now} localZone={localZone} />
-      <div className="container mx-auto px-4 py-8">
+      {/* Level with the schedule, which sits right under the menu on phones. */}
+      <div className="-mt-4 border-b border-line-subtle bg-surface sm:mt-0">
+        <PhaseBar event={event} now={now} localZone={localZone} />
+        <div className="px-2 py-1.5 sm:px-3">
+          <EventPagesNav
+            current={PROPOSALS_PAGE}
+            proposalsHref={links.proposals}
+            scheduleHref={links.schedule}
+            showProposals
+            onOpenDetails={onOpenDetails}
+          />
+        </div>
+      </div>
+      <div className="px-2 py-6 sm:px-3">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">
+          <h1 className="sr-only">
             <Trans>{eventName}: Session Proposals</Trans>
           </h1>
-          <p className="text-fg-muted mt-2">
-            <Trans>Browse session ideas or add your own proposal</Trans>
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center my-6">
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <ActionLink
               href={links.add}
               enabled={proposingEnabled}
@@ -115,13 +125,6 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
               why={texts.voting}
               icon={ChartBarIcon}
               label={t`Go to Quick Voting!`}
-            />
-            <ActionLink
-              href={links.schedule}
-              enabled
-              why=""
-              icon={CalendarDaysIcon}
-              label={t`View Schedule`}
             />
           </div>
         </div>

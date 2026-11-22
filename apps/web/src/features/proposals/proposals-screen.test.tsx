@@ -72,6 +72,7 @@ function setup(
   params = ""
 ) {
   const onVote = vi.fn();
+  const onOpenDetails = vi.fn();
   const onParamsChange =
     vi.fn<(params: URLSearchParams, options?: { push?: boolean }) => void>();
   const snapshot: Snapshot = {
@@ -93,6 +94,7 @@ function setup(
         localZone="UTC"
         standings={standings}
         onVote={onVote}
+        onOpenDetails={onOpenDetails}
         params={current}
         onParamsChange={(next, options) => {
           onParamsChange(next, options);
@@ -108,6 +110,7 @@ function setup(
   );
   return {
     onVote,
+    onOpenDetails,
     onParamsChange,
     table: screen.queryByRole("table") as HTMLElement,
   };
@@ -120,7 +123,25 @@ const titles = (table: HTMLElement) =>
     .map((r) => within(r).getAllByRole("cell")[0].textContent);
 
 describe("the proposals list", () => {
-  it("names the event and links to adding, quick voting and the schedule", () => {
+  it("switches to the schedule and opens the event details like the schedule does", async () => {
+    const { onOpenDetails } = setup("voting");
+
+    const pages = screen.getByRole("navigation", { name: "Event pages" });
+    expect(
+      within(pages)
+        .getByRole("link", { name: "Proposals" })
+        .getAttribute("aria-current")
+    ).toBe("page");
+    expect(
+      within(pages).getByRole("link", { name: "Schedule" }).getAttribute("href")
+    ).toBe("/conf/schedule");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Event details" })
+    );
+    expect(onOpenDetails).toHaveBeenCalledOnce();
+  });
+
+  it("names the event and links to adding and quick voting", () => {
     setup("voting");
 
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
@@ -133,9 +154,6 @@ describe("the proposals list", () => {
     expect(
       screen.getByRole("link", { name: /Go to Quick Voting!/ })
     ).toHaveProperty("pathname", "/conf/proposals/quick-voting");
-    expect(
-      screen.getByRole("link", { name: /View Schedule/ }).getAttribute("href")
-    ).toBe("/conf/schedule");
   });
 
   it(
@@ -237,9 +255,6 @@ describe("the proposals list", () => {
         .getByRole("link", { name: /Go to Quick Voting!/ })
         .getAttribute("aria-disabled")
     ).toBe("true");
-    expect(
-      screen.getByRole("link", { name: /View Schedule/ }).getAttribute("href")
-    ).toBe("/conf/schedule");
   });
 
   it("says so when there are no proposals", () => {

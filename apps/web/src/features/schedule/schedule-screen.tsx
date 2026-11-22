@@ -251,6 +251,7 @@ export function ScheduleScreen({
       onOpenDetails={openDetails}
       showJumpToNow={nowIsOnSchedule}
       proposalsHref={links.proposals}
+      scheduleHref={links.schedule}
       now={data.now}
       sync={sync}
     />

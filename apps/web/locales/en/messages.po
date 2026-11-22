@@ -15,7 +15,7 @@ msgstr "— doesn't match"
 msgid "— hidden by you"
 msgstr "— hidden by you"
 
-#: src/features/proposals/proposals-screen.tsx:570
+#: src/features/proposals/proposals-screen.tsx:573
 msgid "· Co-host wanted"
 msgstr "· Co-host wanted"
 
@@ -281,7 +281,7 @@ msgstr "{emoji} {choice, select, interested {Interested} maybe {Maybe} skip {Ski
 msgid "{eventName} Quick Voting"
 msgstr "{eventName} Quick Voting"
 
-#: src/features/proposals/proposals-screen.tsx:98
+#: src/features/proposals/proposals-screen.tsx:111
 msgid "{eventName}: Session Proposals"
 msgstr "{eventName}: Session Proposals"
 
@@ -465,7 +465,7 @@ msgstr "{response, select, accept {Your request to accept the 1-on-1 might not h
 msgid "{response, select, accept {Your request to accept the 1-on-1 with {name} ({day}, {time}) might not have been saved.} decline {Your request to decline the 1-on-1 with {name} ({day}, {time}) might not have been saved.} other {Your request to decline the 1-on-1 with {name} ({day}, {time}) might not have been saved.}}"
 msgstr "{response, select, accept {Your request to accept the 1-on-1 with {name} ({day}, {time}) might not have been saved.} decline {Your request to decline the 1-on-1 with {name} ({day}, {time}) might not have been saved.} other {Your request to decline the 1-on-1 with {name} ({day}, {time}) might not have been saved.}}"
 
-#: src/features/proposals/proposals-screen.tsx:395
+#: src/features/proposals/proposals-screen.tsx:398
 msgid "{resultCount, plural, one {# result} other {# results}}"
 msgstr "{resultCount, plural, one {# result} other {# results}}"
 
@@ -1081,7 +1081,7 @@ msgstr "Access Site"
 msgid "Account security"
 msgstr "Account security"
 
-#: src/features/proposals/proposals-screen.tsx:448
+#: src/features/proposals/proposals-screen.tsx:451
 msgid "Actions"
 msgstr "Actions"
 
@@ -1146,8 +1146,8 @@ msgstr "Add meeting point"
 msgid "Add moment"
 msgstr "Add moment"
 
-#: src/features/proposals/proposals-screen.tsx:109
-#: src/features/proposals/proposals-screen.tsx:140
+#: src/features/proposals/proposals-screen.tsx:119
+#: src/features/proposals/proposals-screen.tsx:143
 msgid "Add Proposal"
 msgstr "Add Proposal"
 
@@ -1198,7 +1198,7 @@ msgstr "admin-managed"
 msgid "Admin-managed"
 msgstr "Admin-managed"
 
-#: src/features/schedule/schedule-toolbar.tsx:42
+#: src/features/schedule/schedule-toolbar.tsx:38
 msgid "Agenda"
 msgstr "Agenda"
 
@@ -1507,7 +1507,7 @@ msgstr "Based in {basedIn}"
 msgid "Basic info"
 msgstr "Basic info"
 
-#: src/features/proposals/proposals-screen.tsx:134
+#: src/features/proposals/proposals-screen.tsx:137
 msgid "Be the first to suggest a session!"
 msgstr "Be the first to suggest a session!"
 
@@ -1666,10 +1666,6 @@ msgstr "Break before each session (min)"
 #: src/ui/event-icons.ts:81
 msgid "Briefcase"
 msgstr "Briefcase"
-
-#: src/features/proposals/proposals-screen.tsx:101
-msgid "Browse session ideas or add your own proposal"
-msgstr "Browse session ideas or add your own proposal"
 
 #. Name of an event icon
 #: src/ui/event-icons.ts:85
@@ -1883,7 +1879,7 @@ msgctxt "Bulk actions: clear the selection"
 msgid "Clear"
 msgstr "Clear"
 
-#: src/features/proposals/proposals-screen.tsx:357
+#: src/features/proposals/proposals-screen.tsx:360
 msgid "Clear all active filters"
 msgstr "Clear all active filters"
 
@@ -1891,7 +1887,7 @@ msgstr "Clear all active filters"
 msgid "Clear all slots on {dayLabel}"
 msgstr "Clear all slots on {dayLabel}"
 
-#: src/features/proposals/proposals-screen.tsx:359
+#: src/features/proposals/proposals-screen.tsx:362
 msgid "Clear filters"
 msgstr "Clear filters"
 
@@ -1957,7 +1953,7 @@ msgid "Cloud"
 msgstr "Cloud"
 
 #: src/features/admin/stats-text.ts:94
-#: src/features/proposals/proposals-screen.tsx:485
+#: src/features/proposals/proposals-screen.tsx:488
 msgid "Co-host wanted"
 msgstr "Co-host wanted"
 
@@ -2689,7 +2685,7 @@ msgstr "Describe what your session will cover"
 #: src/features/admin/locations-screen.tsx:209
 #: src/features/admin/settings-screen.tsx:84
 #: src/features/proposals/proposal-form.tsx:236
-#: src/features/proposals/proposals-screen.tsx:421
+#: src/features/proposals/proposals-screen.tsx:424
 #: src/features/schedule/session-panel.tsx:361
 #: src/features/sessions/session-form.tsx:564
 msgid "Description"
@@ -2781,7 +2777,7 @@ msgstr "Duplicate {title}"
 
 #: src/features/admin/stats-text.ts:93
 #: src/features/proposals/proposal-form.tsx:284
-#: src/features/proposals/proposals-screen.tsx:424
+#: src/features/proposals/proposals-screen.tsx:427
 #: src/features/sessions/session-form.tsx:708
 msgid "Duration"
 msgstr "Duration"
@@ -2847,7 +2843,7 @@ msgstr "Each guest gets a personal link by email. It replaces the link they had 
 #: src/features/admin/locations-screen.tsx:489
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:198
-#: src/features/proposals/proposals-screen.tsx:671
+#: src/features/proposals/proposals-screen.tsx:674
 #: src/features/schedule/session-panel.tsx:240
 msgid "Edit"
 msgstr "Edit"
@@ -3040,8 +3036,8 @@ msgid "Event"
 msgstr "Event"
 
 #: src/app/panel-host.tsx:93
+#: src/features/events/event-pages-nav.tsx:79
 #: src/features/schedule/event-details-panel.tsx:21
-#: src/features/schedule/schedule-toolbar.tsx:118
 msgid "Event details"
 msgstr "Event details"
 
@@ -3052,6 +3048,10 @@ msgstr "Event not found"
 #: src/app/panel-host.tsx:95
 msgid "Event not found."
 msgstr "Event not found."
+
+#: src/features/events/event-pages-nav.tsx:54
+msgid "Event pages"
+msgstr "Event pages"
 
 #: src/ui/phase-bar.tsx:56
 msgid "Event phases"
@@ -3185,7 +3185,7 @@ msgstr "Filter by Session host (active)"
 msgid "Filter sessions"
 msgstr "Filter sessions"
 
-#: src/features/proposals/proposals-screen.tsx:709
+#: src/features/proposals/proposals-screen.tsx:712
 msgid "Filter to show only {filterKey, select, mine {your proposals} unvoted {unvoted proposals} voted {voted proposals} hostWanted {proposals that want a host} other {}}"
 msgstr "Filter to show only {filterKey, select, mine {your proposals} unvoted {unvoted proposals} voted {voted proposals} hostWanted {proposals that want a host} other {}}"
 
@@ -3297,7 +3297,7 @@ msgstr "Give this contact a label"
 msgid "Globe Alt"
 msgstr "Globe Alt"
 
-#: src/features/proposals/proposals-screen.tsx:117
+#: src/features/proposals/proposals-screen.tsx:127
 msgid "Go to Quick Voting!"
 msgstr "Go to Quick Voting!"
 
@@ -3332,7 +3332,7 @@ msgid "Grey"
 msgstr "Grey"
 
 #. Name of the schedule view that shows rooms as columns
-#: src/features/schedule/schedule-toolbar.tsx:36
+#: src/features/schedule/schedule-toolbar.tsx:32
 msgid "Grid"
 msgstr "Grid"
 
@@ -3418,12 +3418,12 @@ msgstr "Home"
 msgid "Host this proposal"
 msgstr "Host this proposal"
 
-#: src/features/proposals/proposals-screen.tsx:348
+#: src/features/proposals/proposals-screen.tsx:351
 msgid "Host wanted"
 msgstr "Host wanted"
 
 #: src/features/proposals/proposal-form.tsx:245
-#: src/features/proposals/proposals-screen.tsx:415
+#: src/features/proposals/proposals-screen.tsx:418
 msgid "Host(s)"
 msgstr "Host(s)"
 
@@ -3439,7 +3439,7 @@ msgstr "Host(s) ↓"
 msgid "Host(s):"
 msgstr "Host(s):"
 
-#: src/features/proposals/proposals-screen.tsx:565
+#: src/features/proposals/proposals-screen.tsx:568
 msgid "Host(s): {hostNames}"
 msgstr "Host(s): {hostNames}"
 
@@ -3738,7 +3738,7 @@ msgstr "JPEG, PNG, or WebP, max {maxImageMb} MB. You choose the part to show, in
 msgid "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 msgstr "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 
-#: src/features/schedule/schedule-toolbar.tsx:105
+#: src/features/schedule/schedule-toolbar.tsx:109
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
 
@@ -4278,7 +4278,7 @@ msgstr "My name is:"
 msgid "My profile"
 msgstr "My profile"
 
-#: src/features/proposals/proposals-screen.tsx:327
+#: src/features/proposals/proposals-screen.tsx:330
 msgid "My proposals"
 msgstr "My proposals"
 
@@ -4491,8 +4491,8 @@ msgstr "No guests assigned to this event yet."
 msgid "No host for: {title}"
 msgstr "No host for: {title}"
 
-#: src/features/proposals/proposals-screen.tsx:467
-#: src/features/proposals/proposals-screen.tsx:562
+#: src/features/proposals/proposals-screen.tsx:470
+#: src/features/proposals/proposals-screen.tsx:565
 msgid "No host yet"
 msgstr "No host yet"
 
@@ -4533,8 +4533,8 @@ msgstr "No matching sessions"
 msgid "No password yet"
 msgstr "No password yet"
 
-#: src/features/proposals/proposals-screen.tsx:533
-#: src/features/proposals/proposals-screen.tsx:613
+#: src/features/proposals/proposals-screen.tsx:536
+#: src/features/proposals/proposals-screen.tsx:616
 msgid "No proposals found"
 msgstr "No proposals found"
 
@@ -4542,7 +4542,7 @@ msgstr "No proposals found"
 msgid "No proposals match."
 msgstr "No proposals match."
 
-#: src/features/proposals/proposals-screen.tsx:131
+#: src/features/proposals/proposals-screen.tsx:134
 msgid "No proposals yet"
 msgstr "No proposals yet"
 
@@ -4680,7 +4680,7 @@ msgstr "Notifications on your devices"
 #. Badge on a session that is running now
 #. Button: jump to the current time
 #: src/features/schedule/day-agenda.tsx:207
-#: src/features/schedule/schedule-toolbar.tsx:112
+#: src/features/schedule/schedule-toolbar.tsx:116
 msgid "Now"
 msgstr "Now"
 
@@ -4760,11 +4760,11 @@ msgstr "Only the author can change a comment."
 msgid "Only the person asked can answer."
 msgstr "Only the person asked can answer."
 
-#: src/features/proposals/proposals-screen.tsx:334
+#: src/features/proposals/proposals-screen.tsx:337
 msgid "Only unvoted"
 msgstr "Only unvoted"
 
-#: src/features/proposals/proposals-screen.tsx:341
+#: src/features/proposals/proposals-screen.tsx:344
 msgid "Only voted"
 msgstr "Only voted"
 
@@ -5195,8 +5195,8 @@ msgstr "Proposal votes"
 #: src/features/admin/stats-text.ts:116
 #: src/features/admin/stats-text.ts:220
 #: src/features/comments/my-comments-screen.tsx:16
+#: src/features/events/event-pages-nav.tsx:41
 #: src/features/people/profile-body.tsx:238
-#: src/features/schedule/schedule-toolbar.tsx:123
 #: src/ui/phase-bar.tsx:16
 msgid "Proposals"
 msgstr "Proposals"
@@ -5612,10 +5612,15 @@ msgstr "Saving…"
 msgid "Say why, if you like (optional)"
 msgstr "Say why, if you like (optional)"
 
+#: src/features/events/event-pages-nav.tsx:47
+msgctxt "noun"
+msgid "Schedule"
+msgstr "Schedule"
+
 #. Button: put this proposal on the schedule
 #. Button: put this proposal on the schedule
 #: src/features/proposals/proposal-panel.tsx:206
-#: src/features/proposals/proposals-screen.tsx:658
+#: src/features/proposals/proposals-screen.tsx:661
 msgctxt "verb"
 msgid "Schedule"
 msgstr "Schedule"
@@ -5633,7 +5638,7 @@ msgstr "Schedule a 1-on-1 at {eventName}"
 msgid "Schedule increment (min)"
 msgstr "Schedule increment (min)"
 
-#: src/features/schedule/schedule-toolbar.tsx:81
+#: src/features/schedule/schedule-toolbar.tsx:87
 msgid "Schedule view"
 msgstr "Schedule view"
 
@@ -5693,16 +5698,16 @@ msgstr "Search name…"
 msgid "Search names, languages, interests…"
 msgstr "Search names, languages, interests…"
 
-#: src/features/proposals/proposals-screen.tsx:316
+#: src/features/proposals/proposals-screen.tsx:319
 msgid "Search proposals"
 msgstr "Search proposals"
 
-#: src/features/proposals/proposals-screen.tsx:315
+#: src/features/proposals/proposals-screen.tsx:318
 msgid "Search proposals..."
 msgstr "Search proposals..."
 
 #: src/features/people/directory-screen.tsx:188
-#: src/features/proposals/proposals-screen.tsx:367
+#: src/features/proposals/proposals-screen.tsx:370
 msgid "Search results are sorted by relevance"
 msgstr "Search results are sorted by relevance"
 
@@ -5750,7 +5755,7 @@ msgstr "Select a start time"
 #: src/features/proposals/list-model.ts:244
 #: src/features/proposals/list-model.ts:253
 #: src/features/proposals/proposal-panel.tsx:179
-#: src/features/proposals/proposals-screen.tsx:330
+#: src/features/proposals/proposals-screen.tsx:333
 msgid "Select a user first"
 msgstr "Select a user first"
 
@@ -6278,7 +6283,7 @@ msgid "Sorry — my session moved…"
 msgstr "Sorry — my session moved…"
 
 #: src/features/people/directory-screen.tsx:193
-#: src/features/proposals/proposals-screen.tsx:372
+#: src/features/proposals/proposals-screen.tsx:375
 msgid "Sort by"
 msgstr "Sort by"
 
@@ -6914,7 +6919,7 @@ msgstr "Timezone"
 #: src/features/admin/settings-screen.tsx:76
 #: src/features/admin/stats-text.ts:89
 #: src/features/proposals/proposal-form.tsx:226
-#: src/features/proposals/proposals-screen.tsx:407
+#: src/features/proposals/proposals-screen.tsx:410
 msgid "Title"
 msgstr "Title"
 
@@ -6952,7 +6957,7 @@ msgid "Total gap time"
 msgstr "Total gap time"
 
 #: src/features/proposals/proposal-panel.tsx:253
-#: src/features/proposals/proposals-screen.tsx:596
+#: src/features/proposals/proposals-screen.tsx:599
 msgid "Total votes:"
 msgstr "Total votes:"
 
@@ -7212,10 +7217,6 @@ msgstr "Version:"
 msgid "View event"
 msgstr "View event"
 
-#: src/features/proposals/proposals-screen.tsx:124
-msgid "View Schedule"
-msgstr "View Schedule"
-
 #: ../../emails/meeting.tsx:101
 msgid "View the 1-on-1"
 msgstr "View the 1-on-1"
@@ -7286,7 +7287,7 @@ msgstr "Voters who voted on every proposal"
 #. Chart axis: number of votes
 #: src/features/admin/stats-figures.tsx:79
 #: src/features/admin/stats-text.ts:108
-#: src/features/proposals/proposals-screen.tsx:441
+#: src/features/proposals/proposals-screen.tsx:444
 msgid "Votes"
 msgstr "Votes"
 
@@ -7846,7 +7847,7 @@ msgstr "Your temporary login code"
 msgid "Your temporary login code is:"
 msgstr "Your temporary login code is:"
 
-#: src/features/proposals/proposals-screen.tsx:432
+#: src/features/proposals/proposals-screen.tsx:435
 msgid "Your vote"
 msgstr "Your vote"
 
@@ -7859,7 +7860,7 @@ msgid "Your vote ↓"
 msgstr "Your vote ↓"
 
 #: src/features/proposals/proposal-panel.tsx:234
-#: src/features/proposals/proposals-screen.tsx:591
+#: src/features/proposals/proposals-screen.tsx:594
 msgid "Your vote:"
 msgstr "Your vote:"
 

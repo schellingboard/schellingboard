@@ -432,7 +432,10 @@ test("the proposal list keeps its search and sort through a reload and Back @004
   await page.getByRole("button", { name: "Clear search" }).click();
   await page.getByLabel("Sort by").selectOption({ label: "Title ↓" });
   await selectUser(page, /Bob Test/i);
-  await page.getByRole("link", { name: "View Schedule" }).click();
+  await page
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Schedule" })
+    .click();
   await expect(page).toHaveURL(/\/Conference-Alpha\/schedule$/);
   await page.goBack();
   await expect(page.getByLabel("Sort by")).toHaveValue("title-asc");
@@ -460,7 +463,8 @@ test("the proposal list comes back to where it was scrolled after Back @004-US5"
 
   // A real click would first scroll the header link back into view.
   await page
-    .getByRole("link", { name: "View Schedule" })
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Schedule" })
     .dispatchEvent("click");
   await expect(page).toHaveURL(/\/Conference-Alpha\/schedule$/);
   await page.goBack();

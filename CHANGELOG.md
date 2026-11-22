@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Same switch between proposals and schedule**: both pages start with the same Proposals and
+  Schedule tabs and an Event details button.
 - **Upload pictures of any size and shape**: pick the part of a profile or room picture to show by
   moving and resizing a frame; it is no longer refused for its size or aspect ratio.
 - **The session, proposal and profile forms open in a side panel**: you keep your place, and closing

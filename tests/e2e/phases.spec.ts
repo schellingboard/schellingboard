@@ -71,7 +71,10 @@ test("voting phase: proposing and voting are open, the schedule is read-only @00
 
   // The schedule can be read before scheduling opens, but offers no way to
   // create a session
-  await page.getByRole("link", { name: /View Schedule/i }).click();
+  await page
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Schedule" })
+    .click();
   await expect(page.getByRole("list", { name: "Event phases" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Add session" })).toHaveCount(0);
 });

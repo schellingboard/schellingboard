@@ -42,11 +42,16 @@ test("event details open in the side panel, survive a reload, and the proposals 
   await expect(venueMapLink).not.toBeVisible();
   await expect(page).toHaveURL(/\/Conference-Gamma\/schedule$/);
 
-  // The Proposals link sits next to the view toggle and navigates.
-  await page.getByRole("link", { name: "Proposals" }).click();
+  // The proposals page offers the same switch and the same details.
+  await page
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Proposals" })
+    .click();
   await expect(
     page.getByRole("heading", { name: /Conference Gamma: Session Proposals/ })
-  ).toBeVisible();
+  ).toBeAttached();
+  await page.getByRole("button", { name: "Event details" }).click();
+  await expect(panel.getByRole("link", { name: "Venue map" })).toBeVisible();
 });
 
 test("the toolbar scrolls out of view while the room headers stay pinned @007-US1", async ({
@@ -184,14 +189,16 @@ test("dragging the schedule pans it sideways @007-US1", async ({ page }) => {
     .first();
   await expect(lastLocation).not.toBeInViewport();
 
-  const scroller = page.getByTestId("schedule-scroll");
-  const box = (await scroller.boundingBox())!;
-  // Drag on the toolbar row's empty right-hand end: always visible and not a
-  // control.
-  const y = box.y + 12;
-  await page.mouse.move(box.x + box.width - 40, y);
+  const box = (await page.getByTestId("schedule-scroll").boundingBox())!;
+  // Drag on the first room's floor and capacity: plain text, not a control.
+  const start = (await page
+    .getByText("Ground floor, East Wing")
+    .first()
+    .boundingBox())!;
+  const y = start.y + start.height / 2;
+  await page.mouse.move(start.x + start.width, y);
   await page.mouse.down();
-  await page.mouse.move(box.x + 40, y, { steps: 8 });
+  await page.mouse.move(box.x, y, { steps: 8 });
   await page.mouse.up();
 
   await expect(lastLocation).toBeInViewport();

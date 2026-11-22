@@ -31,8 +31,14 @@ test("kiosk mode persists via cookie after navigating without the parameter @007
   // Neither link below carries ?kiosk=1, yet the display should stay in
   // kiosk mode: the cookie set on the first load should carry it through, so
   // the now line is scrolled to again rather than left where the day starts.
-  await page.getByRole("link", { name: "Proposals" }).click();
-  await page.getByRole("link", { name: "View Schedule" }).click();
+  await page
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Proposals" })
+    .click();
+  await page
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Schedule" })
+    .click();
   await expect(page).toHaveURL(/\/Conference-Gamma\/schedule$/);
 
   await expect(page.getByTestId("now-line")).toBeInViewport();
@@ -48,7 +54,10 @@ test("?kiosk=0 clears the cookie and leaves kiosk mode @007-US7", async ({
   // page.goto right after kiosk mode was active risks getting aborted by an
   // in-flight fetch (NS_BINDING_ABORTED) — see memory
   // e2e-nav-abort-after-admin-save.
-  await page.getByRole("link", { name: "Proposals" }).click();
+  await page
+    .getByRole("navigation", { name: "Event pages" })
+    .getByRole("link", { name: "Proposals" })
+    .click();
   await expect(
     page.getByRole("heading", { name: /Session Proposals/ })
   ).toBeVisible();

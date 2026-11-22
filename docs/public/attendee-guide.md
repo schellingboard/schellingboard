@@ -24,10 +24,10 @@ Buttons belonging to another phase are greyed out rather than hidden — hover o
 opens. Organizers can skip phases, and an event with no phase dates at all is always in the
 scheduling phase.
 
-The schedule can be read in every phase, from **View Schedule** on the proposals page. Before
-scheduling opens, and after it closes, it is read-only: you can look at sessions, bookmark them and
-hide them, but not RSVP or book slots. The phase bar at the top shows when scheduling opens, and so
-does a short message when you click an empty part of the schedule.
+The schedule can be read in every phase: switch between **Proposals** and **Schedule** at the top of
+either page. Before scheduling opens, and after it closes, it is read-only: you can look at
+sessions, bookmark them and hide them, but not RSVP or book slots. The phase bar at the top shows
+when scheduling opens, and so does a short message when you click an empty part of the schedule.
 
 :::info "Only an RSVP commits you to anything"
 
@@ -150,8 +150,8 @@ by itself.
 A room name with an **ⓘ** next to it has more to say — tap it (or hover it) to read what the room
 offers (projector, whiteboard, the kind of seating), where to find it and how many people fit.
 
-**Event details** in the toolbar opens the event's dates, time zone, website and description in a
-panel beside the schedule, with its own link.
+**Event details**, at the top of the schedule and of the proposals, opens the event's dates, time
+zone, website and description in a side panel, with its own link.
 
 ![The event details panel beside the schedule grid](../screenshots/event-details.webp)
 
