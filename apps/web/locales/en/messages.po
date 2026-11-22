@@ -2843,7 +2843,7 @@ msgstr "Each guest gets a personal link by email. It replaces the link they had 
 msgid "Edit"
 msgstr "Edit"
 
-#: src/ui/markdown-textarea.tsx:93
+#: src/ui/markdown-textarea.tsx:131
 msgctxt "Markdown field: write mode"
 msgid "Edit"
 msgstr "Edit"
@@ -3238,6 +3238,10 @@ msgstr "For sessions with a reported count: the people who came divided by the R
 #: src/features/sign-in/guest-login-form.tsx:137
 msgid "Forgot your password?"
 msgstr "Forgot your password?"
+
+#: src/ui/markdown-textarea.tsx:120
+msgid "Formatting"
+msgstr "Formatting"
 
 #: src/features/admin/location-availability.tsx:141
 msgid "From"
@@ -5064,7 +5068,7 @@ msgstr "Presets attendees can pick when booking. Nothing is reserved — several
 msgid "Prev"
 msgstr "Prev"
 
-#: src/ui/markdown-textarea.tsx:100
+#: src/ui/markdown-textarea.tsx:140
 msgid "Preview"
 msgstr "Preview"
 

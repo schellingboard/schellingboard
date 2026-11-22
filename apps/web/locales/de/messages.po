@@ -2843,7 +2843,7 @@ msgstr "Jeder Gast erhält per E-Mail einen persönlichen Link. Er ersetzt den b
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: src/ui/markdown-textarea.tsx:93
+#: src/ui/markdown-textarea.tsx:131
 msgctxt "Markdown field: write mode"
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -3238,6 +3238,10 @@ msgstr "Für Sessions mit gemeldeter Zahl: die gekommenen Personen geteilt durch
 #: src/features/sign-in/guest-login-form.tsx:137
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
+
+#: src/ui/markdown-textarea.tsx:120
+msgid "Formatting"
+msgstr "Formatierung"
 
 #: src/features/admin/location-availability.tsx:141
 msgid "From"
@@ -5064,7 +5068,7 @@ msgstr "Voreinstellungen, die Teilnehmende beim Buchen wählen können. Nichts w
 msgid "Prev"
 msgstr "Zurück"
 
-#: src/ui/markdown-textarea.tsx:100
+#: src/ui/markdown-textarea.tsx:140
 msgid "Preview"
 msgstr "Vorschau"
 

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import {
   applyTemplate,
@@ -5,7 +6,12 @@ import {
   matchesKey,
   type Template,
 } from "@schellingboard/domain/markdown-edit";
-import { type TextareaHTMLAttributes, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type TextareaHTMLAttributes,
+  useRef,
+  useState,
+} from "react";
 
 import { Markdown } from "./markdown";
 import { Tooltip } from "./tooltip";
@@ -80,27 +86,61 @@ export function MarkdownTextarea({
   onChange: (value: string) => void;
 }) {
   const [previewing, setPreviewing] = useState(false);
+  const [stop, setStop] = useState(0);
   const textarea = useRef<HTMLTextAreaElement>(null);
+  // The modes come first, so they are where the stop falls back to.
+  const tabStop = previewing && stop > 1 ? 1 : stop;
+  const roving = (index: number) => ({
+    tabIndex: index === tabStop ? 0 : -1,
+    onFocus: () => setStop(index),
+  });
+
+  const onToolbarKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const buttons = [
+      ...e.currentTarget.querySelectorAll<HTMLButtonElement>(
+        "button:not(:disabled)"
+      ),
+    ];
+    const at = buttons.indexOf(document.activeElement as HTMLButtonElement);
+    const next = {
+      ArrowRight: at + 1,
+      ArrowLeft: at - 1,
+      Home: 0,
+      End: buttons.length - 1,
+    }[e.key];
+    if (next === undefined) return;
+    e.preventDefault();
+    buttons[(next + buttons.length) % buttons.length]?.focus();
+  };
 
   return (
     <div className="flex flex-col rounded-md border border-line shadow-sm focus-within:border-brand-accent focus-within:ring-2 focus-within:ring-brand-accent">
-      <div className="flex flex-wrap items-center rounded-t-md border-b border-line bg-surface-muted">
+      <div
+        role="toolbar"
+        aria-label={t`Formatting`}
+        onKeyDown={onToolbarKey}
+        className="flex flex-wrap items-center rounded-t-md border-b border-line bg-surface-muted"
+      >
         <button
           type="button"
+          aria-pressed={!previewing}
           className={`${TAB} ${previewing ? "" : "bg-surface-hover"}`}
           onClick={() => setPreviewing(false)}
+          {...roving(0)}
         >
           <Trans context="Markdown field: write mode">Edit</Trans>
         </button>
         <button
           type="button"
+          aria-pressed={previewing}
           className={`${TAB} ${previewing ? "bg-surface-hover" : ""}`}
           onClick={() => setPreviewing(true)}
+          {...roving(1)}
         >
           <Trans>Preview</Trans>
         </button>
         <span className="flex flex-1 justify-end">
-          {markdownOptions.map((option) => (
+          {markdownOptions.map((option, i) => (
             <Tooltip
               key={option.id}
               content={option.label}
@@ -115,6 +155,7 @@ export function MarkdownTextarea({
                   textarea.current &&
                   applyToTextarea(option.template, textarea.current)
                 }
+                {...roving(i + 2)}
               >
                 {GLYPHS[option.id]}
               </button>

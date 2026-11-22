@@ -52,4 +52,36 @@ describe("MarkdownTextarea", () => {
     await userEvent.keyboard("{Control>}i{/Control}");
     expect(box.value).toBe("*hello* **world**");
   });
+
+  it("is one Tab stop for the whole toolbar, with arrow keys inside it", async () => {
+    render(
+      <>
+        <input aria-label="Title" />
+        <Harness />
+      </>
+    );
+    const edit = screen.getByRole("button", { name: "Edit" });
+    const preview = screen.getByRole("button", { name: "Preview" });
+    const box = screen.getByLabelText("Description");
+    screen.getByLabelText("Title").focus();
+
+    await userEvent.tab();
+    expect(document.activeElement).toBe(edit);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(box);
+
+    await userEvent.tab({ shift: true });
+    await userEvent.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(preview);
+    await userEvent.keyboard("{End}");
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: /^Insert link/ })
+    );
+    await userEvent.tab();
+    expect(document.activeElement).toBe(box);
+    await userEvent.tab({ shift: true });
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: /^Insert link/ })
+    );
+  });
 });

@@ -2843,7 +2843,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: src/ui/markdown-textarea.tsx:93
+#: src/ui/markdown-textarea.tsx:131
 msgctxt "Markdown field: write mode"
 msgid "Edit"
 msgstr ""
@@ -3237,6 +3237,10 @@ msgstr ""
 #: src/features/sign-in/account-security.tsx:179
 #: src/features/sign-in/guest-login-form.tsx:137
 msgid "Forgot your password?"
+msgstr ""
+
+#: src/ui/markdown-textarea.tsx:120
+msgid "Formatting"
 msgstr ""
 
 #: src/features/admin/location-availability.tsx:141
@@ -5064,7 +5068,7 @@ msgstr ""
 msgid "Prev"
 msgstr ""
 
-#: src/ui/markdown-textarea.tsx:100
+#: src/ui/markdown-textarea.tsx:140
 msgid "Preview"
 msgstr ""
 

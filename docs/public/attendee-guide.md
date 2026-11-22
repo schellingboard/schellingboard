@@ -67,7 +67,7 @@ the schedule.
   asking for a co-host.
 - **Descriptions accept Markdown.** The toolbar above the box adds bold, italics, links, lists,
   quotes, code and code blocks; the **Preview** tab shows how it will look. Each code block has a
-  copy button.
+  copy button. With the keyboard, the toolbar is one Tab stop; the arrow keys move along it.
 - **You can browse, search and sort proposals in any phase.** Search covers titles, hosts and full
   descriptions, so a tool or prerequisite mentioned deep in a proposal is enough to find it. While
   you search, results stay ordered by how well they match.
