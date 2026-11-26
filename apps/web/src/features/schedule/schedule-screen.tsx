@@ -346,7 +346,7 @@ export function ScheduleScreen({
             its first item. */}
         <div
           data-schedule-frame
-          className="fixed inset-x-0 bottom-0 top-16 flex flex-col bg-surface"
+          className="fixed inset-x-0 bottom-0 top-[calc(4rem+var(--top-inset,0px))] flex flex-col bg-surface"
         >
           {view === "agenda" ? (
             <AgendaView

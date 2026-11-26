@@ -37,7 +37,7 @@ export function NavBar({
   return (
     <header
       ref={root}
-      className="fixed z-30 w-full sm:z-[56] border-b border-line bg-surface-raised"
+      className="fixed top-[var(--top-inset,0px)] z-30 w-full sm:z-[56] border-b border-line bg-surface-raised"
     >
       <div className="flex h-16 items-center justify-between gap-2 px-2 sm:px-6 lg:px-8">
         <button

@@ -115,7 +115,7 @@ describe("the demo gate", { tags: ["024-US2"] }, () => {
     const res = await call("/demo/status");
 
     expect(await res.json()).toEqual({
-      nextResetAt: NEXT_RESET.toISOString(),
+      msUntilReset: 0,
     });
     expect(res.headers.get("cache-control")).toBe("no-store");
   });

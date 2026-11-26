@@ -1,4 +1,4 @@
-.PHONY: help audit dev mailpit build start lint typecheck commit-check arch openapi openapi-check i18n-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration i18n-extract i18n-compile test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help audit dev mailpit build start lint typecheck commit-check arch openapi openapi-check i18n-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration i18n-extract i18n-compile test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker test-e2e-demo format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -19,6 +19,7 @@ help:
 	@printf "  %-28s %s\n" "make test-e2e"           "Run E2E tests (headless)"
 	@printf "  %-28s %s\n" "make test-e2e-headed"    "Run E2E tests (headed, for local dev)"
 	@printf "  %-28s %s\n" "make test-e2e-docker"    "Run E2E tests against the Docker image"
+	@printf "  %-28s %s\n" "make test-e2e-demo"      "Run the demo spec against the demo image"
 	@printf "  %-28s %s\n" "make test-watch"         "Run tests in watch mode"
 	@printf "  %-28s %s\n" "make test-coverage"      "Run tests with coverage"
 	@printf "  %-28s %s\n" "make use-cases"          "Report which tests cover which use case"
@@ -174,6 +175,10 @@ test-e2e-headed: install-playwright
 # hand to the container.
 test-e2e-docker: install-playwright
 	bun set-env.ts test bash scripts/e2e-docker.sh
+
+# The demo spec (tests/e2e-demo) against the demo image; builds it unless IMAGE names one.
+test-e2e-demo: install-playwright
+	bash scripts/e2e-demo.sh
 
 format: install
 	bun x prettier --cache --write .

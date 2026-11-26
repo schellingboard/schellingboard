@@ -239,7 +239,7 @@ export function SidePanel({
       onFocus={guard.noteField}
       onPointerDown={guard.noteField}
       style={{ ["--panel-w" as string]: `${width}px` }}
-      className="fixed inset-0 z-[55] flex flex-col bg-surface-raised shadow-xl focus:outline-none sm:inset-y-auto sm:bottom-0 sm:left-auto sm:right-0 sm:top-16 sm:w-[var(--panel-w)] sm:border-l sm:border-t sm:border-line"
+      className="fixed inset-0 z-[55] flex flex-col bg-surface-raised shadow-xl focus:outline-none sm:inset-y-auto sm:bottom-0 sm:left-auto sm:right-0 sm:top-[calc(4rem+var(--top-inset,0px))] sm:w-[var(--panel-w)] sm:border-l sm:border-t sm:border-line"
     >
       <div
         role="separator"
