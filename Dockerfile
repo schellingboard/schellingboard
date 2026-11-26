@@ -69,11 +69,14 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 
 CMD ["node", "dist/server/main.mjs"]
 
-# The public demo: built only by `flyctl deploy --build-target demo`, never
-# published. It seeds the large dev dataset, so it also carries the seed avatars.
+# The public demo: built with `docker build --target demo`, deployed to Fly with
+# `flyctl deploy --image`, never published. It seeds the large dev dataset, so
+# it also carries the seed avatars.
 FROM runner AS demo
+# A Fly volume is mounted root-owned: start as root only to chown it, then drop to nextjs.
+USER root
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/seed-assets/avatars ./scripts/seed-assets/avatars
-CMD ["node", "dist/server/demo.mjs"]
+CMD ["sh", "-c", "chown -R nextjs:nodejs /data && exec setpriv --reuid=1001 --regid=1001 --init-groups node dist/server/demo.mjs"]
 
 # Last, so that a build without --target (the published image) is the server, not the demo.
 FROM runner

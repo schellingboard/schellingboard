@@ -31,7 +31,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-docker run -d --name "$CONTAINER" -p "127.0.0.1:$PORT:3000" \
+docker run -d --name "$CONTAINER" --memory 512m -p "127.0.0.1:$PORT:3000" \
   -e "AUTH_SECRET=$(bun -e 'process.stdout.write(crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", ""))')" \
   -e "SITE_URL=$BASE_URL" \
   "$IMAGE" >/dev/null

@@ -93,14 +93,24 @@ passed:
 
 Images are `linux/amd64` only, which is what has always been published.
 
+A second job, `demo`, runs after `release` only when the release took over `:latest`. It runs
+`make test-e2e-demo` against the `demo` Dockerfile target, then pushes that same image to Fly's
+registry and runs `flyctl deploy --image` (`fly.toml`). Dispatch the workflow against a tag with
+`demo_only` to redeploy the demo without publishing anything.
+
 ### Repository configuration
 
-The workflow needs two repository secrets:
+The workflow needs these repository secrets:
 
 | Secret               | Value                                                                                                                                                        |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `DOCKERHUB_USERNAME` | The Docker Hub account that can push to `schellingboard/schellingboard`.                                                                                     |
 | `DOCKERHUB_TOKEN`    | A Docker Hub [access token](https://app.docker.com/settings/personal-access-tokens) for that account with **Read & Write** scope — not the account password. |
+
+The demo job also needs `FLY_API_TOKEN`, a deploy-scoped token for the `schellingboard-demo` app.
+The app, its `demo_data` volume (`fly volumes create demo_data --size 1 --region fra`), its session
+secret (`fly secrets set AUTH_SECRET=$(openssl rand -base64 32)`) and the DNS record for
+`demo.schellingboard.org` (`fly certs add`) are created by hand once.
 
 Nothing else: the GitHub release is created with the automatic `GITHUB_TOKEN`, which the workflow
 grants `contents: write`.

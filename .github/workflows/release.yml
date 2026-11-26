@@ -17,6 +17,11 @@ on:
   # Republishing a tag (a Docker Hub outage, a flake in the E2E gate): run this
   # workflow against the tag, not a branch.
   workflow_dispatch:
+    inputs:
+      demo_only:
+        description: "Only redeploy the public demo from this tag; publish nothing"
+        type: boolean
+        default: false
 
 # A release must never race another one for `:latest`.
 concurrency:
@@ -25,8 +30,10 @@ concurrency:
 
 jobs:
   release:
-    if: github.repository == 'schellingboard/schellingboard'
+    if: github.repository == 'schellingboard/schellingboard' && !inputs.demo_only
     runs-on: ubuntu-latest
+    outputs:
+      takes_latest: ${{ steps.tags.outputs.takes_latest }}
 
     permissions:
       contents: write # create the GitHub release
@@ -80,6 +87,7 @@ jobs:
       # Before the E2E gate, so a ref that is not a release version (v3.4.2-rc1,
       # a dispatch against a branch) fails ahead of the ten minutes, not after.
       - name: Work out which tags to publish
+        id: tags
         env:
           IMAGE: ${{ steps.build.outputs.image }}
         run: |
@@ -90,6 +98,11 @@ jobs:
             echo "$refs"
             echo REFS_EOF
           } >> "$GITHUB_ENV"
+          if printf '%s\n' $refs | grep -q ':latest$'; then
+            echo "takes_latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "takes_latest=false" >> "$GITHUB_OUTPUT"
+          fi
 
       # The release gate: the only tier that runs the artifact we ship, against
       # the very image about to be pushed. See docs/dev/testing.md § Testing the
@@ -166,3 +179,62 @@ jobs:
           EOF
           gh release create "$VERSION" --title "$VERSION" "$latest" \
             --notes-file "$RUNNER_TEMP/release-notes.md"
+
+  # The demo runs the newest release, so a patch to an older line never
+  # downgrades it. A manual run with `demo_only` redeploys it from a tag.
+  demo:
+    needs: release
+    if: >-
+      always() && github.repository == 'schellingboard/schellingboard' &&
+      ((inputs.demo_only && startsWith(github.ref, 'refs/tags/v')) ||
+      (needs.release.result == 'success' &&
+      needs.release.outputs.takes_latest == 'true'))
+    runs-on: ubuntu-latest
+    # Holds FLY_API_TOKEN, and admits only `v*` tags.
+    environment: demo
+    permissions:
+      contents: read
+    concurrency:
+      group: demo-deploy
+      cancel-in-progress: false
+    env:
+      APP_VERSION: ${{ github.ref_name }}
+      IMAGE: registry.fly.io/schellingboard-demo:${{ github.ref_name }}
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.x
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: bunx playwright install --with-deps firefox
+
+      # Built once and tested, then pushed as it is: what visitors get is the
+      # image that passed. Fly's registry only, never Docker Hub.
+      - name: Build the demo image
+        run: docker build --target demo --build-arg "APP_VERSION=$APP_VERSION" -t "$IMAGE" .
+
+      - name: E2E Tests against the demo image
+        run: make test-e2e-demo
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # 1.6
+        with:
+          version: 0.5.14
+
+      # The app, its volume and its secrets must already exist; see
+      # docs/dev/releasing.md.
+      - name: Deploy the demo
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl auth docker
+          docker push "$IMAGE"
+          flyctl deploy --image "$IMAGE"
