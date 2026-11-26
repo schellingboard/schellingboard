@@ -6602,6 +6602,10 @@ msgstr "Das ist eine geschlossene Session, das heißt, du darfst höchstens 5 Mi
 msgid "This is a test email sent to {name}."
 msgstr "Das ist eine Test-E-Mail an {name}."
 
+#: src/commands/failure-message.ts
+msgid "This is turned off on this site."
+msgstr "Das ist auf dieser Website ausgeschaltet."
+
 #: src/features/sign-in/bootstrap-screen.tsx
 msgid "This link is invalid. Ask whoever runs the site for a new one."
 msgstr "Dieser Link ist ungültig. Bitte die Betreiber der Website um einen neuen."

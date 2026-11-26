@@ -33,6 +33,22 @@ describe("failureMessage", () => {
     );
   });
 
+  it(
+    "says when this site has turned a feature off",
+    { tags: ["024-US2"] },
+    () => {
+      expect(
+        failureMessage({
+          described,
+          code: "site.featureDisabled",
+          gaveUp: false,
+        })
+      ).toBe(
+        "Could not RSVP to “Intro” (Mon 10:00, Room A). This is turned off on this site."
+      );
+    }
+  );
+
   it("falls back to a generic reason for a code it does not know", () => {
     expect(failureMessage({ described, code: "http.418", gaveUp: false })).toBe(
       "Could not RSVP to “Intro” (Mon 10:00, Room A). Please try again."

@@ -833,6 +833,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US2: {
+        title: "Visitor of the public demo cannot lock others out of its names",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
 } as const satisfies Record<string, Feature>;

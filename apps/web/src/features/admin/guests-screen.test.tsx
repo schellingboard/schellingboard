@@ -200,6 +200,34 @@ describe("the admin users screen", { tags: ["016-US1"] }, () => {
     });
   });
 
+  it("sends the username only when it was edited", async () => {
+    const { region, calls } = setup([
+      guest("g1", "Alice", { username: "alice" }),
+    ]);
+    const edit = async () => {
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Edit" })
+      );
+    };
+    const save = () =>
+      userEvent.click(within(region).getByRole("button", { name: "Save" }));
+
+    await edit();
+    await save();
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].body).not.toHaveProperty("username");
+
+    await edit();
+    await userEvent.clear(
+      within(region)
+        .getAllByLabelText(/username/i)
+        .at(-1)!
+    );
+    await save();
+    await waitFor(() => expect(calls).toHaveLength(2));
+    expect(calls[1].body).toHaveProperty("username", "");
+  });
+
   it("says when someone else changed the user", async () => {
     const { region, onChanged } = setup([guest("g1", "Alice")], {
       handler: () => problem(409, "guest.versionConflict"),

@@ -8,6 +8,7 @@ const CAPACITY_INVALID = msg`Max attendees must be a non-negative whole number`;
 export const capacityError = () => i18n._(CAPACITY_INVALID);
 
 const REASONS: Record<string, MessageDescriptor> = {
+  "site.featureDisabled": msg`This is turned off on this site.`,
   "session.full": msg`This session is full.`,
   "rsvp.ownSession": msg`Hosts cannot RSVP to their own session.`,
   "event.notSchedulingPhase": msg`This can only be changed during the scheduling phase.`,

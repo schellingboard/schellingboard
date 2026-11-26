@@ -6602,6 +6602,10 @@ msgstr ""
 msgid "This is a test email sent to {name}."
 msgstr ""
 
+#: src/commands/failure-message.ts
+msgid "This is turned off on this site."
+msgstr ""
+
 #: src/features/sign-in/bootstrap-screen.tsx
 msgid "This link is invalid. Ask whoever runs the site for a new one."
 msgstr ""

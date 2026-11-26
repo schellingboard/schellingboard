@@ -6602,6 +6602,10 @@ msgstr "Esta é uma sessão fechada: podes chegar, no máximo, 5 minutos atrasad
 msgid "This is a test email sent to {name}."
 msgstr "Este é um email de teste enviado a {name}."
 
+#: src/commands/failure-message.ts
+msgid "This is turned off on this site."
+msgstr "Isto está desativado neste site."
+
 #: src/features/sign-in/bootstrap-screen.tsx
 msgid "This link is invalid. Ask whoever runs the site for a new one."
 msgstr "Esta ligação não é válida. Pede uma nova a quem gere o site."

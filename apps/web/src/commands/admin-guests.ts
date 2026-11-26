@@ -20,7 +20,8 @@ export function adminGuestCalls(api: ApiClient) {
       }),
     update: (
       id: string,
-      body: GuestBody,
+      // An omitted username keeps the stored one.
+      body: Omit<GuestBody, "username"> & { username?: string },
       expectedVersion: number,
       key: string
     ) =>

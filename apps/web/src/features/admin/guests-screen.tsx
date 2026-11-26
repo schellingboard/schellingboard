@@ -226,7 +226,12 @@ function EditForm({
       if (!saved.current) {
         const result = await calls.update(
           guest.id,
-          { name, email, username, eventIds },
+          {
+            name,
+            email,
+            eventIds,
+            username: username === guest.username ? undefined : username,
+          },
           guest.version,
           key
         );

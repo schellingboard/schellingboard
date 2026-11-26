@@ -6,6 +6,7 @@ import { startJobsLoop, stopJobsLoop } from "@/utils/jobs/loop";
 import { initMailer } from "@/utils/mailer";
 
 import { assertResetAt, nextReset, prepareDemoDatabase } from "./boot";
+import { demoGate } from "./gate";
 
 const resetAt = process.env.SB_DEMO_RESET_AT ?? "03:00";
 assertResetAt(resetAt);
@@ -22,9 +23,12 @@ initMailer();
 startJobsLoop();
 
 const port = Number(process.env.PORT ?? 3000);
-const server = serve(
-  { fetch: (req) => web.fetch(withForwardedProto(req)), port },
-  () => console.log(`Listening on port ${port}`)
+const gate = demoGate({
+  inner: (req) => web.fetch(withForwardedProto(req)),
+  nextReset: () => nextReset(new Date(), resetAt),
+});
+const server = serve({ fetch: gate, port }, () =>
+  console.log(`Listening on port ${port}`)
 );
 
 // The platform restarts the process, and boot reseeds: in-memory feed and
