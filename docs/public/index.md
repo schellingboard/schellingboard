@@ -11,6 +11,9 @@ vote on the ones they want, and place them on a shared schedule.
 
 ![Scheduling grid with rooms as columns and time slots as rows, and a first column holding the viewer's own 1-on-1s](../screenshots/schedule-grid.webp)
 
+Want a look first? Try the [public demo](https://demo.schellingboard.org). It holds sample data and
+resets daily; see [what you can do there](demo.md).
+
 ## For attendees
 
 - [Attendee guide](attendee-guide.md) — pick your name, propose, vote, RSVP, and protect your name

@@ -39,7 +39,8 @@ agreed to this fork serving that role. See [LICENSING_HISTORY.md](LICENSING_HIST
 
 ![Scheduling board](docs/screenshots/schedule-grid.webp)
 
-More screenshots at [schellingboard.org](https://schellingboard.org).
+Try it with sample data at [demo.schellingboard.org](https://demo.schellingboard.org) (reset daily),
+or see more screenshots at [schellingboard.org](https://schellingboard.org).
 
 ## Hosting
 

@@ -45,6 +45,14 @@ describe("the demo banner", { tags: ["024-US1"] }, () => {
     );
   });
 
+  it("links to the page that says what the demo can do", async () => {
+    const html = await (await get(respond(PAGE, "text/html"))).text();
+
+    expect(html).toContain(
+      '<a href="https://docs.schellingboard.org/demo/" target="_blank" rel="noopener">What works here?</a>'
+    );
+  });
+
   it.each([
     ["application/json", '{"a":1}'],
     ["text/javascript", "console.log(1)"],

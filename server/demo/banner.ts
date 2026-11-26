@@ -4,6 +4,7 @@ import {
 } from "@/scripts/seed/data/guests";
 
 export const CONTACT = "abuse@schellingboard.org";
+const DOCS = "https://docs.schellingboard.org/demo/";
 const SOON_MS = 30 * 60 * 1000;
 const SAMPLE_GUEST = "Wei Chen";
 
@@ -23,7 +24,7 @@ const STYLE = `
 `;
 
 export const MARKUP = `<div id="demo-banner" role="region" aria-label="Public demo notice">
-<p><strong>Public demo.</strong><span data-more> Anyone can post here: do not enter real data and do not trust links.</span> Resets in <span data-countdown>…</span>.<span data-more> Sign in as <code>${SEED_SITE_ADMIN.name}</code> (<code>${SEED_SITE_ADMIN.username}</code>) or <code>${SAMPLE_GUEST}</code> with password <code>${SEED_PROTECTED_PASSWORD}</code>. Report abuse to <a href="mailto:${CONTACT}">${CONTACT}</a>.</span></p>
+<p><strong>Public demo.</strong><span data-more> Anyone can post here: do not enter real data and do not trust links.</span> Resets in <span data-countdown>…</span>.<span data-more> Sign in as <code>${SEED_SITE_ADMIN.name}</code> (<code>${SEED_SITE_ADMIN.username}</code>) or <code>${SAMPLE_GUEST}</code> with password <code>${SEED_PROTECTED_PASSWORD}</code>. <a href="${DOCS}" target="_blank" rel="noopener">What works here?</a> Report abuse to <a href="mailto:${CONTACT}">${CONTACT}</a>.</span></p>
 <button type="button" data-close aria-label="Close demo notice">Close</button>
 <button type="button" data-open hidden>Show info</button>
 </div>`;

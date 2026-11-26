@@ -32,6 +32,7 @@ the repository.
 | [Running multiple instances](multiple-instances.md) | ports and env files when several clones share a machine                    |
 | [Documentation and the sites](documentation.md)     | how the three published sites are built                                    |
 | [Releasing a new version](releasing.md)             | tagging, the release checklist, publishing Docker images                   |
+| [The public demo](demo.md)                          | the demo program, its daily reset, the deny list to keep current           |
 | [GitHub issues](github-issues.md)                   | setting Issue Type and Priority via `gh api graphql`                       |
 
 ## Design

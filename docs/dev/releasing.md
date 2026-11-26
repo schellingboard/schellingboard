@@ -107,10 +107,9 @@ The workflow needs these repository secrets:
 | `DOCKERHUB_USERNAME` | The Docker Hub account that can push to `schellingboard/schellingboard`.                                                                                     |
 | `DOCKERHUB_TOKEN`    | A Docker Hub [access token](https://app.docker.com/settings/personal-access-tokens) for that account with **Read & Write** scope — not the account password. |
 
-The demo job also needs `FLY_API_TOKEN`, a deploy-scoped token for the `schellingboard-demo` app.
-The app, its `demo_data` volume (`fly volumes create demo_data --size 1 --region fra`), its session
-secret (`fly secrets set AUTH_SECRET=$(openssl rand -base64 32)`) and the DNS record for
-`demo.schellingboard.org` (`fly certs add`) are created by hand once.
+The demo job also needs `FLY_API_TOKEN`, a deploy token for the `schellingboard-demo` app, as a
+secret of the environment `demo`. That and everything on Fly is created by hand, see
+[One-time Fly.io setup of the demo](demo-fly-setup.md).
 
 Nothing else: the GitHub release is created with the automatic `GITHUB_TOKEN`, which the workflow
 grants `contents: write`.

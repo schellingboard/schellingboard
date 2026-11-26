@@ -230,7 +230,7 @@ jobs:
           version: 0.5.14
 
       # The app, its volume and its secrets must already exist; see
-      # docs/dev/releasing.md.
+      # docs/dev/demo-fly-setup.md.
       - name: Deploy the demo
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -47,6 +47,7 @@
   "pageNavigation": true,
   "navigation": [
     { "title": "Overview", "path": "/", "icon": "home" },
+    { "title": "Public demo", "path": "/demo/", "icon": "flask-conical" },
     { "title": "Attendee guide", "path": "/attendee-guide/", "icon": "users" },
     {
       "title": "For organizers",
