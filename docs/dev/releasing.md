@@ -47,7 +47,8 @@ minor release, so `v3.2.1` republishes the `3.2` documentation.
 
    Commit and merge it like any other change.
 
-2. **Tag the commit on `main` and push the tag.** This publishes the documentation.
+2. **Tag the commit on `main` and push the tag.** This publishes the documentation. Only repository
+   administrators can push it.
 
    ```bash
    jj git fetch
@@ -113,6 +114,26 @@ secret of the environment `demo`. That and everything on Fly is created by hand,
 
 Nothing else: the GitHub release is created with the automatic `GITHUB_TOKEN`, which the workflow
 grants `contents: write`.
+
+A `v*` tag publishes a release and opens the `demo` environment, so the ruleset "Protect release
+tags" lets only repository administrators create, move or delete one. To create it again:
+
+```bash
+gh api -X POST repos/schellingboard/schellingboard/rulesets --input - <<'JSON'
+{
+  "name": "Protect release tags",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["refs/tags/v*"], "exclude": [] } },
+  "rules": [{ "type": "creation" }, { "type": "update" }, { "type": "deletion" }],
+  "bypass_actors": [
+    { "actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always" }
+  ]
+}
+JSON
+```
+
+`actor_id` 5 is the repository's admin role.
 
 ### If it fails
 
