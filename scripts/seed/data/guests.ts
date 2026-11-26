@@ -5,7 +5,7 @@ import type {
 
 // Shared demo password for seeded guests with account protection enabled
 // (issue #370). Not a security boundary — dev/e2e seed data only.
-export const SEED_PROTECTED_PASSWORD = "seed-password";
+export const SEED_PROTECTED_PASSWORD = "schelling";
 
 // The attendee the documentation screenshots are taken as, so the large
 // profile gives her the 1-on-1s to photograph (docs/screenshots/README.md).

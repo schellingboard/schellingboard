@@ -98,9 +98,8 @@ A web admin UI is available at `/admin` for managing all core records: events (b
 days), the global pools of users and locations, event↔guest and event↔location assignments,
 moderation of proposals, sessions, and RSVPs, and site settings (title, description, and the
 optional venue map). It is for site admins, who sign in at `/admin`; `make dev-db-seed` seeds one
-(username `site-admin`, password `seed-password`), and `make bootstrap-link` prints a link that
-makes another. It has its own layout, and the sign-in asks for `SITE_PASSWORD` first when one is
-set.
+(username `site-admin`, password `schelling`), and `make bootstrap-link` prints a link that makes
+another. It has its own layout, and the sign-in asks for `SITE_PASSWORD` first when one is set.
 
 ## Dev fake clock
 

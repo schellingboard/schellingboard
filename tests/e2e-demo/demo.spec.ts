@@ -15,7 +15,7 @@ test("the demo says what it is, refuses a password change, and signs in with the
   await nameBox.fill("Site Admin");
   await page.getByRole("option", { name: "Site Admin" }).click();
   const field = page.getByLabel("Password or emailed code");
-  await field.fill("seed-password");
+  await field.fill("schelling");
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(
     page.getByRole("button", { name: /^Your name: Site Admin/ })
@@ -24,7 +24,7 @@ test("the demo says what it is, refuses a password change, and signs in with the
   await page.getByRole("button", { name: /^Your name/ }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();
   await page.getByRole("button", { name: "Change password" }).click();
-  await page.getByLabel("Current password").fill("seed-password");
+  await page.getByLabel("Current password").fill("schelling");
   await page.getByLabel(/new password/i).fill("another-password");
   await page.getByRole("button", { name: "Change password" }).click();
   await expect(

@@ -18,7 +18,7 @@ Anyone can post there. Do not enter real data, and do not trust links. Report ab
 ## Signing in
 
 Pick any name without a password to act as that attendee. Names marked **(password)** all use the
-password `seed-password`, for example:
+password `schelling`, for example:
 
 | Name         | Username     | What you can try                                              |
 | ------------ | ------------ | ------------------------------------------------------------- |

@@ -4,7 +4,7 @@ import { login } from "./auth";
 
 // The seeded site admin (scripts/seed/data/guests.ts).
 const ADMIN_USERNAME = "site-admin";
-const ADMIN_PASSWORD = "seed-password";
+const ADMIN_PASSWORD = "schelling";
 
 /** Enters the site password on the page /admin sent a new visitor to. */
 export async function enterSitePassword(page: Page) {
