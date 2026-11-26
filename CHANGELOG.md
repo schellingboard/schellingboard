@@ -15,6 +15,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Public demo**: try SchellingBoard with sample data at demo.schellingboard.org, reset daily.
 
+### Fixed
+
+- **Choosing your name on a phone**: the name list now fills the screen, so the keyboard no longer
+  covers the matching names.
+
 ## [5.3.0] - 2026-11-22
 
 ### Added

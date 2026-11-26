@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 
 import { useDiscardGuard } from "./use-discard-guard";
 import { useScrollLock } from "./use-scroll-lock";
+import { useVisibleArea } from "./use-visible-area";
 
 /** Open dialogs, innermost last: Escape closes only the one on top. */
 const openDialogs: symbol[] = [];
@@ -24,6 +25,7 @@ export function Dialog({
   wide,
   label,
   titleAction,
+  fullScreen,
 }: {
   open: boolean;
   onClose: () => void;
@@ -34,11 +36,14 @@ export function Dialog({
   label?: string;
   /** Sits beside the title, outside the heading, so it stays out of the dialog's name. */
   titleAction?: ReactNode;
+  /** On phones, fills the screen instead of rising from the bottom. */
+  fullScreen?: boolean;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
 
   useScrollLock(open);
+  const area = useVisibleArea();
   const guard = useDiscardGuard(panel, onClose);
   const { escape, reset } = guard;
 
@@ -88,7 +93,12 @@ export function Dialog({
   return createPortal(
     <div
       data-testid="dialog-backdrop"
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-overlay p-0 sm:items-center sm:p-4"
+      className={`fixed inset-0 z-[60] flex justify-center bg-overlay p-0 sm:items-center sm:p-4 ${fullScreen ? "items-stretch" : "items-end"}`}
+      style={
+        area
+          ? { top: area.top, bottom: "auto", height: area.height }
+          : undefined
+      }
       onClick={() => guard.requestClose()}
     >
       <div
@@ -102,7 +112,7 @@ export function Dialog({
         onKeyDown={keepFocusInside}
         onFocus={guard.noteField}
         onPointerDown={guard.noteField}
-        className={`relative max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-lg bg-surface-raised p-4 shadow-xl focus:outline-none sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"}`}
+        className={`relative w-full overflow-y-auto overscroll-contain bg-surface-raised p-4 shadow-xl focus:outline-none sm:max-h-[90%] sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"} ${fullScreen ? "flex flex-col sm:block" : "max-h-[90%] rounded-t-lg"}`}
       >
         <div className="flex items-start gap-2 pr-8">
           <h2
@@ -122,7 +132,11 @@ export function Dialog({
           <span aria-hidden>✕</span>
         </button>
         {guard.prompt}
-        <div className="mt-3">{children}</div>
+        <div
+          className={`mt-3 ${fullScreen ? "flex min-h-0 flex-1 flex-col sm:block" : ""}`}
+        >
+          {children}
+        </div>
       </div>
     </div>,
     document.body

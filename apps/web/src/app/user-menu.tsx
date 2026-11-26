@@ -211,7 +211,7 @@ export function NamePicker({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} title={t`Who are you?`}>
+    <Dialog open={open} onClose={onClose} title={t`Who are you?`} fullScreen>
       <label htmlFor={inputId} className="text-fg-subtle">
         {t`My name is:`}
       </label>
@@ -240,7 +240,7 @@ export function NamePicker({
         id={listId}
         role="listbox"
         aria-label={t`Names`}
-        className="mt-2 max-h-72 overflow-y-auto"
+        className="mt-2 min-h-0 flex-1 overflow-y-auto sm:max-h-72"
       >
         {shown.map((guest, i) => (
           <li
