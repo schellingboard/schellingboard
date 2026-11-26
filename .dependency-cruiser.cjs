@@ -230,6 +230,15 @@ module.exports = {
       to: { path: "^db/", dependencyTypesNot: ["type-only"] },
     },
     {
+      name: "nothing-imports-the-demo",
+      severity: "error",
+      comment:
+        "The public demo wraps the server from outside: it has its own entry point and " +
+        "image target, and production code stays unaware of it.",
+      from: { pathNot: "^(server/demo/|tests/)" },
+      to: { path: "^server/demo/" },
+    },
+    {
       name: "no-unresolvable",
       severity: "error",
       comment: "A dependency that does not resolve is a broken import.",

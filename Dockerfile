@@ -68,3 +68,12 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD node -e "fetch('http://localhost:3000/api/health').then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"
 
 CMD ["node", "dist/server/main.mjs"]
+
+# The public demo: built only by `flyctl deploy --build-target demo`, never
+# published. It seeds the large dev dataset, so it also carries the seed avatars.
+FROM runner AS demo
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/seed-assets/avatars ./scripts/seed-assets/avatars
+CMD ["node", "dist/server/demo.mjs"]
+
+# Last, so that a build without --target (the published image) is the server, not the demo.
+FROM runner

@@ -9,8 +9,9 @@ const OUT = "dist/server";
 const version = process.env.APP_VERSION || getAppVersion();
 
 const options: BuildOptions = {
-  entryPoints: ["server/main.ts"],
-  outfile: `${OUT}/main.mjs`,
+  entryPoints: { main: "server/main.ts", demo: "server/demo/main.ts" },
+  outdir: OUT,
+  outExtension: { ".js": ".mjs" },
   bundle: true,
   platform: "node",
   format: "esm",

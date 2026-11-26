@@ -7,7 +7,6 @@ import fs from "fs";
 import { DateTime } from "luxon";
 import { nanoid } from "nanoid";
 import path from "path";
-import { fileURLToPath } from "url";
 
 import { resolveDbPath, runMigrations } from "@/db/migrate";
 import * as schema from "@/db/schema";
@@ -86,10 +85,7 @@ function openDb() {
   // Enforce foreign keys on every connection; runMigrations toggles it off and
   // back on internally.
   sqlite.pragma("foreign_keys = ON");
-  const migrationsFolder = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "../../drizzle"
-  );
+  const migrationsFolder = path.resolve(process.cwd(), "drizzle");
   runMigrations(sqlite, migrationsFolder);
   return drizzle(sqlite, { schema });
 }
@@ -219,10 +215,8 @@ function generateEventDates(today: Date) {
 
 // Committed CC0 avatar images (see scripts/seed-assets/avatars/README.md);
 // copied into SB_UPLOADS_DIR at seed time like real uploads.
-const seedAvatarsDir = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../seed-assets/avatars"
-);
+const seedAvatarsDir = () =>
+  path.resolve(process.cwd(), "scripts/seed-assets/avatars");
 
 function uploadedAvatarsDir(): string {
   return path.join(uploadsDir(), "avatars");
@@ -325,7 +319,7 @@ async function seedWithDb(
         const filename = `${id}.webp`;
         fs.copyFileSync(
           path.join(
-            seedAvatarsDir,
+            seedAvatarsDir(),
             `avatar-${String(config.avatar).padStart(2, "0")}.webp`
           ),
           path.join(uploadedAvatarsDir(), filename)

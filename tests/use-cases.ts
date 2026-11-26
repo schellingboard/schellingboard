@@ -824,6 +824,17 @@ export const features = {
       },
     },
   },
+  "024": {
+    slug: "public-demo",
+    component: "infra & dev",
+    stories: {
+      US1: {
+        title: "Visitor tries a public demo that starts afresh every day",
+        actor: "attendee",
+        priority: "P3",
+      },
+    },
+  },
 } as const satisfies Record<string, Feature>;
 
 type Features = typeof features;
