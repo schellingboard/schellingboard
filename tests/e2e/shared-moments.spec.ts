@@ -94,15 +94,16 @@ test("an organizer adds a shared moment to every day of an event @015-US9", asyn
     .click();
 
   const days = page.getByRole("region", { name: "Days" });
-  for (const date of ["2030-10-01", "2030-10-02"]) {
+  for (const [i, date] of ["2030-10-01", "2030-10-02"].entries()) {
     await days.getByRole("button", { name: "Add day" }).click();
     await days.getByLabel("Start*").fill(`${date}T09:00`);
     await days.getByLabel("End*").fill(`${date}T18:00`);
     await days.getByLabel("Bookings open*").fill(`${date}T09:00`);
     await days.getByLabel("Bookings close*").fill(`${date}T17:30`);
     await days.getByRole("button", { name: "Add day" }).click();
+    // The form's submit button shares its name with the one that opens it.
+    await expect(days.getByRole("listitem")).toHaveCount(i + 1);
   }
-  await expect(days.getByRole("listitem")).toHaveCount(2);
 
   const moments = page.getByRole("region", { name: "Shared moments" });
   await moments.getByRole("button", { name: "Add shared moment" }).click();
