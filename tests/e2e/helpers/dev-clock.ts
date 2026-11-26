@@ -13,7 +13,7 @@ import { gammaDay } from "./seed";
 
 /**
  * 16:00 Berlin on Web Unconference's first event day (seeded at today+14,
- * running 09:00–18:00 Europe/Berlin — see scripts/seed/seed-database.ts). Late
+ * running 09:00–18:00 Europe/Berlin — see scripts/seed/seed.ts). Late
  * enough in the day that the now line starts outside the visible schedule
  * area, so only scrolling brings it into view.
  *

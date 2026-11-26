@@ -34,13 +34,13 @@ export interface GuestConfig {
   // state at runtime in tests/e2e/user-auth.spec.ts) so those stay switchable.
   password?: string;
   // How long ago the guest last saved their profile. Curated guests derive
-  // this from their list position (see seed-database.ts); bulk guests set it
+  // this from their list position (see seed.ts); bulk guests set it
   // explicitly so 400 of them don't stretch a year into the past.
   profileAgeHours?: number;
 }
 
 // Whether the guest has filled in any profile field. Decides both if
-// profileUpdatedAt gets stamped (seed-database.ts) and if bulk generation
+// profileUpdatedAt gets stamped (seed.ts) and if bulk generation
 // assigns a profileAgeHours (bulk.ts) — the two must agree, or bulk guests
 // fall back to the curated index-based age formula, which stretches ~10
 // months into the past at index 400.

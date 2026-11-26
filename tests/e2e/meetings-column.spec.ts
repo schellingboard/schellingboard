@@ -11,7 +11,7 @@ import { selectUser } from "./helpers/user";
  *
  * Web Unconference is the seeded event in its scheduling phase, and Zanele's
  * first morning there holds two 1-on-1s in the 10:00 slot and three in the
- * 11:00 slot (scripts/seed/seed-database.ts) — shown from 10:10 and 11:10,
+ * 11:00 slot (scripts/seed/seed.ts) — shown from 10:10 and 11:10,
  * after the event's break, as sessions in those slots are.
  */
 const VIEWER = "Zanele Khumalo";

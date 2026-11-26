@@ -29,7 +29,7 @@ import { selectUser } from "./helpers/user";
 test.use({ timezoneId: "Europe/Berlin" });
 
 // Gamma's days run 09:00–18:00 Berlin from today+14
-// (scripts/seed/seed-database.ts, scripts/seed/data/gamma-schedule.ts). 17:00
+// (scripts/seed/seed.ts, scripts/seed/data/gamma-schedule.ts). 17:00
 // is after every session scheduled on a day, and before the day itself ends —
 // a day that has ended folds shut, taking its session links with it.
 const lateOnGammaDay = (day: number) => gammaDay(day).set({ hour: 17 });

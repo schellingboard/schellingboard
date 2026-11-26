@@ -8,7 +8,7 @@ import {
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { getRepositories, resetRepositories } from "@/db/container";
-import { seedTestData } from "@/scripts/seed/seed-database";
+import { seedTestData } from "@/scripts/seed/seed";
 import { GET } from "@/tests/helpers/v1-route";
 
 import { createAdminAuthCookie } from "../helpers/admin-cookie";

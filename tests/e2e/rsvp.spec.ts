@@ -81,7 +81,7 @@ test("a refused RSVP names the session and why @009-US2", async ({ page }) => {
 });
 
 // Zanele's seeded 1-on-1 with Rafael falls inside "API Design" on Gamma's
-// first day (scripts/seed/seed-database.ts). Only the warning is under test,
+// first day (scripts/seed/seed.ts). Only the warning is under test,
 // so it is declined and her diary is left as it was.
 test("RSVPing over a confirmed 1-on-1 warns about it first @009-US3", async ({
   page,
