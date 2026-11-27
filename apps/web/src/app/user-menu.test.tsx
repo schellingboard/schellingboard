@@ -359,4 +359,50 @@ describe("UserMenu", () => {
     );
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it("offers a sign-in, not a list of names, in a verified event", async () => {
+    const user = userEvent.setup();
+    render(
+      <UserMenu
+        viewer={{
+          guestId: null,
+          choose: vi.fn(),
+          signOut: vi.fn(),
+          refresh: vi.fn(),
+        }}
+        guests={guests}
+        signInOnly
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: "Log in" }));
+
+    expect(screen.queryByText("Ada")).toBeNull();
+    expect(hardNavigate).toHaveBeenCalledWith(
+      expect.stringMatching(/^\/auth\/login\?redirect=/)
+    );
+  });
+
+  it("offers a sign-in to a claimed name that is not in a verified event", async () => {
+    const user = userEvent.setup();
+    render(
+      <UserMenu
+        viewer={{
+          guestId: "elsewhere",
+          choose: vi.fn(),
+          signOut: vi.fn(),
+          refresh: vi.fn(),
+        }}
+        guests={guests}
+        signInOnly
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: "Log in" }));
+
+    expect(hardNavigate).toHaveBeenCalledWith(
+      expect.stringMatching(/^\/auth\/login\?redirect=/)
+    );
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
 });

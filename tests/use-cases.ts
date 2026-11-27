@@ -855,6 +855,11 @@ export const features = {
         actor: "attendee",
         priority: "P1",
       },
+      US3: {
+        title: "Attendee of a verified event signs in on their first action",
+        actor: "attendee",
+        priority: "P1",
+      },
     },
   },
 } as const satisfies Record<string, Feature>;

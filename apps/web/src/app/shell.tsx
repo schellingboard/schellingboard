@@ -34,6 +34,7 @@ export function ShellFrame({
   currentPath,
   search,
   onClockChange,
+  signInOnly,
   children,
 }: ShellProps) {
   const health = useHealth(api);
@@ -42,7 +43,7 @@ export function ShellFrame({
   const viewer = useViewer();
   const kiosk = useKioskMode(new URLSearchParams(search));
   return (
-    <IdentityPrompt guests={guests}>
+    <IdentityPrompt guests={guests} signInOnly={signInOnly}>
       {viewer.nameToConfirm !== undefined && (
         <NameConfirmDialog
           api={api}
@@ -58,7 +59,7 @@ export function ShellFrame({
           <NavBar items={events} currentPath={currentPath}>
             <HeaderLinks signedIn={!!viewer.guestId} />
             <MapButton url={site?.mapImageUrl} />
-            <UserMenu viewer={viewer} guests={guests} />
+            <UserMenu viewer={viewer} guests={guests} signInOnly={signInOnly} />
           </NavBar>
         }
         footer={<Footer api={api} version={health?.version} update={update} />}
@@ -93,6 +94,8 @@ export type ShellProps = {
   currentPath: string;
   search: string;
   onClockChange: () => void;
+  /** A verified event: people sign in instead of picking a name. */
+  signInOnly?: boolean;
   children: ReactNode;
 };
 

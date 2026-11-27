@@ -198,6 +198,27 @@ describe("snapshot", () => {
     expect(snapshot!.sessions[0].title).toBe("Two");
   });
 
+  it("gives a claimed viewer no data of their own in a verified event", async () => {
+    const verifiedEvent = await createEvent({
+      name: "Verified Con",
+      identityMode: "verified",
+    });
+    const openEvent = await createEvent({
+      name: "Open Con",
+      identityMode: "open",
+    });
+    const guest = await createGuest({ name: "Otto", eventId: openEvent.id });
+    const claimed = openGuest(guest.id);
+
+    expect((await read(openEvent.slug, claimed))!.me?.guestId).toBe(guest.id);
+    expect((await read(verifiedEvent.slug, claimed))!.me).toBeNull();
+    const verified = await read(verifiedEvent.slug, {
+      admin: false,
+      guest: { id: guest.id, level: "verified" },
+    });
+    expect(verified!.me?.guestId).toBe(guest.id);
+  });
+
   it("is undefined for an unknown event", async () => {
     expect(await read("nope", NOBODY)).toBeUndefined();
   });

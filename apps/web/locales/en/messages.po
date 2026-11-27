@@ -3921,6 +3921,7 @@ msgstr "Locations"
 msgid "Locations to leave out"
 msgstr "Locations to leave out"
 
+#: src/app/user-menu.tsx
 #: src/features/sign-in/guest-login-form.tsx
 msgid "Log in"
 msgstr "Log in"
