@@ -22,6 +22,8 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // clock helper reloads right after the SPA has) is logged as a corrupt image.
   // The seeded photos are static files, so real damage would fail every run.
   /Image corrupt or truncated.*\/locations\/[\w-]+\.jpg/,
+  // The same for avatars cut off when a test leaves the attendee list.
+  /Image corrupt or truncated.*\/media\/avatars\/[\w-]+\.webp/,
 ];
 
 function isAllowed(text: string): boolean {
