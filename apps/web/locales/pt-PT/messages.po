@@ -660,6 +660,10 @@ msgid "**Shared moments**: organizers mark lunch or a keynote as a striped band 
 msgstr "**Momentos partilhados**: os organizadores marcam o almoço ou uma conferência de abertura como uma faixa às riscas que atravessa todas as salas, para que os anfitriões vejam quando a maioria está ausente, e ainda assim podem marcar aí."
 
 #: src/app/release-highlights.ts
+msgid "**Sign in with your SSO proxy**: people are signed in by their email, with no name picker, and site admins turn it on in the admin settings."
+msgstr "**Início de sessão com o teu proxy SSO**: as pessoas são identificadas pelo email, sem escolha de nome, e os administradores do site ativam-no nas definições de administração."
+
+#: src/app/release-highlights.ts
 msgid "**Spot clashes**: a Clashes filter lists your overlapping sessions and 1-on-1s, and clashing blocks get a warning icon."
 msgstr "**Deteta sobreposições**: um filtro «Sobreposições» lista as tuas sessões e 1 a 1 que coincidem no tempo, e os blocos sobrepostos mostram um ícone de aviso."
 
