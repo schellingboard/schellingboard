@@ -27,6 +27,7 @@ import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
 
 import type { PeopleDeps } from "../ports";
+import { retireTokens } from "./auth-tokens";
 
 export interface AdminGuest {
   id: string;
@@ -344,7 +345,7 @@ export const setSiteAdmin =
   ({ uow }: PeopleDeps) =>
   async (
     actor: Actor,
-    input: { id: string; siteAdmin: boolean },
+    input: { id: string; siteAdmin: boolean; resetPassword?: boolean },
     now: Date
   ): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
@@ -354,7 +355,24 @@ export const setSiteAdmin =
       const done = await recordingShownGuests(
         tx,
         await tx.guests.listShownEventIds(input.id),
-        () => tx.guests.setSiteAdmin(input.id, input.siteAdmin),
+        async () => {
+          const granting =
+            input.siteAdmin &&
+            input.resetPassword &&
+            !(await tx.guests.getSiteAdmin(input.id));
+          const found = await tx.guests.setSiteAdmin(input.id, input.siteAdmin);
+          // In one step, so a password of unknown origin never administers.
+          // Only while granting: a stale list must not lock out a sitting admin.
+          if (found && granting) {
+            await tx.guests.setAuthProtection(input.id, {
+              authProtected: true,
+              passwordHash: null,
+            });
+            await tx.loginSessions.deleteForGuest(input.id);
+            await retireTokens(tx, input.id);
+          }
+          return found;
+        },
         byAdmin(actor, now)
       );
       if (!done) return guestNotFound();

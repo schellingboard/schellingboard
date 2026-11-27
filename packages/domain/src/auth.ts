@@ -29,7 +29,7 @@ export function assuranceRequired(
   return mode === "verified" || personProtected ? "verified" : "claimed";
 }
 
-/** How a login session began; only a join link may replace a forgotten password. */
+/** How a login session began. */
 export type LoginVia = "name" | "password" | "code" | "link";
 
 /** An allowlist, so that a new way to sign in gives no admin rights by default. */

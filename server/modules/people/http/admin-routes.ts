@@ -17,6 +17,7 @@ import {
   joinLinkViewSchema,
   mailJoinLinksBodySchema,
   mailJoinLinksResultSchema,
+  passwordLinkViewSchema,
   siteAdminBodySchema,
 } from "@schellingboard/contracts/guest";
 
@@ -98,7 +99,7 @@ const setSiteAdmin = createRoute({
   path: "/admin/guests/{id}/site-admin",
   tags,
   description:
-    "Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last.",
+    "Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last. `resetPassword` also takes away the password the guest has.",
   request: {
     headers: idempotencyHeaders,
     params: idParam,
@@ -108,6 +109,29 @@ const setSiteAdmin = createRoute({
     200: json(adminGuestViewSchema, "The updated guest"),
     ...problemDefault,
   },
+});
+
+const createPasswordLink = createRoute({
+  method: "post",
+  path: "/admin/guests/{id}/password-link",
+  tags,
+  description:
+    "Makes a link to set the guest's password, for the admin to hand over; it ends the guest's earlier password link and signs no one in. The token is shown only in this answer.",
+  request: { params: idParam },
+  responses: {
+    201: json(passwordLinkViewSchema, "The new link"),
+    ...problemDefault,
+  },
+});
+
+const mailPasswordLink = createRoute({
+  method: "post",
+  path: "/admin/guests/{id}/password-link/mail",
+  tags,
+  description:
+    "Makes a password link, valid 24 hours, and mails it to the guest. `guest.noEmail` (409) without an email; `auth.mailUnavailable` (503) when the server cannot send email; `auth.mailFailed` (503) when sending failed.",
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Sent"), ...problemDefault },
 });
 
 const sendTestEmail = createRoute({
@@ -300,6 +324,24 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
       c.var.actor,
       c.req.valid("param"),
       c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
+  });
+
+  app.openapi(createPasswordLink, async (c) => {
+    const result = await people().createPasswordLink(
+      c.var.actor,
+      c.req.valid("param")
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 201);
+  });
+
+  app.openapi(mailPasswordLink, async (c) => {
+    const result = await people().mailPasswordLink(
+      c.var.actor,
+      c.req.valid("param")
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);

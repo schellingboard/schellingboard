@@ -26,6 +26,7 @@ export const MAX_CODE_ATTEMPTS = 100;
 // Password-reset links live longer than login codes: the recipient may open
 // the mail on another device and still needs time to choose a new password.
 export const RESET_TOKEN_VALID_MINUTES = 30;
+export const PASSWORD_LINK_VALID_MINUTES = 24 * 60;
 // No I, O, 0, 1: codes are meant to be read from an email on one device and
 // typed on another.
 const AUTH_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

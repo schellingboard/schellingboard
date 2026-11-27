@@ -643,6 +643,11 @@ export const features = {
         actor: "organizer",
         priority: "P1",
       },
+      US6: {
+        title: "Organizer gives a user a password link",
+        actor: "organizer",
+        priority: "P1",
+      },
     },
   },
   "017": {

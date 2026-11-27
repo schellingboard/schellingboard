@@ -143,14 +143,13 @@ export const joinWithLink = (deps: PeopleDeps) => {
     const viaProxy = actor.guest?.via === "proxy";
     if (viaProxy && actor.guest?.id !== link.guestId) return proxyFixed();
 
-    const passwordSetAt = await repos.guests.getPasswordSetAt(link.guestId);
+    const creds = await repos.guests.getAuthCredentials(link.guestId);
     const signedInAlready =
       actor.guest?.id === link.guestId &&
       (viaProxy || actor.guest.level === "verified");
-    // A link that signed a site admin in would hand out admin rights.
+    // A site admin's name stays protected even while it has no password.
     const trusted =
-      (!passwordSetAt || passwordSetAt <= link.createdAt) &&
-      !(await repos.guests.getSiteAdmin(link.guestId));
+      !creds?.passwordHash && !(await repos.guests.getSiteAdmin(link.guestId));
     if (!signedInAlready && !trusted) return ok({ ...base, joined: false });
 
     await uow.run((tx) =>

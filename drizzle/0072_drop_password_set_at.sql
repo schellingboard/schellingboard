@@ -1,0 +1,1 @@
+ALTER TABLE `guests` DROP COLUMN `password_set_at`;

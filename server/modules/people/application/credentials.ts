@@ -27,9 +27,6 @@ import {
 } from "@/server/kernel/result";
 import { realNow } from "@/utils/real-clock";
 import {
-  generateAuthCodeSalt,
-  generateResetToken,
-  hashAuthCode,
   hashUserPassword,
   RESET_TOKEN_VALID_MINUTES,
   verifyUserPassword,
@@ -39,9 +36,11 @@ import type { PeopleDeps } from "../ports";
 import { noEmail } from "./admin-guests";
 import {
   type GuestTarget,
+  issuePasswordToken,
   matchToken,
   recentlyIssued,
   resolveTarget,
+  retireTokens,
 } from "./auth-tokens";
 import { type SignedIn, signIn } from "./identity";
 
@@ -120,18 +119,12 @@ export const requestResetLink =
         "A link was emailed to you moments ago — check your inbox and spam folder"
       );
 
-    const token = generateResetToken();
-    const salt = generateAuthCodeSalt();
-    await repos.authCodes.replace({
+    const token = await issuePasswordToken(
+      repos,
       guestId,
-      purpose: "reset",
-      salt,
-      codeHash: hashAuthCode(token, salt),
-      createdAt: now,
-      expiresAt: new Date(
-        now.getTime() + RESET_TOKEN_VALID_MINUTES * 60 * 1000
-      ),
-    });
+      RESET_TOKEN_VALID_MINUTES,
+      now
+    );
     try {
       await loginMail.sendResetLink({
         guestId,
@@ -153,7 +146,7 @@ export const requestResetLink =
   };
 
 /**
- * Sets the password a reset link allows and turns protection on. It proves only
+ * Sets the password a password link allows and turns protection on. It proves only
  * control of the emailed link, so it signs no one in. Other browsers' rows go:
  * all of them for a password reset, the verified ones for a first password
  * (claimed rows are then refused as "protected", which tells their user why).
@@ -175,7 +168,7 @@ export const resetPassword = (deps: PeopleDeps) => {
     if (!matched)
       return forbidden(
         "auth.credentialWrong",
-        "This link is invalid or has expired"
+        "This link no longer works. Request a new one, or ask an admin."
       );
     // A site admin without a password is protected by the role, not by one.
     const wasProtected =
@@ -220,20 +213,7 @@ async function confirmedPassword(
   return ok(guestId);
 }
 
-/**
- * A forgotten password is replaced without the old one only where no mail can
- * reset it, and only by a join-link login: a stolen password or code session
- * must not take the name over.
- */
-function mayReplacePassword(
-  { loginMail }: PeopleDeps,
-  actor: Actor,
-  hasEmail: boolean
-): boolean {
-  return actor.guest?.via === "link" && !(hasEmail && loginMail.configured());
-}
-
-/** Sets a password for a verified session; see `mayReplacePassword` for replacing one. */
+/** Sets the first password of a name; only a password link replaces one without the old. */
 export const setFirstPassword = (deps: PeopleDeps) => {
   return async (
     actor: Actor,
@@ -255,15 +235,12 @@ export const setFirstPassword = (deps: PeopleDeps) => {
       if (await tx.guests.getSiteAdmin(guestId))
         return forbidden(
           "siteAdmin.passwordLink",
-          "A site admin's password changes only through a reset link or with the old password"
+          "A site admin's password changes only through a password link or with the old password"
         );
-      const guest = await tx.guests.findById(guestId);
-      const hasPassword = (await tx.guests.getAuthCredentials(guestId))
-        ?.passwordHash;
-      if (hasPassword && !mayReplacePassword(deps, actor, !!guest?.info.email))
+      if ((await tx.guests.getAuthCredentials(guestId))?.passwordHash)
         return conflict(
           "auth.passwordSet",
-          "This name already has a password. Change it with the old one, reset it by email, or ask an organizer for a new link."
+          "This name already has a password. Change it with the old one, or set a new one with a password link."
         );
       await tx.guests.setAuthProtection(guestId, {
         authProtected: true,
@@ -273,21 +250,12 @@ export const setFirstPassword = (deps: PeopleDeps) => {
       return ok(null);
     });
     if (!stored.ok) return stored;
-    await retireTokens(deps, guestId);
+    await retireTokens(deps.repos, guestId);
     credentialsChanged(guestId);
     await notifySecurityChange(deps, guestId, "password-changed");
     return stored;
   };
 };
-
-/** A changed credential retires whatever was emailed before it. */
-async function retireTokens({ repos }: PeopleDeps, guestId: string) {
-  const now = realNow();
-  for (const purpose of ["login", "reset"] as const) {
-    const active = await repos.authCodes.findActive(guestId, purpose, now);
-    if (active) await repos.authCodes.consume(active.id);
-  }
-}
 
 /** Changes the password; this session stays, the others are signed out. */
 export const changePassword = (deps: PeopleDeps) => {
@@ -311,7 +279,7 @@ export const changePassword = (deps: PeopleDeps) => {
       });
       await tx.loginSessions.deleteForGuest(guestId, actor.guest?.sessionId);
     });
-    await retireTokens(deps, guestId);
+    await retireTokens(deps.repos, guestId);
     credentialsChanged(guestId);
     await notifySecurityChange(deps, guestId, "password-changed");
     return ok(null);
@@ -346,7 +314,7 @@ export const unprotect = (deps: PeopleDeps) => {
       authProtected: false,
       passwordHash: null,
     });
-    await retireTokens(deps, guestId);
+    await retireTokens(deps.repos, guestId);
     credentialsChanged(guestId);
     const stillProtected = (await deps.repos.guests.getAuthCredentials(guestId))
       ?.authProtected;
@@ -403,15 +371,14 @@ export const getCredentials =
     if (!acting.ok) return acting;
     const creds = await deps.repos.guests.getAuthCredentials(acting.value);
     const guest = await deps.repos.guests.findById(acting.value);
-    const hasEmail = Boolean(guest?.info.email);
     return ok({
       authProtected: creds?.passwordHash != null,
       username: await deps.repos.guests.getUsername(acting.value),
-      hasEmail,
+      hasEmail: Boolean(guest?.info.email),
       canSetPassword:
         actor.guest?.level === "verified" &&
-        !(await deps.repos.guests.getSiteAdmin(acting.value)) &&
-        (!creds?.passwordHash || mayReplacePassword(deps, actor, hasEmail)),
+        !creds?.passwordHash &&
+        !(await deps.repos.guests.getSiteAdmin(acting.value)),
     });
   };
 

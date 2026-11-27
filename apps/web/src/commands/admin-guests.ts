@@ -35,10 +35,24 @@ export function adminGuestCalls(api: ApiClient) {
         params: { path: { id } },
         headers: { "Idempotency-Key": key },
       }),
-    setSiteAdmin: (id: string, siteAdmin: boolean, key: string) =>
+    setSiteAdmin: (
+      id: string,
+      siteAdmin: boolean,
+      key: string,
+      resetPassword?: boolean
+    ) =>
       api.PUT("/api/v1/admin/guests/{id}/site-admin", {
         params: { path: { id } },
-        body: { siteAdmin },
+        body: { siteAdmin, resetPassword },
+        headers: { "Idempotency-Key": key },
+      }),
+    createPasswordLink: (id: string) =>
+      api.POST("/api/v1/admin/guests/{id}/password-link", {
+        params: { path: { id } },
+      }),
+    mailPasswordLink: (id: string, key: string) =>
+      api.POST("/api/v1/admin/guests/{id}/password-link/mail", {
+        params: { path: { id } },
         headers: { "Idempotency-Key": key },
       }),
     sendTestEmail: (id: string, key: string) =>

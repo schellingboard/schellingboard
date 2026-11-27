@@ -22,7 +22,7 @@ recorded under their name.
 
 A join link never gives admin rights. A site admin signed in by one acts as an attendee, and
 `/admin` asks them to sign in with their password. A site admin's password changes only with the old
-one or through a reset link; they cannot set one without it.
+one or through a [password link](#password-links); they cannot set one without it.
 
 - **The first site admin**: while the site has none, the server logs a one-time link at start (valid
   24 hours). Open it, choose your name or enter a name and email, and set a username and password.
@@ -32,8 +32,13 @@ one or through a reset link; they cannot set one without it.
   admins sign in through the proxy too** is on; otherwise the link is refused and kept, and you set
   `SB_DISABLE_PROXY_SIGN_IN=1` to use the form.
 - **Make site admin / Remove site admin**: on the Users page, per user. The last site admin cannot
-  be removed. A site admin who has not set a password yet is marked "No password yet" and signs in
-  with a reset link.
+  be removed. A site admin who has not set a password yet is marked "No password yet".
+  - For a user **without a password**, the confirmation offers **Send password link** (when the site
+    sends email and the user has an address) or **Copy password link**. They set a password, sign
+    in, and can use admin.
+  - For a user **with a password**, you can keep it or choose **Reset password**: the password stops
+    working, their sessions end, and you give them a password link. Do this if you are not sure that
+    they set the password themselves, for example after a forwarded join link.
 
 ## Site settings
 
@@ -189,6 +194,15 @@ quick; saving an edit sets the guest's events to those ticked.
 - Attendees edit their own About me/Pronouns/Avatar from a profile page once they've picked their
   name; admins don't set these.
 
+### Password links
+
+**Copy password link**, per user on the Users page, makes a link that sets that user's password. It
+is how someone without email gets a password, or a new one after forgetting it.
+
+- **Send it privately.** It works once, for 24 hours, and anyone who opens it can set the password.
+- **It signs no one in.** The user sets a password, then signs in with it.
+- **A new link ends the previous one.** A link is shown once; make another if you lost it.
+
 ### Labels
 
 An event's **Guests** tab has a **Labels** section for tags such as "Orga team", "Volunteer" or
@@ -203,14 +217,11 @@ On an event's **Guests** tab, **New link** makes a personal link for one guest: 
 messenger and send it. **Mail new links** emails a link to every guest of the event, or only to the
 ones you ticked; guests without an email are counted and skipped.
 
-- **A link signs its guest in and adds them to the event.** It asks for a sign-in instead once the
-  guest has set a password after the link was made, and always for a site admin.
+- **A link signs its guest in and adds them to the event.** For a guest who has a password, and for
+  a site admin, it asks for a sign-in instead.
 - **A new link replaces the guest's earlier one** for that event, and the guest is emailed that a
   new link exists. A link is shown once; make a new one if you lost it.
-- **A guest who forgot their password and cannot get email** (no address on file, or a site that
-  sends none) gets back in with a new link, then sets a new password under **Settings → Account
-  security** without the old one. Only a link login can do this, and never for a site admin. Whoever
-  has the link can do it, so share it privately. Other guests reset by email.
+- **A join link does not recover a password.** Use a [password link](#password-links).
 
 ### Attendees who protect their name
 
@@ -218,10 +229,10 @@ In an _Open_ event, any attendee can opt into [name protection](how-it-works.md#
 from their own settings. You can't turn it on or off for someone; to require proof of identity from
 everyone, make the event _Verified_.
 
-The one thing you _can_ do is fix a lockout. Protection is anchored to the guest's email address, so
-an attendee who's lost both their password and their mailbox is stuck until you **change their email
-address here** — codes then go to the new address and they can unlock themselves. **Verify who
-you're talking to first; this is effectively a password reset.**
+The one thing you _can_ do is fix a lockout. An attendee who forgot their password and cannot get a
+reset email gets a [password link](#password-links) from you. If their address on file is wrong, you
+can also **change the email address here**; codes then go to the new one. **Verify who you're
+talking to first: both let that person act under the name.**
 
 Deleting and recreating the guest also clears protection, but discards their votes, RSVPs, and
 profile — prefer changing the email.

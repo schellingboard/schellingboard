@@ -8,8 +8,11 @@ import { TextField } from "../../ui/form";
 import { PasswordManagerHint } from "../../ui/password-manager-hint";
 import { useCredentialForm } from "./use-credential-form";
 
+const deadLink = () =>
+  t`This link no longer works. Request a new one, or ask an admin.`;
+
 /**
- * Sets a new password from an emailed link. It signs no one in, so on success
+ * Sets a new password from a password link. It signs no one in, so on success
  * it points at the sign-in.
  */
 function ResetPasswordForm({
@@ -27,6 +30,7 @@ function ResetPasswordForm({
 }) {
   const [newPassword, setNewPassword] = useState("");
   const [done, setDone] = useState(false);
+  const [dead, setDead] = useState(false);
   const mutation = useCredentialForm(() =>
     calls.resetPassword({ guestId: guest.id, token, newPassword })
   );
@@ -34,6 +38,11 @@ function ResetPasswordForm({
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const result = await mutation.submit();
+    setDead(
+      result?.ok === false &&
+        result.kind === "refused" &&
+        result.code === "auth.credentialWrong"
+    );
     if (result?.ok) {
       setDone(true);
       onPasswordSet?.();
@@ -77,7 +86,7 @@ function ResetPasswordForm({
       />
       {mutation.error && !mutation.fields.newPassword && (
         <p role="alert" className="text-sm text-danger-fg">
-          {mutation.error}
+          {dead ? deadLink() : mutation.error}
         </p>
       )}
       <div>
@@ -92,7 +101,7 @@ function ResetPasswordForm({
   );
 }
 
-/** The reset-link landing page: the form for the named guest, or why the link is no good. */
+/** The password-link landing page: the form for the named guest, or why the link is no good. */
 export function ResetScreen({
   calls,
   guest,
@@ -123,12 +132,7 @@ export function ResetScreen({
           />
         </>
       ) : (
-        <p className="text-fg-muted">
-          <Trans>
-            This password link is invalid. Request a new one from the name
-            selector or your settings page.
-          </Trans>
-        </p>
+        <p className="text-fg-muted">{deadLink()}</p>
       )}
     </div>
   );

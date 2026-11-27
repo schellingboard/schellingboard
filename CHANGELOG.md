@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Password links** ([#1683](https://github.com/schellingboard/schellingboard/issues/1683)): admins
+  send or copy a link that sets a user's password, also without email and for new site admins.
 - **Public demo**: try SchellingBoard with sample data at demo.schellingboard.org, reset daily.
 - **Sign in through a proxy**: sites behind an SSO proxy (oauth2-proxy, Authelia) sign people in by
   their email: no name picker or code, and Log out leads to the proxy. Site admins set it up in the
@@ -21,6 +23,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Join links no longer replace passwords**
+  ([#1683](https://github.com/schellingboard/schellingboard/issues/1683)): they sign in only people
+  without a password. Ask an admin for a password link to recover one.
 - **Verified events ask you to log in instead of listing names**: the header shows Log in, and a
   first action such as Add Proposal opens the login page, then returns you to the same page.
 - **Actions that need your name now open the name picker**: Add Proposal, voting, "My proposals" and

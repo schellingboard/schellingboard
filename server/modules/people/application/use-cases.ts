@@ -36,6 +36,7 @@ import {
   updateLabel,
 } from "./labels";
 import { updateMyLocale } from "./locale";
+import { createPasswordLink, mailPasswordLink } from "./password-links";
 import {
   confirmMyName,
   getProfile,
@@ -84,6 +85,8 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     issueBootstrapToken: issueBootstrapToken(deps),
     announceBootstrap: announceBootstrap(deps),
     bootstrapAdmin: bootstrapAdmin(deps),
+    createPasswordLink: createPasswordLink(deps),
+    mailPasswordLink: mailPasswordLink(deps),
     createJoinLink: createJoinLink(deps),
     mailJoinLinks: mailJoinLinks(deps),
     joinWithLink: joinWithLink(deps),

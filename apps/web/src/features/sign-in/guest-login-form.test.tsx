@@ -37,7 +37,7 @@ describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
   it("offers no mailed code or reset where the server sends no mail", async () => {
     setup(() => Response.json({ guestId: "g1" }), { guest: ada }, false);
 
-    await screen.findByText(/Ask an organizer for a new link/);
+    await screen.findByText(/Ask an admin for a password link/);
     expect(
       screen.queryByRole("button", { name: "Email me a code" })
     ).toBeNull();

@@ -3,6 +3,9 @@ import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import { realNow } from "@/utils/real-clock";
 import {
   authCodeMatches,
+  generateAuthCodeSalt,
+  generateResetToken,
+  hashAuthCode,
   isAuthCodeShaped,
   MAX_CODE_ATTEMPTS,
   normalizeAuthCode,
@@ -70,6 +73,35 @@ export async function recentlyIssued(
 }
 
 export const isSpent = (token: AuthCode) => token.attempts >= MAX_CODE_ATTEMPTS;
+
+/** The token of a new password link, which ends the guest's earlier one. */
+export async function issuePasswordToken(
+  { authCodes }: TokenRepos,
+  guestId: string,
+  validMinutes: number,
+  now: Date
+): Promise<string> {
+  const token = generateResetToken();
+  const salt = generateAuthCodeSalt();
+  await authCodes.replace({
+    guestId,
+    purpose: "reset",
+    salt,
+    codeHash: hashAuthCode(token, salt),
+    createdAt: now,
+    expiresAt: new Date(now.getTime() + validMinutes * 60 * 1000),
+  });
+  return token;
+}
+
+/** A changed credential retires whatever was handed out before it. */
+export async function retireTokens({ authCodes }: TokenRepos, guestId: string) {
+  const now = realNow();
+  for (const purpose of ["login", "reset"] as const) {
+    const active = await authCodes.findActive(guestId, purpose, now);
+    if (active) await authCodes.consume(active.id);
+  }
+}
 
 /** What a request names: a guest id, or an email or username that may match nobody. */
 export type GuestTarget = string | { identifier: string };

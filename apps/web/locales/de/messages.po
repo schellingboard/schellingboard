@@ -403,9 +403,21 @@ msgstr "{name} ({event})"
 msgid "{name} (max {max})"
 msgstr "{name} (max. {max})"
 
+#: src/features/admin/password-link-dialog.tsx
+msgid "{name} already has a password. Reset it if you are not sure that {name} set the password themselves, for example after a forwarded join link. The password then stops working, their sessions end, and you give them a password link."
+msgstr "{name} hat bereits ein Passwort. Setze es zurück, wenn du nicht sicher bist, dass {name} das Passwort selbst festgelegt hat, zum Beispiel nach einem weitergeleiteten Beitrittslink. Das Passwort funktioniert dann nicht mehr, alle Sitzungen dieser Person enden, und du gibst ihr einen Passwort-Link."
+
+#: src/features/admin/password-link-dialog.tsx
+msgid "{name} has no password. A password link lets them set one."
+msgstr "{name} hat kein Passwort. Mit einem Passwort-Link kann diese Person eines festlegen."
+
 #: src/features/meetings/book-meeting.tsx
 msgid "{name} is already booked during this time."
 msgstr "{name} ist zu dieser Zeit schon gebucht."
+
+#: src/features/admin/password-link-dialog.tsx
+msgid "{name} is now a site admin."
+msgstr "{name} ist jetzt Site-Admin."
 
 #: src/features/sign-in/join-screen.tsx
 msgid "{name} needs to sign in first. You then join the event."
@@ -855,6 +867,10 @@ msgstr "Eine neuere Version ist erschienen: {latestVersion}."
 msgid "A niche internet community I love"
 msgstr "Eine Nischen-Community im Netz, die ich liebe"
 
+#: src/features/admin/password-link-dialog.tsx
+msgid "A password link was sent to {name}."
+msgstr "Ein Passwort-Link wurde an {name} gesendet."
+
 #: src/features/people/prompt-text.ts
 msgid "A pattern I keep seeing everywhere"
 msgstr "Ein Muster, das mir ständig begegnet"
@@ -950,6 +966,10 @@ msgstr "Bei einer Session, die du hostest, hat sich die Zeit geändert."
 #: src/features/admin/event-moments.tsx
 msgid "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
 msgstr "Ein gemeinsamer Moment, etwa Mittagessen oder eine Keynote, erscheint als gestreiftes Band über allen Räumen. Er blockiert nichts: Sessions können darin weiter gebucht werden. Um eine Zeit unbuchbar zu machen, lege stattdessen in jedem Raum eine Sperr-Session an. Die Zeiten gelten in der Zeitzone der Veranstaltung ({timezone})."
+
+#: ../../emails/auth-password-reset.tsx
+msgid "A site admin sent you this link. After you set the password, log in with it."
+msgstr "Ein Site-Admin hat dir diesen Link geschickt. Melde dich mit dem Passwort an, nachdem du es festgelegt hast."
 
 #: src/features/people/prompt-text.ts
 msgid "A skill I'm building this year"
@@ -1250,6 +1270,10 @@ msgstr "Eine andere Session nutzt diesen Raum zu dieser Zeit schon."
 #: src/features/people/profile-form.tsx
 msgid "Any pronouns"
 msgstr "Beliebige Pronomen"
+
+#: src/features/sign-in/account-security.tsx
+msgid "Anyone can currently act under your name. Ask an admin for a password link to protect it."
+msgstr "Jede Person kann derzeit unter deinem Namen handeln. Bitte einen Admin um einen Passwort-Link, um ihn zu schützen."
 
 #: src/features/sign-in/account-security.tsx
 msgid "Anyone can currently act under your name. Enable protection so switching to your name requires your password. We'll email you a link to set it."
@@ -1759,8 +1783,8 @@ msgid "Choose a new password. You'll use it to switch to your name from now on."
 msgstr "Wähle ein neues Passwort. Damit wechselst du ab jetzt zu deinem Namen."
 
 #: src/features/sign-in/account-security.tsx
-msgid "Choose a password. You are signed in with your personal link, so the old one is not needed."
-msgstr "Wähle ein Passwort. Du bist mit deinem persönlichen Link angemeldet, daher brauchst du das alte nicht."
+msgid "Choose a password. Switching to your name will then require it."
+msgstr "Wähle ein Passwort. Das Wechseln zu deinem Namen erfordert es dann."
 
 #: src/commands/failure-message.ts
 msgid "Choose or type where to meet."
@@ -2119,6 +2143,7 @@ msgstr "Kopieren"
 msgid "Copy code"
 msgstr "Code kopieren"
 
+#: src/features/admin/password-link-dialog.tsx
 #: src/ui/copy-link-button.tsx
 msgid "Copy link"
 msgstr "Link kopieren"
@@ -2130,6 +2155,11 @@ msgstr "Link für {guestName} kopieren"
 #: src/features/admin/event-sessions.tsx
 msgid "Copy of {title}"
 msgstr "Kopie von {title}"
+
+#: src/features/admin/guests-screen.tsx
+#: src/features/admin/password-link-dialog.tsx
+msgid "Copy password link"
+msgstr "Passwort-Link kopieren"
 
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "Copy secret"
@@ -2969,8 +2999,8 @@ msgid "Enter your password, or a single-use code emailed to you. Forgot the pass
 msgstr "Gib dein Passwort ein oder einen dir per E-Mail gesendeten Einmalcode. Passwort vergessen? Setze es stattdessen zurück."
 
 #: src/features/sign-in/guest-login-form.tsx
-msgid "Enter your password. Forgot it? Ask an organizer for a new link."
-msgstr "Gib dein Passwort ein. Vergessen? Bitte eine organisierende Person um einen neuen Link."
+msgid "Enter your password. Forgot it? Ask an admin for a password link."
+msgstr "Gib dein Passwort ein. Vergessen? Bitte einen Admin um einen Passwort-Link."
 
 #: src/features/settings/email-settings-form.tsx
 #: src/features/settings/language-setting.tsx
@@ -3833,6 +3863,7 @@ msgid "Lime"
 msgstr "Limette"
 
 #: src/features/admin/join-links.tsx
+#: src/features/admin/password-link-dialog.tsx
 #: src/ui/copy-link-button.tsx
 msgid "Link copied"
 msgstr "Link kopiert"
@@ -3877,6 +3908,7 @@ msgstr "Vorschläge werden geladen …"
 #: src/features/admin/events-screen.tsx
 #: src/features/admin/guests-screen.tsx
 #: src/features/admin/locations-screen.tsx
+#: src/features/admin/password-link-dialog.tsx
 #: src/features/admin/settings-screen.tsx
 #: src/features/comments/my-comments-screen.tsx
 #: src/features/meetings/book-meeting.tsx
@@ -3980,11 +4012,16 @@ msgstr "Auf der Suche nach einem Co-Host: {cohostNote}"
 msgid "Mail new links to all guests"
 msgstr "Neue Links an alle Gäste mailen"
 
+#: src/features/admin/password-link-dialog.tsx
+msgid "Make {name} a site admin?"
+msgstr "{name} zum Site-Admin machen?"
+
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "Make secret"
 msgstr "Geheimnis erzeugen"
 
 #: src/features/admin/guests-screen.tsx
+#: src/features/admin/password-link-dialog.tsx
 msgid "Make site admin"
 msgstr "Zum Site-Admin machen"
 
@@ -4886,6 +4923,10 @@ msgstr "Passwort (mindestens 8 Zeichen)"
 msgid "Password changed"
 msgstr "Passwort geändert"
 
+#: src/features/admin/password-link-dialog.tsx
+msgid "Password link for {name}"
+msgstr "Passwort-Link für {name}"
+
 #: src/features/sign-in/guest-login-form.tsx
 msgid "Password or emailed code"
 msgstr "Passwort oder per E-Mail gesendeter Code"
@@ -5423,6 +5464,10 @@ msgstr "Filter zurücksetzen"
 msgid "Reset link sent — check your email to set a new password"
 msgstr "Link zum Zurücksetzen gesendet — prüfe deine E-Mails, um ein neues Passwort festzulegen"
 
+#: src/features/admin/password-link-dialog.tsx
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
 #: src/features/admin/event-config.tsx
 msgid "Reset to default"
 msgstr "Auf Standard zurücksetzen"
@@ -5774,6 +5819,10 @@ msgstr "Wähle deinen Namen, um einen Kommentar zu schreiben."
 msgid "Select your name to vote"
 msgstr "Wähle deinen Namen, um abzustimmen"
 
+#: src/features/admin/password-link-dialog.tsx
+msgid "Send password link"
+msgstr "Passwort-Link senden"
+
 #: src/features/meetings/meeting-request-fields.tsx
 msgid "Send request"
 msgstr "Anfrage senden"
@@ -5781,6 +5830,10 @@ msgstr "Anfrage senden"
 #: src/features/admin/guests-screen.tsx
 msgid "Send test email"
 msgstr "Test-E-Mail senden"
+
+#: src/features/admin/password-link-dialog.tsx
+msgid "Send this link to {name} privately. It works once, for 24 hours. Anyone who opens it can set {name}'s password."
+msgstr "Sende diesen Link privat an {name}. Er funktioniert einmal, 24 Stunden lang. Wer ihn öffnet, kann das Passwort von {name} festlegen."
 
 #: src/features/admin/guests-screen.tsx
 #: src/features/meetings/meeting-request-fields.tsx
@@ -5952,10 +6005,6 @@ msgstr "Sessions: Vorschlag"
 #: src/features/admin/stats-text.ts
 msgid "Sessions: spontaneous"
 msgstr "Sessions: spontan"
-
-#: src/features/sign-in/account-security.tsx
-msgid "Set a new password"
-msgstr "Neues Passwort festlegen"
 
 #: src/features/sign-in/account-security.tsx
 msgid "Set a password"
@@ -6799,6 +6848,10 @@ msgstr "Dieser Link ist ungültig. Bitte die Betreiber der Website um einen neue
 msgid "This link no longer works: a newer one replaced it. Ask an organizer for a new link."
 msgstr "Dieser Link funktioniert nicht mehr: Ein neuerer hat ihn ersetzt. Bitte eine organisierende Person um einen neuen Link."
 
+#: src/features/sign-in/reset-password-form.tsx
+msgid "This link no longer works. Request a new one, or ask an admin."
+msgstr "Dieser Link funktioniert nicht mehr. Fordere einen neuen an oder bitte einen Admin darum."
+
 #: src/features/sign-in/guest-login-form.tsx
 msgid "This login link is invalid. Request a new code from the name selector or your settings page."
 msgstr "Dieser Anmeldelink ist ungültig. Fordere über die Namensauswahl oder deine Einstellungen einen neuen Code an."
@@ -6814,10 +6867,6 @@ msgstr "Dieser Name ist geschützt. Melde dich mit seinem Passwort an."
 #: src/features/sign-in/bootstrap-screen.tsx
 msgid "This one-time link makes you a site admin. Choose who you are, or add yourself, then set a username and password."
 msgstr "Dieser einmalige Link macht dich zum Site-Admin. Wähle, wer du bist, oder füge dich hinzu und lege dann einen Benutzernamen und ein Passwort fest."
-
-#: src/features/sign-in/reset-password-form.tsx
-msgid "This password link is invalid. Request a new one from the name selector or your settings page."
-msgstr "Dieser Passwortlink ist ungültig. Fordere über die Namensauswahl oder deine Einstellungen einen neuen an."
 
 #: src/features/people/profile-panel.tsx
 msgid "This person is no longer listed."
@@ -6929,8 +6978,8 @@ msgid "This user has protected their account. Enter their password, or use a sin
 msgstr "Diese Person hat ihr Konto geschützt. Gib ihr Passwort ein oder nutze einen ihr per E-Mail gesendeten Einmalcode. Passwort vergessen? Setze es stattdessen zurück."
 
 #: src/features/sign-in/guest-login-form.tsx
-msgid "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
-msgstr "Diese Person hat ihr Konto geschützt. Gib ihr Passwort ein. Vergessen? Bitte eine organisierende Person um einen neuen Link."
+msgid "This user has protected their account. Enter their password. Forgot it? Ask an admin for a password link."
+msgstr "Diese Person hat ihr Konto geschützt. Gib ihr Passwort ein. Vergessen? Bitte einen Admin um einen Passwort-Link."
 
 #: src/features/admin/event-config.tsx
 msgid "This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified."
@@ -7176,6 +7225,10 @@ msgstr "Lade eine CSV-Datei mit einer Kopfzeile hoch, die die Spalten <0>name</0
 #: src/commands/field-message.ts
 msgid "Use at least 8 characters"
 msgstr "Verwende mindestens 8 Zeichen"
+
+#: ../../emails/auth-password-reset.tsx
+msgid "Use this link to set a new password for your name. It works once and expires in {hours, plural, one {# hour} other {# hours}}:"
+msgstr "Mit diesem Link legst du ein neues Passwort für deinen Namen fest. Er funktioniert einmal und läuft in {hours, plural, one {# Stunde} other {# Stunden}} ab:"
 
 #: ../../emails/auth-password-reset.tsx
 msgid "Use this link to set a new password for your name. It works once and expires in {validMinutes, plural, one {# minute} other {# minutes}}:"
@@ -7723,8 +7776,8 @@ msgid "Your name is protected: switching to it requires your password or a singl
 msgstr "Dein Name ist geschützt: Um zu ihm zu wechseln, brauchst du dein Passwort oder einen dir per E-Mail gesendeten Einmalcode. Passwort vergessen? Setze es mit einem per E-Mail gesendeten Link zurück."
 
 #: src/features/sign-in/account-security.tsx
-msgid "Your name is protected: switching to it requires your password. Forgot it? Ask an organizer for a new link, then set a new password here."
-msgstr "Dein Name ist geschützt: Um zu ihm zu wechseln, brauchst du dein Passwort. Vergessen? Bitte eine organisierende Person um einen neuen Link und lege hier ein neues Passwort fest."
+msgid "Your name is protected: switching to it requires your password. Forgot it? Ask an admin for a password link."
+msgstr "Dein Name ist geschützt: Das Wechseln dazu erfordert dein Passwort. Vergessen? Bitte einen Admin um einen Passwort-Link."
 
 #: ../../emails/auth-security-changed.tsx
 msgid "Your name protection was turned off"

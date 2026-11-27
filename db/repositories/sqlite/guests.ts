@@ -23,8 +23,6 @@ import {
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 
-import { realNow } from "@/utils/real-clock";
-
 import * as schema from "../../schema";
 import {
   type GuestAuthCredentials,
@@ -521,15 +519,6 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return row ?? null;
   }
 
-  async getPasswordSetAt(id: string): Promise<Date | null> {
-    const row = this.db
-      .select({ at: schema.guests.passwordSetAt })
-      .from(schema.guests)
-      .where(eq(schema.guests.id, id))
-      .get();
-    return row?.at ? new Date(row.at) : null;
-  }
-
   async setAuthProtection(
     id: string,
     creds: GuestAuthCredentials
@@ -539,11 +528,6 @@ export class SqliteGuestsRepository implements GuestsRepository {
       .set({
         authProtected: creds.authProtected,
         passwordHash: creds.passwordHash,
-        ...(creds.passwordHash === null
-          ? {}
-          : {
-              passwordSetAt: realNow().toISOString(),
-            }),
         version: sql`${schema.guests.version} + (${schema.guests.authProtected} != ${creds.authProtected ? 1 : 0})`,
       })
       .where(eq(schema.guests.id, id))

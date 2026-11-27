@@ -103,21 +103,26 @@ describe("account security: protection", { tags: ["003-US3"] }, () => {
     expect(reload).toHaveBeenCalled();
   });
 
-  it("offers a new password without the old one only when the server allows it", async () => {
-    setup(ready({ hasEmail: false, canSetPassword: true }), undefined, false);
-    expect(
-      await screen.findByRole("button", { name: "Set a new password" })
-    ).toBeTruthy();
-    expect(
-      screen.queryByRole("button", { name: "Forgot your password?" })
-    ).toBeNull();
-    cleanup();
-    setup(ready({ canSetPassword: false }));
-    await screen.findByRole("button", { name: "Forgot your password?" });
-    expect(
-      screen.queryByRole("button", { name: "Set a new password" })
-    ).toBeNull();
-  });
+  it.each([
+    ["forgot the password", true],
+    ["may not set the first one here", false],
+  ])(
+    "sends someone without email who %s to an admin",
+    async (_, authProtected) => {
+      setup(
+        ready({ authProtected, hasEmail: false, canSetPassword: false }),
+        undefined,
+        false
+      );
+
+      expect(
+        await screen.findByText(/Ask an admin for a password link/)
+      ).toBeTruthy();
+      expect(
+        screen.queryByRole("button", { name: /Set a .*password/ })
+      ).toBeNull();
+    }
+  );
 
   it("changes the password with the current one", async () => {
     const { calls, reload } = setup(ready());

@@ -505,6 +505,13 @@
       "when": 1795622904146,
       "tag": "0071_event_proxy_joins",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "6",
+      "when": 1795766418518,
+      "tag": "0072_drop_password_set_at",
+      "breakpoints": true
     }
   ]
 }

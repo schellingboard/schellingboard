@@ -190,7 +190,7 @@ export const credentialsSchema = z.object({
   canSetPassword: z
     .boolean()
     .describe(
-      "Whether this login may set the password without the old one: a verified one for a name with none, or a join-link one where no mail can reset it"
+      "Whether this login may set the first password: a verified one, for a name with none that is no site admin"
     ),
 });
 
@@ -204,6 +204,6 @@ export const joinResultSchema = z.object({
   joined: z
     .boolean()
     .describe(
-      "False when the guest set a password after the link was made: sign in as them, then send the token again. Nothing changed."
+      "False when the guest has a password or is a site admin: sign in as them, then send the token again. Nothing changed."
     ),
 });

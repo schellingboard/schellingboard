@@ -33,6 +33,7 @@ import {
   loginAsAdmin,
   updateEventAction,
 } from "../helpers/admin-api";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
 import {
@@ -379,6 +380,43 @@ describe("login and join screens for a proxy person", () => {
         "X-Forwarded-Email": EMAIL,
         cookie,
       });
+      expect(admin.status).toBe(200);
+    }
+  );
+
+  it(
+    "gives a new site admin admin rights through a password link",
+    { tags: ["025-US2", "016-US6"] },
+    async () => {
+      const ada = await adminGuest();
+      await configure({ siteAdmins: false });
+      const link = await request(
+        `/api/v1/admin/guests/${ada.id}/password-link`,
+        {
+          cookie: await createAdminAuthCookie().then(
+            (c) => `${c.name}=${c.value}`
+          ),
+        },
+        { method: "POST" }
+      );
+      const { token } = (await link.json()) as { token: string };
+
+      const set = await post("/api/v1/auth/reset", {
+        guestId: ada.id,
+        token,
+        newPassword: "correct horse",
+      });
+      expect(set.status).toBe(204);
+      const res = await post("/api/v1/auth/login", {
+        guestId: ada.id,
+        credential: "correct horse",
+      });
+      const cookie = (res.headers.get("set-cookie") ?? "").split(";")[0];
+      const admin = await request("/api/v1/admin/guests", {
+        "X-Forwarded-Email": EMAIL,
+        cookie,
+      });
+
       expect(admin.status).toBe(200);
     }
   );
