@@ -144,7 +144,9 @@ describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
       path: "/conf/meetings?viewMeeting=m1",
     });
     expect(await screen.findByText(/Select your name/i)).toBeTruthy();
-    expect(router.history.location.pathname).toBe("/conf/meetings/m1");
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/conf/meetings/m1")
+    );
   });
 
   it("asks for the password when the chosen name is protected", async () => {
