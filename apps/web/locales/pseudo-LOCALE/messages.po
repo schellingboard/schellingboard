@@ -4916,6 +4916,19 @@ msgstr ""
 msgid "People who sent requests, people who got them, and people with at least one accepted meeting."
 msgstr ""
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "People who sign in through the proxy join no event yet. Turn this on in an event's settings."
+msgstr ""
+
+#. placeholder {0}: joinedEvents.join(", ")
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "People who sign in through the proxy join these events: {0}. Change this in each event's settings."
+msgstr ""
+
+#: src/features/admin/event-config.tsx
+msgid "People who sign in through the proxy join this event"
+msgstr ""
+
 #: src/features/admin/stats-text.ts
 msgid "People with RSVPs"
 msgstr ""

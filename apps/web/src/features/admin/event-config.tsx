@@ -76,6 +76,7 @@ const detailsOf = (event: AdminEvent) => ({
   slotIncrementMinutes: String(event.slotIncrementMinutes),
   rsvpCapacityHardLimit: event.rsvpCapacityHardLimit,
   identityMode: event.identityMode,
+  proxyJoins: event.proxyJoins,
   icon: event.icon && isEventIconName(event.icon) ? event.icon : "",
 });
 
@@ -237,6 +238,12 @@ function DetailsForm({
         name="rsvpCapacityHardLimit"
         checked={form.rsvpCapacityHardLimit}
         onChange={setField("rsvpCapacityHardLimit")}
+      />
+      <CheckboxField
+        label={t`People who sign in through the proxy join this event`}
+        name="proxyJoins"
+        checked={form.proxyJoins}
+        onChange={setField("proxyJoins")}
       />
       <div className="flex flex-col gap-1">
         <span className="font-medium">

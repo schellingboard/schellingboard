@@ -35,6 +35,12 @@ export const eventSettingsBodySchema = z.object({
     .describe(`One of ${SLOT_INCREMENT_OPTIONS.join(", ")}`),
   rsvpCapacityHardLimit: z.boolean().default(false),
   icon: z.enum(EVENT_ICON_NAMES).nullable().optional(),
+  proxyJoins: z
+    .boolean()
+    .optional()
+    .describe(
+      "People who sign in through the proxy join this event. Omitted: unchanged on edit, off on create"
+    ),
   identityMode: z
     .enum(IDENTITY_MODES)
     .optional()
@@ -74,6 +80,7 @@ export const eventViewSchema = z
     slotIncrementMinutes: z.number().int(),
     rsvpCapacityHardLimit: z.boolean(),
     icon: z.string().nullable(),
+    proxyJoins: z.boolean(),
     identityMode: z.enum(IDENTITY_MODES),
     readAccess: z.enum(READ_ACCESS),
     meetingsEnabled: z.boolean(),

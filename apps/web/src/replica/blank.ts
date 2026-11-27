@@ -21,6 +21,7 @@ export function blankSnapshot(now: string): Snapshot {
       slotIncrementMinutes: 0,
       rsvpCapacityHardLimit: false,
       icon: null,
+      proxyJoins: false,
       identityMode: "open",
       readAccess: "public",
       meetingsEnabled: false,

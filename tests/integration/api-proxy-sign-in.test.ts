@@ -21,6 +21,11 @@ import { makePerson } from "@/server/kernel/make-person";
 import { hashProxySecret } from "@/server/kernel/proxy-sign-in";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 
+import {
+  createEventAction,
+  loginAsAdmin,
+  updateEventAction,
+} from "../helpers/admin-api";
 import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
 import {
@@ -652,5 +657,91 @@ describe("the proxy sign-in settings", { tags: ["025-US1"] }, () => {
       })
     );
     expect(res.status).toBe(403);
+  });
+});
+
+describe("events the proxy people join", { tags: ["025-US1"] }, () => {
+  beforeEach(() => vi.stubEnv("SITE_PASSWORD", ""));
+
+  const headers = { "X-Forwarded-Email": EMAIL };
+  const eventIdsOf = async (guestId: string) =>
+    (await getRepositories().guests.listEventsByGuests([guestId]))
+      .get(guestId)
+      ?.map((e) => e.id) ?? [];
+  const identity = async () =>
+    (await (await request("/api/v1/me/identity", headers)).json()) as {
+      guestId: string;
+    };
+
+  it("adds a new person to the events with the switch on, and only once", async () => {
+    const joined = await createEvent({ proxyJoins: true });
+    await createEvent();
+    await configure({ createPeople: true });
+
+    const { guestId } = await identity();
+    expect(await eventIdsOf(guestId)).toEqual([joined.id]);
+
+    await getRepositories().guests.removeFromEvent(joined.id, [guestId]);
+    await identity();
+    expect(await eventIdsOf(guestId)).toEqual([]);
+  });
+
+  it("adds an existing person when the switch is turned on", async () => {
+    const guest = await createGuest({ email: EMAIL });
+    const event = await createEvent();
+    await configure();
+    await identity();
+    expect(await eventIdsOf(guest.id)).toEqual([]);
+
+    await loginAsAdmin();
+    const fields = {
+      name: event.name,
+      description: "",
+      website: "",
+      timezone: "UTC",
+      maxSessionDuration: "120",
+      breakMinutes: "10",
+      slotIncrementMinutes: "30",
+    };
+    const updated = await updateEventAction({
+      ...fields,
+      id: event.id,
+      expectedVersion: event.version,
+      proxyJoins: true,
+    });
+    expect(updated.ok).toBe(true);
+    await identity();
+    expect(await eventIdsOf(guest.id)).toEqual([event.id]);
+
+    await getRepositories().guests.removeFromEvent(event.id, [guest.id]);
+    for (const [step, proxyJoins] of [false, true].entries())
+      await updateEventAction({
+        ...fields,
+        id: event.id,
+        expectedVersion: event.version + 1 + step,
+        proxyJoins,
+      });
+    await identity();
+    expect(await eventIdsOf(guest.id)).toEqual([event.id]);
+  });
+
+  it("adds a known person to an event made with the switch on", async () => {
+    const guest = await createGuest({ email: EMAIL });
+    await configure();
+    await identity();
+
+    await loginAsAdmin();
+    await createEventAction({
+      name: "New one",
+      description: "",
+      website: "",
+      timezone: "UTC",
+      maxSessionDuration: "120",
+      breakMinutes: "10",
+      slotIncrementMinutes: "30",
+      proxyJoins: true,
+    });
+    await identity();
+    expect(await eventIdsOf(guest.id)).toHaveLength(1);
   });
 });

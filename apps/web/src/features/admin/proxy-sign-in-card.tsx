@@ -170,10 +170,12 @@ export function ProxySignInCard({
   settings,
   calls,
   onChanged,
+  joinedEvents,
 }: {
   settings: ProxySignInSettings;
   calls: AdminProxySignInCalls;
   onChanged: () => void;
+  joinedEvents?: string[];
 }) {
   const [enabled, setEnabled] = useState(settings.enabled);
   const [headerName, setHeaderName] = useState(settings.headerName);
@@ -306,6 +308,21 @@ export function ProxySignInCard({
             hint={t`Optional, for example Remote-Name. Empty uses the part of the email before the @.`}
             error={fields.nameHeader}
           />
+        )}
+        {joinedEvents && (
+          <p className="text-sm text-fg-muted">
+            {joinedEvents.length > 0 ? (
+              <Trans>
+                People who sign in through the proxy join these events:{" "}
+                {joinedEvents.join(", ")}. Change this in each event's settings.
+              </Trans>
+            ) : (
+              <Trans>
+                People who sign in through the proxy join no event yet. Turn
+                this on in an event's settings.
+              </Trans>
+            )}
+          </p>
         )}
         <FormErrorSummary
           fields={fields}

@@ -29,6 +29,7 @@ export const snapshot: Snapshot = {
     slotIncrementMinutes: 30,
     rsvpCapacityHardLimit: false,
     icon: null,
+    proxyJoins: false,
     identityMode: "open",
     readAccess: "public",
     meetingsEnabled: false,

@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Public demo**: try SchellingBoard with sample data at demo.schellingboard.org, reset daily.
 - **Sign in through a proxy**: sites behind an SSO proxy (oauth2-proxy, Authelia) sign people in by
   their email: no name picker or code, and Log out leads to the proxy. Organizers set it up in
-  Settings. Unknown emails can become new people.
+  Settings. Unknown emails can become new people, and each event can add everyone from the proxy.
 
 ### Changed
 

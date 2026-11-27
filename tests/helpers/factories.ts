@@ -32,6 +32,7 @@ export async function createEvent(opts?: {
   slotIncrementMinutes?: number;
   rsvpCapacityHardLimit?: boolean;
   identityMode?: "open" | "verified";
+  proxyJoins?: boolean;
 }): Promise<Event> {
   const { events } = getRepositories();
   const now = new Date();
@@ -84,6 +85,7 @@ export async function createEvent(opts?: {
     timezone: "UTC",
     rsvpCapacityHardLimit: opts?.rsvpCapacityHardLimit ?? false,
     identityMode: opts?.identityMode,
+    proxyJoins: opts?.proxyJoins ?? false,
   });
 }
 
