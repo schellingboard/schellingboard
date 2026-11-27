@@ -227,7 +227,6 @@ export function sortOptions(
 export function phaseTexts(
   event: Snapshot["event"],
   now: Date,
-  signedIn: boolean,
   localZone: string | null
 ): { proposing: string; voting: string; scheduling: string } {
   const e = toEvent(event);
@@ -237,20 +236,14 @@ export function phaseTexts(
   const schedulingAt = at(e.schedulingPhaseStart);
   const scheduling = inSchedPhase(e, now);
   return {
-    proposing: scheduling
-      ? t`Proposal and voting phases are over`
-      : signedIn
-        ? ""
-        : t`Select a user first`,
+    proposing: scheduling ? t`Proposal and voting phases are over` : "",
     voting: scheduling
       ? t`The voting phase is over`
       : inProposalPhase(e, now)
         ? votingAt
           ? t`Voting will be enabled at ${votingAt}`
           : t`Voting is not enabled`
-        : signedIn
-          ? ""
-          : t`Select a user first`,
+        : "",
     scheduling: schedulingAt
       ? t`Scheduling will be enabled at ${schedulingAt}`
       : t`Scheduling is not enabled`,

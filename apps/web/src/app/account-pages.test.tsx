@@ -263,7 +263,7 @@ describe("the settings page", { tags: ["013-US5"] }, () => {
       identity: null,
     });
 
-    expect(await screen.findByText(/select who you are/)).toBeTruthy();
+    expect(await screen.findByText(/Select your name/)).toBeTruthy();
     expect(
       screen.getByRole("heading", { name: "Appearance (this device)" })
     ).toBeTruthy();
@@ -323,6 +323,6 @@ describe("the notifications page", { tags: ["013-US2"] }, () => {
       identity: null,
     });
 
-    expect(await screen.findByText(/select who you are/)).toBeTruthy();
+    expect(await screen.findByText(/Select your name/)).toBeTruthy();
   });
 });

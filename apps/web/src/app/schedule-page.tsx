@@ -87,10 +87,9 @@ function Loaded(view: EventView) {
     () => open({ kind: "event", slug }),
     [open, slug]
   );
-  const { actions, picker } = useScheduleActions(view);
+  const { actions } = useScheduleActions(view);
   return (
     <>
-      {picker}
       <ScheduleScreen
         actions={actions}
         clashes={clashes}

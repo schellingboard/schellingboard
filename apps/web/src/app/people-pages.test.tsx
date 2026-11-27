@@ -256,7 +256,7 @@ describe("the edit-profile page", { tags: ["011-US1"] }, () => {
   it("asks to select a name first", async () => {
     await open({ handler: answers, path: "/guests/edit", identity: null });
 
-    expect(await screen.findByText(/select who you are/)).toBeTruthy();
+    expect(await screen.findByText(/Select your name/)).toBeTruthy();
   });
 
   it("asks to log in when the chosen name is protected", async () => {

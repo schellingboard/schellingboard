@@ -85,6 +85,8 @@ test("settings page asks to select a name when none is chosen @013-US5", async (
   await login(page);
   await page.goto("/settings");
 
-  await expect(page.getByText(/select who you are/i)).toBeVisible();
+  await expect(
+    page.getByText("Select your name to change your settings.")
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Settings" })).toHaveCount(0);
 });

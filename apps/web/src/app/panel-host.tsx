@@ -146,7 +146,7 @@ function MeetingHost({
     [snapshot, now, timeFormat]
   );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
-  const { actions, picker } = useScheduleActions(view);
+  const { actions } = useScheduleActions(view);
   const onBack = depth > 1 ? back : undefined;
   if (!data.guestId)
     return (
@@ -158,7 +158,6 @@ function MeetingHost({
     );
   return (
     <>
-      {picker}
       <MeetingPanel
         meeting={data.meetings.find((m) => m.id === item.id)}
         now={now}
@@ -189,7 +188,7 @@ function SessionHost({
     [snapshot, now, timeFormat]
   );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
-  const { actions, picker } = useScheduleActions(view);
+  const { actions } = useScheduleActions(view);
   const params = useMemo(
     () => new URLSearchParams(item.record ? { record: "count" } : undefined),
     [item.record]
@@ -206,7 +205,6 @@ function SessionHost({
         setHash,
       }}
     >
-      {picker}
       <SessionPanel
         sessionId={item.id}
         onClose={close}

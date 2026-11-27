@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 import { login, loginAndGoto } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
-import { selectUser } from "./helpers/user";
+import { openNameSwitcher, selectUser } from "./helpers/user";
 
 // Parallel tests add proposals above this one, and a row that moves between
 // mouse down and up is not clicked. Searching keeps the others out; the sort
@@ -643,4 +643,62 @@ test("a host asks for a co-host and a volunteer joins @004-US6 @004-US7", async 
   await modal.getByRole("button", { name: /close/i }).click();
   await expect(hostWanted).toHaveAttribute("aria-pressed", "true");
   await expect(row).toHaveCount(0);
+});
+
+test("Add Proposal asks for a name, then opens the form, at phone width @004-US1", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await login(page);
+  await page.goto("/Hackathon/proposals");
+
+  await page.getByRole("link", { name: /Add Proposal/i }).click();
+  await page.getByLabel("My name is:").fill("Bob Test");
+  await page.getByRole("option", { name: /Bob Test/i }).click();
+
+  await expect(
+    page.getByRole("dialog", { name: "Session proposal form" })
+  ).toBeVisible();
+});
+
+test("picking a name in the header keeps the open proposal @003-US1", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Hackathon/proposals");
+  const title = "Hands-on Docker and Kubernetes";
+  await searchList(page, title);
+  await page.getByRole("link", { name: title }).click();
+  const panel = page.getByRole("dialog", { name: "Proposal details" });
+  await expect(panel.getByRole("heading", { name: title })).toBeVisible();
+  const address = page.url();
+  await page.reload();
+  await expect(panel.getByRole("heading", { name: title })).toBeVisible();
+
+  await selectUser(page, /Bob Test/i);
+
+  await expect(panel.getByRole("heading", { name: title })).toBeVisible();
+  expect(page.url()).toBe(address);
+});
+
+test("picking a protected name on an open proposal returns to that proposal after signing in @003-US4", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Hackathon/proposals");
+  const title = "Hands-on Docker and Kubernetes";
+  await searchList(page, title);
+  await page.getByRole("link", { name: title }).click();
+  const panel = page.getByRole("dialog", { name: "Proposal details" });
+  await expect(panel.getByRole("heading", { name: title })).toBeVisible();
+  const address = page.url();
+
+  const nameBox = await openNameSwitcher(page);
+  await nameBox.fill("Sofía");
+  await page.getByRole("option", { name: /Sofía Martínez/ }).click();
+  await page.getByLabel("Password or emailed code").fill("schelling");
+  await page.getByRole("button", { name: "Log in" }).click();
+
+  await expect(page).toHaveURL(address);
+  await expect(panel.getByRole("heading", { name: title })).toBeVisible();
 });

@@ -143,7 +143,7 @@ describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
       identity: null,
       path: "/conf/meetings?viewMeeting=m1",
     });
-    expect(await screen.findByText(/select who you are/i)).toBeTruthy();
+    expect(await screen.findByText(/Select your name/i)).toBeTruthy();
     expect(router.history.location.pathname).toBe("/conf/meetings/m1");
   });
 

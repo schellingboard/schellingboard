@@ -216,33 +216,31 @@ test("votes from two users persist independently across reloads @005-US1", async
   );
 });
 
-test("should show voting disabled state when not logged in as a user @005-US1", async ({
+test("voting without a name opens the name picker, then votes once one is chosen @005-US1", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Open-Source-Summit/proposals");
 
-  // Find the first proposal row (skip header)
-  const firstProposalRow = page.getByRole("row").nth(1);
-  await expect(firstProposalRow).toBeVisible();
+  // Not the first row: the voting-phase sort puts proposals other tests have
+  // just created there, and voting on them breaks those tests.
+  const row = page.getByRole("row", { name: /Building Inclusive Tech Teams/ });
+  await expect(row).toBeVisible();
+  const interested = row.getByRole("button", { name: "❤️" });
 
-  // Quick voting is offered but unavailable, and says why on hover.
-  const quickVotingLink = page.getByRole("link", {
-    name: /Go to Quick Voting!/i,
-  });
-  await expect(quickVotingLink).toHaveClass(/opacity-50|cursor-not-allowed/);
-  await expect(quickVotingLink).toHaveAttribute("aria-disabled", "true");
+  await interested.click();
+  await page.getByLabel("My name is:").fill("Alice Test");
+  await page.getByRole("option", { name: /Alice Test/i }).click();
 
-  // Without a name selected there is nobody to vote as, so the per-proposal
-  // vote buttons are not rendered at all.
   await expect(
-    firstProposalRow.getByRole("button", { name: "❤️" })
-  ).toHaveCount(0);
-  await expect(
-    firstProposalRow.getByRole("button", { name: "⭐" })
-  ).toHaveCount(0);
-  await expect(
-    firstProposalRow.getByRole("button", { name: "👋🏽" })
-  ).toHaveCount(0);
+    page.getByRole("button", { name: "Your name: Alice Test" })
+  ).toBeVisible();
+  // Other specs vote on shared seed rows in parallel, so only the change is certain.
+  const before = await interested.getAttribute("aria-pressed");
+  await interested.click();
+  await expect(interested).toHaveAttribute(
+    "aria-pressed",
+    before === "true" ? "false" : "true"
+  );
 });
 
 // Web Unconference is in the scheduling phase, where the vote breakdown is

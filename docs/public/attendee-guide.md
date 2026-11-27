@@ -126,12 +126,15 @@ organizers included.
 
 ### Why the vote buttons are greyed out
 
-Greyed-out buttons mean voting isn't available to you _right now_. Hover one to see why:
+Greyed-out buttons mean voting isn't available _right now_. Hover one to see why:
 
 - **"Voting will be enabled at …"** — still the proposal phase. Add and discuss proposals now; come
   back when voting opens.
-- **"Select a user first"** — you haven't picked your name yet.
 - **"The voting phase is over"** — scheduling has started, and vote counts are visible now.
+
+Without a name, the buttons stay active: pressing one, or **Add Proposal**, opens the name picker.
+After you pick your name, **Add Proposal** carries on to the form; press a vote button again to
+vote.
 
 ## The schedule
 

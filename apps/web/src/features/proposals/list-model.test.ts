@@ -224,41 +224,24 @@ describe("the phase texts", () => {
   const at = new Date(iso(10));
 
   it("explains why voting is unavailable", () => {
-    expect(phaseTexts(proposing, at, true, "UTC").voting).toMatch(
+    expect(phaseTexts(proposing, at, "UTC").voting).toMatch(
       /^Voting will be enabled at /
     );
     expect(
       phaseTexts(
         event({ votingPhaseStart: iso(0), schedulingPhaseStart: iso(5) }),
         at,
-        true,
         "UTC"
       ).voting
     ).toBe("The voting phase is over");
-    expect(
-      phaseTexts(
-        event({
-          votingPhaseStart: iso(0),
-          votingPhaseEnd: iso(20),
-          schedulingPhaseStart: iso(20),
-        }),
-        at,
-        false,
-        "UTC"
-      ).voting
-    ).toBe("Select a user first");
   });
 
   it("explains why scheduling and proposing are unavailable", () => {
-    expect(phaseTexts(proposing, at, true, "UTC").scheduling).toMatch(
+    expect(phaseTexts(proposing, at, "UTC").scheduling).toMatch(
       /^Scheduling will be enabled at /
     );
-    expect(phaseTexts(proposing, at, false, "UTC").proposing).toBe(
-      "Select a user first"
-    );
     expect(
-      phaseTexts(event({ schedulingPhaseStart: iso(5) }), at, true, "UTC")
-        .proposing
+      phaseTexts(event({ schedulingPhaseStart: iso(5) }), at, "UTC").proposing
     ).toBe("Proposal and voting phases are over");
   });
 });

@@ -14,6 +14,10 @@ import { type ProposalDetailState } from "../../queries/proposal-detail";
 import { createObservable } from "../../queries/store";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
+import {
+  type RequireIdentity,
+  RequireIdentityProvider,
+} from "../../ui/require-identity";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { proposalLinks } from "./links";
 import { type ProposalActions, ProposalPanel } from "./proposal-panel";
@@ -103,24 +107,28 @@ function setup(
     comments: vi.fn(() => fakeComments([comment("c1")])),
   } satisfies ProposalActions;
   const onClose = vi.fn();
+  const requireIdentity = vi.fn<RequireIdentity>();
   const element = (current: Snapshot) => (
     <NoticeProvider>
-      <ProposalPanel
-        proposalId="p"
-        snapshot={current}
-        now={new Date(iso(10))}
-        localZone="UTC"
-        links={proposalLinks("conf")}
-        actions={actions}
-        setHash={() => {}}
-        onClose={onClose}
-      />
+      <RequireIdentityProvider value={requireIdentity}>
+        <ProposalPanel
+          proposalId="p"
+          snapshot={current}
+          now={new Date(iso(10))}
+          localZone="UTC"
+          links={proposalLinks("conf")}
+          actions={actions}
+          setHash={() => {}}
+          onClose={onClose}
+        />
+      </RequireIdentityProvider>
     </NoticeProvider>
   );
   const { rerender } = render(element(snapshot));
   return {
     actions,
     onClose,
+    requireIdentity,
     refresh,
     update: (next: Partial<Snapshot>) =>
       rerender(element({ ...snapshot, ...next })),
@@ -216,18 +224,19 @@ describe("voting in the modal", () => {
   });
 
   it(
-    "says why voting is unavailable, on a tap",
+    "asks for a name on a vote without one",
     { tags: ["006-US2"] },
     async () => {
-      setup("voting", { patch: { me: null } });
+      const { actions, requireIdentity } = setup("voting", {
+        patch: { me: null },
+      });
       const button = dialog().getByRole("button", { name: /❤️ Interested/ });
 
-      expect(button.getAttribute("aria-disabled")).toBe("true");
       await userEvent.click(button);
 
-      expect(screen.getAllByRole("status").map((s) => s.textContent)).toContain(
-        "Select a user first" + "Dismiss"
-      );
+      expect(button.getAttribute("aria-disabled")).toBeNull();
+      expect(actions.vote).not.toHaveBeenCalled();
+      expect(requireIdentity).toHaveBeenCalledTimes(1);
     }
   );
 });
@@ -380,16 +389,18 @@ describe("taking on a proposal that wants a host", () => {
     ).toBeTruthy();
   });
 
-  it("needs a user, and says so", { tags: ["004-US6"] }, async () => {
-    const { actions } = setup("voting", { p: wanted, patch: { me: null } });
-    const join = dialog().getByRole("button", { name: "Host this proposal" });
+  it("asks for a name first", { tags: ["004-US6"] }, async () => {
+    const { actions, requireIdentity } = setup("voting", {
+      p: wanted,
+      patch: { me: null },
+    });
 
-    await userEvent.click(join);
+    await userEvent.click(
+      dialog().getByRole("button", { name: "Host this proposal" })
+    );
 
     expect(actions.join).not.toHaveBeenCalled();
-    expect(
-      screen.getAllByRole("status").map((s) => s.textContent?.trim())
-    ).toContain("Select a user first" + "Dismiss");
+    expect(requireIdentity).toHaveBeenCalledTimes(1);
   });
 
   it(

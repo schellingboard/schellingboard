@@ -252,7 +252,7 @@ describe("a new proposal", { tags: ["004-US1"] }, () => {
   it("asks who you are when nobody is chosen", () => {
     setup(undefined, { patch: { me: null } });
 
-    expect(screen.getByText(/select who you are/)).toBeTruthy();
+    expect(screen.getByText(/Select your name/)).toBeTruthy();
     expect(screen.queryByLabelText(/Title/)).toBeNull();
   });
 

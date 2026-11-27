@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { claimSession } from "../commands/claim-session";
 import { newKey } from "../commands/keys";
@@ -15,22 +15,19 @@ import type { ScheduleActions } from "../features/schedule/context";
 import { attendeeCountApi } from "../queries/attendee-count";
 import { createAttendeesQuery } from "../queries/attendees";
 import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
+import { useRequireIdentity } from "../ui/require-identity";
 import type { EventView } from "./event-page";
 import { likerFrom, useCommentSource } from "./use-comment-actions";
-import { NamePicker } from "./user-menu";
-import { useViewer } from "./viewer";
 
-/** What the schedule's controls do, and the name picker an RSVP may need. */
+/** What the schedule's controls do. */
 export function useScheduleActions({ api, runner, snapshot }: EventView): {
   actions: ScheduleActions;
-  picker: ReactNode;
 } {
-  const viewer = useViewer();
-  const [picking, setPicking] = useState(false);
+  const requireIdentity = useRequireIdentity();
   const openComments = useCommentSource(api, runner, likerFrom(snapshot));
   const actions = useMemo<ScheduleActions>(
     () => ({
-      pickName: () => setPicking(true),
+      pickName: () => requireIdentity(),
       toggleRsvp: async (sessionId, withdraw) => {
         await runner.run(withdraw ? removeRsvp : addRsvp, { sessionId });
       },
@@ -66,15 +63,7 @@ export function useScheduleActions({ api, runner, snapshot }: EventView): {
       meetingRequest: meetingRequestCalls(api),
       comments: (sessionId) => openComments({ kind: "session", id: sessionId }),
     }),
-    [runner, api, openComments, snapshot.event.id]
+    [runner, api, openComments, snapshot.event.id, requireIdentity]
   );
-  const picker = (
-    <NamePicker
-      open={picking}
-      onClose={() => setPicking(false)}
-      guests={snapshot.guests}
-      choose={viewer.choose}
-    />
-  );
-  return { actions, picker };
+  return { actions };
 }

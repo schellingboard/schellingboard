@@ -151,11 +151,13 @@ export function UserMenu({
 export function NamePicker({
   open,
   onClose,
+  onChosen,
   guests,
   choose,
 }: {
   open: boolean;
   onClose: () => void;
+  onChosen?: () => void;
   guests: PickableGuest[];
   choose: Viewer["choose"];
 }) {
@@ -182,9 +184,16 @@ export function NamePicker({
   const pick = async (guest: PickableGuest) => {
     setError(null);
     const result = await choose(guest.id);
-    if (result.ok) return onClose();
+    if (result.ok) {
+      onClose();
+      return onChosen?.();
+    }
     if (result.code === "guest.protected")
-      return hardNavigate(`/auth/login?guest=${guest.id}`);
+      return hardNavigate(
+        `/auth/login?guest=${guest.id}&redirect=${encodeURIComponent(
+          location.pathname + location.search + location.hash
+        )}`
+      );
     setError(msg`Could not select that name — try again`);
   };
 

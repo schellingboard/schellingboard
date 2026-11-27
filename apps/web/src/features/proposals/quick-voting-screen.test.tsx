@@ -8,6 +8,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
+import {
+  type RequireIdentity,
+  RequireIdentityProvider,
+} from "../../ui/require-identity";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { proposalLinks } from "./links";
 import { QuickVotingScreen } from "./quick-voting-screen";
@@ -74,24 +78,28 @@ function setup(
   standingsStatus: "idle" | "loading" | "ready" | "error" = "ready"
 ) {
   const onVote = vi.fn();
+  const requireIdentity = vi.fn<RequireIdentity>();
   const openComments = vi.fn(() => fakeComments([comment("c1")]));
   const element = (snapshot: Snapshot) => (
     <NoticeProvider>
-      <QuickVotingScreen
-        snapshot={snapshot}
-        links={proposalLinks("conf")}
-        now={new Date(iso(10))}
-        localZone="UTC"
-        standings={standings}
-        standingsStatus={standingsStatus}
-        onVote={onVote}
-        comments={openComments}
-      />
+      <RequireIdentityProvider value={requireIdentity}>
+        <QuickVotingScreen
+          snapshot={snapshot}
+          links={proposalLinks("conf")}
+          now={new Date(iso(10))}
+          localZone="UTC"
+          standings={standings}
+          standingsStatus={standingsStatus}
+          onVote={onVote}
+          comments={openComments}
+        />
+      </RequireIdentityProvider>
     </NoticeProvider>
   );
   const { rerender } = render(element(snapshotOf(phase, patch)));
   return {
     onVote,
+    requireIdentity,
     openComments,
     update: (next: Partial<Snapshot>) =>
       rerender(element(snapshotOf(phase, { ...patch, ...next }))),
@@ -193,10 +201,14 @@ describe("quick voting", () => {
     expect(screen.queryByRole("button", { name: /❤️ Interested/ })).toBeNull();
   });
 
-  it("asks a signed-out viewer to choose who they are", () => {
-    setup("voting", { me: null });
+  it("offers a signed-out viewer to select their name", async () => {
+    const { requireIdentity } = setup("voting", { me: null });
 
-    expect(screen.getByText("Please choose who you are first.")).toBeTruthy();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Select your name to vote" })
+    );
+
+    expect(requireIdentity).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("button", { name: /❤️ Interested/ })).toBeNull();
   });
 

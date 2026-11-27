@@ -342,9 +342,7 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
   it("asks who you are first when nobody is selected", () => {
     setup({ patch: { me: null } });
 
-    expect(
-      screen.getByText(/select who you are before adding a session/)
-    ).toBeTruthy();
+    expect(screen.getByText(/Select your name to add a session/)).toBeTruthy();
     expect(screen.queryByLabelText(/Session title/)).toBeNull();
   });
 });

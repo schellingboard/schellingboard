@@ -9,6 +9,7 @@ import type {
   StandingsState,
 } from "../../queries/proposal-standings";
 import { ownVotesFrom, proposalsFrom, toEvent } from "../../replica/selectors";
+import { useRequireIdentity } from "../../ui/require-identity";
 import { Comments, type CommentsHandle } from "../comments/comments-section";
 import type { ProposalLinks } from "./links";
 import { phaseTexts } from "./list-model";
@@ -43,6 +44,7 @@ export function QuickVotingScreen({
   comments,
 }: QuickVotingProps) {
   const guestId = snapshot.me?.guestId ?? null;
+  const requireIdentity = useRequireIdentity();
   const [shownId, setShownId] = useState<string | null>(null);
   const back = (
     <a href={links.proposals} className={BACK}>
@@ -53,9 +55,13 @@ export function QuickVotingScreen({
     return (
       <div className="mx-auto max-w-2xl px-4">
         {back}
-        <div className="mt-6">
-          <Trans>Please choose who you are first.</Trans>
-        </div>
+        <button
+          type="button"
+          onClick={() => requireIdentity()}
+          className="mt-6 inline-flex items-center rounded-md bg-brand px-4 py-2 font-medium text-on-brand transition-colors hover:bg-brand-hover"
+        >
+          <Trans>Select your name to vote</Trans>
+        </button>
       </div>
     );
 
@@ -77,7 +83,7 @@ export function QuickVotingScreen({
   const votedCount = votable.filter((p) => votes.has(p.id)).length;
   const votableCount = votable.length;
   const eventName = snapshot.event.name;
-  const texts = phaseTexts(snapshot.event, now, true, localZone);
+  const texts = phaseTexts(snapshot.event, now, localZone);
   const votingEnabled = inVotingPhase(toEvent(snapshot.event), now);
 
   return (

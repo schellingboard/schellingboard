@@ -184,7 +184,7 @@ describe("UserMenu", () => {
     });
   });
 
-  it("sends a protected name to the legacy login", async () => {
+  it("sends a protected name to the login, which returns to this page", async () => {
     const { user, choose } = setup({
       choose: vi
         .fn<Choose>()
@@ -195,7 +195,11 @@ describe("UserMenu", () => {
     await user.click(screen.getByRole("option", { name: /Grace/ }));
 
     expect(choose).toHaveBeenCalledWith("g2");
-    expect(hardNavigate).toHaveBeenCalledWith("/auth/login?guest=g2");
+    expect(hardNavigate).toHaveBeenCalledWith(
+      `/auth/login?guest=g2&redirect=${encodeURIComponent(
+        location.pathname + location.search + location.hash
+      )}`
+    );
   });
 
   it("says so when the name cannot be chosen", async () => {

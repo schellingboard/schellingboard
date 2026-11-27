@@ -2,6 +2,7 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import {
+  act,
   cleanup,
   render,
   screen,
@@ -15,6 +16,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
+import {
+  type RequireIdentity,
+  RequireIdentityProvider,
+} from "../../ui/require-identity";
 import { proposalLinks } from "./links";
 import { ProposalsScreen } from "./proposals-screen";
 
@@ -73,6 +78,7 @@ function setup(
 ) {
   const onVote = vi.fn();
   const onOpenDetails = vi.fn();
+  const requireIdentity = vi.fn<RequireIdentity>();
   const onParamsChange =
     vi.fn<(params: URLSearchParams, options?: { push?: boolean }) => void>();
   const snapshot: Snapshot = {
@@ -105,11 +111,14 @@ function setup(
   }
   render(
     <NoticeProvider>
-      <Page />
+      <RequireIdentityProvider value={requireIdentity}>
+        <Page />
+      </RequireIdentityProvider>
     </NoticeProvider>
   );
   return {
     onVote,
+    requireIdentity,
     onOpenDetails,
     onParamsChange,
     table: screen.queryByRole("table") as HTMLElement,
@@ -440,18 +449,46 @@ describe("the proposals list", () => {
     expect(screen.getByRole("status").textContent).toMatch(/Voting/);
   });
 
-  it("keeps a filter that has no reason to give inert and silent", async () => {
-    setup("scheduling", { me: null });
+  it("asks for a name when a filter needs one, then applies it", async () => {
+    const { requireIdentity, onParamsChange } = setup("scheduling", {
+      me: null,
+    });
     const filter = screen.getByRole("button", {
       name: "Filter to show only your proposals",
     });
 
     await userEvent.click(filter);
 
-    expect(filter.getAttribute("aria-pressed")).toBe("false");
-    expect(screen.getByRole("status").textContent).toContain(
-      "Select a user first"
+    expect(filter.getAttribute("aria-disabled")).toBeNull();
+    expect(requireIdentity).toHaveBeenCalledTimes(1);
+    expect(onParamsChange).not.toHaveBeenCalled();
+    act(() => requireIdentity.mock.calls[0][0]?.());
+    expect(onParamsChange.mock.calls[0][0].get("filter")).toBe("mine");
+  });
+
+  it("asks for a name when a vote or Add Proposal needs one", async () => {
+    const { onVote, requireIdentity, table } = setup("voting", { me: null });
+
+    await userEvent.click(
+      within(within(table).getByRole("row", { name: /Cooking/ })).getByRole(
+        "button",
+        { name: "❤️" }
+      )
     );
+    expect(onVote).not.toHaveBeenCalled();
+    expect(requireIdentity).toHaveBeenCalledTimes(1);
+    expect(requireIdentity.mock.calls[0][0]).toBeUndefined();
+
+    const add = screen.getByRole("link", { name: "Add Proposal" });
+    expect(add.getAttribute("aria-disabled")).toBeNull();
+    const followed = vi.fn<(e: Event) => void>();
+    add.addEventListener("click", followed);
+    await userEvent.click(add);
+    expect(requireIdentity).toHaveBeenCalledTimes(2);
+    expect(followed).toHaveBeenCalledTimes(1);
+    expect(followed.mock.calls[0][0].defaultPrevented).toBe(true);
+    act(() => requireIdentity.mock.calls[1][0]?.());
+    expect(followed).toHaveBeenCalledTimes(2);
   });
 
   it("lets a guest vote, change and withdraw, but not on their own proposal", async () => {

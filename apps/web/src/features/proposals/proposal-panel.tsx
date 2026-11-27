@@ -22,6 +22,7 @@ import {
 } from "../../replica/selectors";
 import { CopyLinkButton } from "../../ui/copy-link-button";
 import { CalendarIcon, HandRaisedIcon, PencilIcon } from "../../ui/icons";
+import { useRequireIdentity } from "../../ui/require-identity";
 import { SidePanel } from "../../ui/side-panel";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
@@ -131,11 +132,12 @@ function Details({
   setHash: (hash: string) => void;
 }) {
   const guestId = snapshot.me?.guestId ?? null;
+  const requireIdentity = useRequireIdentity();
   const event = toEvent(snapshot.event);
-  const texts = phaseTexts(snapshot.event, now, !!guestId, localZone);
+  const texts = phaseTexts(snapshot.event, now, localZone);
   const isHost = !!guestId && proposal.hosts.some((h) => h.id === guestId);
   const canEdit = proposal.hosts.length === 0 || isHost;
-  const votingEnabled = !!guestId && inVotingPhase(event, now);
+  const votingEnabled = inVotingPhase(event, now);
   const schedEnabled = inSchedPhase(event, now);
   const hostVoting = isHost && inVotingPhase(event, now);
   const myVote = ownVotesFrom(snapshot).get(proposal.id);
@@ -176,18 +178,18 @@ function Details({
               ? t`Nobody is offering to host this proposal yet. If you could run it, take it on.`
               : t`The hosts would like a co-host. Joining lets you edit this proposal with them.`}
           </p>
-          <Unavailable blocked={!guestId} why={t`Select a user first`}>
-            <button
-              type="button"
-              onClick={() => void actions.join(proposal.id)}
-              className="inline-flex items-center justify-center rounded-md bg-brand px-3 py-1.5 font-medium text-on-brand transition-colors hover:bg-brand-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-            >
-              <HandRaisedIcon className="mr-1 h-4 w-4" />
-              {proposal.hosts.length === 0
-                ? t`Host this proposal`
-                : t`Join as co-host`}
-            </button>
-          </Unavailable>
+          <button
+            type="button"
+            onClick={() =>
+              guestId ? void actions.join(proposal.id) : requireIdentity()
+            }
+            className="inline-flex items-center justify-center rounded-md bg-brand px-3 py-1.5 font-medium text-on-brand transition-colors hover:bg-brand-hover"
+          >
+            <HandRaisedIcon className="mr-1 h-4 w-4" />
+            {proposal.hosts.length === 0
+              ? t`Host this proposal`
+              : t`Join as co-host`}
+          </button>
         </div>
       )}
 
@@ -222,7 +224,9 @@ function Details({
             enabled={votingEnabled}
             why={texts.voting}
             onVote={(choice) =>
-              actions.vote(proposal.id, choice === myVote ? null : choice)
+              guestId
+                ? actions.vote(proposal.id, choice === myVote ? null : choice)
+                : requireIdentity()
             }
           />
         </div>

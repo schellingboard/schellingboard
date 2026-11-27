@@ -26,15 +26,15 @@ export function actingGuestRefusal(code: string, task: ActingTask): string {
       other: `This name is protected.`,
     });
   return select(task, {
-    editProfile: `You need to select who you are before editing your profile. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    createProposal: `You need to select who you are before creating a proposal. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    editProposal: `You need to select who you are before editing this proposal. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    addSession: `You need to select who you are before adding a session. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    editSession: `You need to select who you are before editing a session. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    changeSettings: `You need to select who you are before changing your settings. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    seeNotifications: `You need to select who you are before seeing your notifications. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    seeComments: `You need to select who you are before seeing your comments. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    openMeetings: `You need to select who you are before opening your 1-on-1s. Pick your name via the “Select your name” chip in the header at the top of the page.`,
-    other: `You need to select who you are.`,
+    editProfile: `Select your name to edit your profile.`,
+    createProposal: `Select your name to create a proposal.`,
+    editProposal: `Select your name to edit this proposal.`,
+    addSession: `Select your name to add a session.`,
+    editSession: `Select your name to edit a session.`,
+    changeSettings: `Select your name to change your settings.`,
+    seeNotifications: `Select your name to see your notifications.`,
+    seeComments: `Select your name to see your comments.`,
+    openMeetings: `Select your name to open your 1-on-1s.`,
+    other: `Select your name first.`,
   });
 }

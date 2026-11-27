@@ -5,7 +5,7 @@ import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
-import { type ComponentType, useMemo } from "react";
+import { type ComponentType, type MouseEventHandler, useMemo } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
 import { formatDuration } from "../../i18n/duration";
@@ -27,6 +27,7 @@ import {
 import { paramsUpdater } from "../../ui/list-paging";
 import { ListToolbar } from "../../ui/list-toolbar";
 import { PhaseBar } from "../../ui/phase-bar";
+import { useNameGate, useRequireIdentity } from "../../ui/require-identity";
 import { SearchInput } from "../../ui/search-input";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
@@ -87,10 +88,11 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
   const event = toEvent(snapshot.event);
   const guestId = snapshot.me?.guestId ?? null;
   const eventName = snapshot.event.name;
-  const texts = phaseTexts(snapshot.event, now, !!guestId, localZone);
-  const votingEnabled = !!guestId && inVotingPhase(event, now);
+  const texts = phaseTexts(snapshot.event, now, localZone);
+  const votingEnabled = inVotingPhase(event, now);
   const schedEnabled = inSchedPhase(event, now);
-  const proposingEnabled = !!guestId && !schedEnabled;
+  const proposingEnabled = !schedEnabled;
+  const needName = useNameGate(guestId);
 
   return (
     <>
@@ -122,6 +124,7 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
               href={links.add}
               enabled={proposingEnabled}
               why={texts.proposing}
+              onClick={needName}
               icon={PlusIcon}
               label={t`Add Proposal`}
             />
@@ -130,6 +133,7 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
               href={links.quickVoting}
               enabled={votingEnabled}
               why={texts.voting}
+              onClick={needName}
               icon={ChartBarIcon}
               label={t`Go to Quick Voting!`}
             />
@@ -145,6 +149,7 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
             </p>
             <a
               href={links.add}
+              onClick={needName}
               className="mt-4 inline-block bg-brand text-on-brand px-4 py-2 rounded-md hover:bg-brand-hover"
             >
               <Trans>Add Proposal</Trans>
@@ -167,12 +172,14 @@ function ActionLink({
   href,
   enabled,
   why,
+  onClick,
   icon: Icon,
   label,
 }: {
   href: string;
   enabled: boolean;
   why: string;
+  onClick: MouseEventHandler<HTMLAnchorElement>;
   icon: ComponentType<{ className?: string }>;
   label: string;
 }) {
@@ -180,6 +187,7 @@ function ActionLink({
     <Unavailable blocked={!enabled} why={why}>
       <a
         href={enabled ? href : "#"}
+        onClick={onClick}
         className={cx(
           "bg-brand hover:bg-brand-hover transition-colors text-on-brand px-4 py-2 rounded-md flex items-center gap-2",
           !enabled && "opacity-50 cursor-not-allowed"
@@ -209,6 +217,7 @@ function ProposalTable({
   schedEnabled: boolean;
 }) {
   const listFormat = useListFormat();
+  const requireIdentity = useRequireIdentity();
   const guestId = snapshot.me?.guestId ?? null;
   const rows = useMemo(() => rowsFrom(snapshot), [snapshot]);
   const votes = useMemo(() => ownVotesFrom(snapshot), [snapshot]);
@@ -267,13 +276,15 @@ function ProposalTable({
         )
       : null;
   const voteControls = (row: Row) =>
-    guestId && !row.hosts.some((h) => h.id === guestId) ? (
+    !row.hosts.some((h) => h.id === guestId) ? (
       <VotingButtons
         chosen={votes.get(row.id)}
         enabled={votingEnabled}
         why={texts.voting}
         onVote={(choice) =>
-          onVote(row.id, choice === votes.get(row.id) ? null : choice)
+          guestId
+            ? onVote(row.id, choice === votes.get(row.id) ? null : choice)
+            : requireIdentity()
         }
       />
     ) : null;
@@ -313,7 +324,11 @@ function ProposalTable({
       why={why}
       active={effective === key}
       count={filteredCount}
-      onClick={() => toggle(key)}
+      onClick={() =>
+        guestId || key === FILTER_HOST_WANTED
+          ? toggle(key)
+          : requireIdentity(() => toggle(key))
+      }
     />
   );
 
@@ -332,13 +347,7 @@ function ProposalTable({
         }
         filters={
           <>
-            {filterButton(
-              FILTER_MINE,
-              t`My proposals`,
-              UserIcon,
-              !!guestId,
-              t`Select a user first`
-            )}
+            {filterButton(FILTER_MINE, t`My proposals`, UserIcon, true, "")}
             {filterButton(
               FILTER_UNVOTED,
               t`Only unvoted`,

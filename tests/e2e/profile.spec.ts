@@ -456,7 +456,9 @@ test("shows an error on the edit page when no user is selected @011-US1", async 
   await login(page);
   await page.goto("/guests/edit");
 
-  await expect(page.getByText(/select who you are/i)).toBeVisible();
+  await expect(
+    page.getByText("Select your name to edit your profile.")
+  ).toBeVisible();
   await expect(page.getByLabel("About me")).toHaveCount(0);
 });
 

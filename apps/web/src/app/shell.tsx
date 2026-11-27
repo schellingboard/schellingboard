@@ -11,6 +11,7 @@ import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
 import { HeaderLinks } from "./header-links";
 import { useHealth } from "./health";
+import { IdentityPrompt } from "./identity-prompt";
 import { Layout } from "./layout";
 import { MapButton } from "./map-button";
 import { NavBar, type NavItem } from "./nav-bar";
@@ -39,34 +40,36 @@ export function ShellFrame({
   const viewer = useViewer();
   const kiosk = useKioskMode(new URLSearchParams(search));
   return (
-    <Layout
-      nav={
-        <NavBar items={events} currentPath={currentPath}>
-          <HeaderLinks signedIn={!!viewer.guestId} />
-          <MapButton url={site?.mapImageUrl} />
-          <UserMenu viewer={viewer} guests={guests} />
-        </NavBar>
-      }
-      footer={<Footer api={api} version={health?.version} update={update} />}
-    >
-      <ReloadOffer api={api} kiosk={kiosk} onReload={hardReload} />
-      <ErrorBoundary resetKey={currentPath}>{children}</ErrorBoundary>
-      <DevToolbar
-        enabled={health?.devTools ?? false}
-        search={search}
-        onChange={onClockChange}
-        sendReminders={async () => {
-          const response = await fetch("/api/dev/reminders", {
-            method: "POST",
-          });
-          /* eslint-disable lingui/no-unlocalized-strings -- dev toolbar, English only */
-          if (!response.ok) return "dispatch failed";
-          const { sent } = (await response.json()) as { sent: number };
-          return `sent ${sent} reminders`;
-          /* eslint-enable lingui/no-unlocalized-strings */
-        }}
-      />
-    </Layout>
+    <IdentityPrompt guests={guests}>
+      <Layout
+        nav={
+          <NavBar items={events} currentPath={currentPath}>
+            <HeaderLinks signedIn={!!viewer.guestId} />
+            <MapButton url={site?.mapImageUrl} />
+            <UserMenu viewer={viewer} guests={guests} />
+          </NavBar>
+        }
+        footer={<Footer api={api} version={health?.version} update={update} />}
+      >
+        <ReloadOffer api={api} kiosk={kiosk} onReload={hardReload} />
+        <ErrorBoundary resetKey={currentPath}>{children}</ErrorBoundary>
+        <DevToolbar
+          enabled={health?.devTools ?? false}
+          search={search}
+          onChange={onClockChange}
+          sendReminders={async () => {
+            const response = await fetch("/api/dev/reminders", {
+              method: "POST",
+            });
+            /* eslint-disable lingui/no-unlocalized-strings -- dev toolbar, English only */
+            if (!response.ok) return "dispatch failed";
+            const { sent } = (await response.json()) as { sent: number };
+            return `sent ${sent} reminders`;
+            /* eslint-enable lingui/no-unlocalized-strings */
+          }}
+        />
+      </Layout>
+    </IdentityPrompt>
   );
 }
 
