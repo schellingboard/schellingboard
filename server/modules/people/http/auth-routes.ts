@@ -29,7 +29,7 @@ const requestLoginCode = createRoute({
   path: "/auth/login-code",
   tags: ["auth"],
   description:
-    "Emails the guest, named by `guestId` or by `identifier` (email or username; exactly one), a single-use login code and link. An identifier nobody holds answers 204 too. `auth.codeRecentlySent` (409) while a code sent within the last minute is still valid; `auth.codeSpent` (409) when it has no guesses left; `auth.tooManyEmails` (429); `auth.mailUnavailable` (503) when the server cannot send email; `auth.mailFailed` (503) when sending failed.",
+    "Emails the guest, named by `guestId` or by `identifier` (email or username; exactly one), a single-use login code and link. An identifier nobody holds answers 204 too. `auth.codeRecentlySent` (409) while a code sent within the last minute is still valid; `auth.codeSpent` (409) when it has no guesses left; `auth.tooManyEmails` (429); `auth.mailUnavailable` (503) when the server cannot send email; `auth.mailFailed` (503) when sending failed. Behind a sign-in proxy, only a site admin asking for themself; `identity.fixed` (403) otherwise.",
   request: { body: body(loginCodeBodySchema) },
   responses: { 204: noContent("The code was emailed"), ...problemDefault },
 });
@@ -59,7 +59,7 @@ const logIn = createRoute({
   path: "/auth/login",
   tags: ["auth"],
   description:
-    "Logs in as a guest, named by `guestId` or by `identifier` (email or username; exactly one), with the password or an emailed login code, and sets the guest cookie. `auth.credentialWrong` (403) for a wrong or expired password or code; `auth.tooManyAttempts` (429) while the password is locked, when a code still works.",
+    "Logs in as a guest, named by `guestId` or by `identifier` (email or username; exactly one), with the password or an emailed login code, and sets the guest cookie. `auth.credentialWrong` (403) for a wrong or expired password or code; `auth.tooManyAttempts` (429) while the password is locked, when a code still works. Behind a sign-in proxy, only a site admin logging in as themself; `identity.fixed` (403) otherwise.",
   request: { body: body(loginBodySchema) },
   responses: {
     200: json(identitySchema, "The guest the browser now acts as"),

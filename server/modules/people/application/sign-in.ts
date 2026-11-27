@@ -41,10 +41,24 @@ import { proxyFixed, type SignedIn, signIn } from "./identity";
 let dummy: Promise<string> | undefined;
 const dummyHash = () => (dummy ??= hashUserPassword("no such guest"));
 
+/**
+ * The proxy decides who a person is, so only a site admin signs in behind it,
+ * as themself: that is how they get admin rights where the proxy gives none.
+ */
+async function fixedByProxy(
+  { guests }: PeopleDeps["repos"],
+  actor: Actor,
+  target: GuestTarget | undefined
+): Promise<boolean> {
+  if (actor.guest?.via !== "proxy") return false;
+  const named = target && (await resolveTarget({ guests }, target));
+  return named !== actor.guest.id || !(await guests.getSiteAdmin(named));
+}
+
 export const requestLoginCode =
   ({ repos, loginMail }: PeopleDeps) =>
   async (actor: Actor, target: GuestTarget): Promise<Result<null>> => {
-    if (actor.guest?.via === "proxy") return proxyFixed();
+    if (await fixedByProxy(repos, actor, target)) return proxyFixed();
     if (!loginMail.configured())
       return unavailable(
         "auth.mailUnavailable",
@@ -136,7 +150,8 @@ export const logIn = (deps: PeopleDeps) => {
       device?: string | null;
     }
   ): Promise<Result<SignedIn>> => {
-    if (actor.guest?.via === "proxy") return proxyFixed();
+    const target = identifier !== undefined ? { identifier } : named;
+    if (await fixedByProxy(repos, actor, target)) return proxyFixed();
     let guestId = named;
     if (identifier !== undefined) {
       // Unknown identifiers share a bucket per spelling, so guessing them is

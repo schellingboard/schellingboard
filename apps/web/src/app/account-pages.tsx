@@ -289,7 +289,7 @@ function Login({
         <Trans>Loading…</Trans>
       </p>
     );
-  if (viewer.fixed) {
+  if (viewer.fixed && !viewer.adminNeedsSignIn) {
     const me = entries.find((e) => e.id === viewer.guestId);
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 sm:px-0">
@@ -314,9 +314,10 @@ function Login({
       </div>
     );
   }
-  // Such a person may have neither an email nor a username to type.
-  const guestId =
-    params.get("guest") ?? (viewer.adminNeedsSignIn ? viewer.guestId : null);
+  // Such a person may have neither an email nor a username to type, and behind
+  // a proxy they can log in as nobody else.
+  const own = viewer.adminNeedsSignIn ? viewer.guestId : null;
+  const guestId = viewer.fixed ? own : (params.get("guest") ?? own);
   const named = entries.find((e) => e.id === guestId);
   if (guestId && !named && !loaded) return <DirectoryWait failed={failed} />;
   return (

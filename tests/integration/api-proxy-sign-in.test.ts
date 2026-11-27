@@ -14,6 +14,11 @@ import {
   vi,
 } from "vitest";
 
+vi.mock("@/utils/mailer", () => ({
+  sendMail: vi.fn(),
+  isMailerConfigured: vi.fn(() => true),
+}));
+
 import { getRepositories } from "@/db/container";
 import { resolveDbPath } from "@/db/migrate";
 import { handleRequest } from "@/server/http/handler";
@@ -21,6 +26,7 @@ import { makePerson } from "@/server/kernel/make-person";
 import { hashProxySecret } from "@/server/kernel/proxy-sign-in";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { hashSessionToken } from "@/utils/login-session-token";
+import { hashUserPassword } from "@/utils/user-credentials";
 
 import {
   createEventAction,
@@ -348,6 +354,58 @@ describe("login and join screens for a proxy person", () => {
     expect(mail.status).toBe(403);
     expect(await code(mail)).toBe("identity.fixed");
   });
+
+  it(
+    "lets a site admin log in as themself to get admin rights",
+    { tags: ["025-US2"] },
+    async () => {
+      const ada = await adminGuest();
+      await getRepositories().guests.setAuthProtection(ada.id, {
+        authProtected: true,
+        passwordHash: await hashUserPassword("correct horse"),
+      });
+      await configure({ siteAdmins: false });
+
+      const mail = await post("/api/v1/auth/login-code", { identifier: EMAIL });
+      expect(mail.status).toBe(204);
+      const res = await post("/api/v1/auth/login", {
+        guestId: ada.id,
+        credential: "correct horse",
+      });
+
+      expect(res.status).toBe(200);
+      const cookie = (res.headers.get("set-cookie") ?? "").split(";")[0];
+      const admin = await request("/api/v1/admin/guests", {
+        "X-Forwarded-Email": EMAIL,
+        cookie,
+      });
+      expect(admin.status).toBe(200);
+    }
+  );
+
+  it(
+    "refuses a site admin who logs in as someone else",
+    { tags: ["025-US2"] },
+    async () => {
+      await adminGuest();
+      const other = await createGuest({ email: "other@proxy.example" });
+      await configure();
+
+      for (const body of [
+        { guestId: other.id },
+        { identifier: "other@proxy.example" },
+        { identifier: "nobody@proxy.example" },
+      ]) {
+        const res = await post("/api/v1/auth/login-code", body);
+        expect(await code(res)).toBe("identity.fixed");
+        const login = await post("/api/v1/auth/login", {
+          ...body,
+          credential: "x",
+        });
+        expect(await code(login)).toBe("identity.fixed");
+      }
+    }
+  );
 
   it(
     "joins the event through a link but signs no one in",
