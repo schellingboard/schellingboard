@@ -209,6 +209,28 @@ describe("sign-in through a proxy", { tags: ["025-US2"] }, () => {
     expect(await whoAmI({ cookie: asBob })).toBeNull();
   });
 
+  it("signs out the cookie session it keeps", async () => {
+    const ada = await createGuest({ email: EMAIL });
+    await configure();
+    const asAda = `${GUEST_COOKIE_NAME}=${openGuestValue(ada.id)}`;
+    expect(sessionRows()).toBe(1);
+
+    const res = await request(
+      "/api/v1/auth/sign-out",
+      {
+        "X-Forwarded-Email": EMAIL,
+        cookie: asAda,
+        origin: "http://test",
+        "sec-fetch-site": "same-origin",
+        "idempotency-key": "k1",
+      },
+      { method: "POST" }
+    );
+
+    expect(res.status).toBe(204);
+    expect(sessionRows()).toBe(0);
+  });
+
   it("leaves the site-admin role to a password session, unless the setting gives it", async () => {
     const ada = await adminGuest();
     await configure();
@@ -277,6 +299,41 @@ describe("sign-in through a proxy", { tags: ["025-US2"] }, () => {
     expect(((await res.json()) as { code: string }).code).toBe(
       "identity.fixed"
     );
+  });
+});
+
+describe("the identity the web app reads", { tags: ["025-US2"] }, () => {
+  const identity = async (headers: Record<string, string>) =>
+    (await (await request("/api/v1/me/identity", headers)).json()) as {
+      guestId: string | null;
+      fixedBy?: { logoutUrl: string; siteAdmin: boolean };
+    };
+
+  it("says a proxy fixes the identity, with the logout address", async () => {
+    await createGuest({ email: EMAIL });
+    await configure({ logoutUrl: "https://sso.example/logout" });
+
+    expect((await identity({ "X-Forwarded-Email": EMAIL })).fixedBy).toEqual({
+      logoutUrl: "https://sso.example/logout",
+      siteAdmin: false,
+    });
+  });
+
+  it("says a site admin is one even when the proxy does not give the role", async () => {
+    await adminGuest();
+    await configure({ siteAdmins: false });
+
+    expect((await identity({ "X-Forwarded-Email": EMAIL })).fixedBy).toEqual({
+      logoutUrl: "",
+      siteAdmin: true,
+    });
+  });
+
+  it("says nothing of a proxy for a request without the header", async () => {
+    await createGuest({ email: EMAIL });
+    await configure();
+
+    expect((await identity({})).fixedBy).toBeUndefined();
   });
 });
 

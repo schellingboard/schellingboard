@@ -117,6 +117,7 @@ export const currentGuest =
     guestId: string | null;
     locale: string | null;
     awaitingLogin?: true;
+    fixedBy?: { logoutUrl: string; siteAdmin: boolean };
   }> => {
     if (!actor.guest) return { guestId: null, locale: null };
     const creds = await repos.guests.getAuthCredentials(actor.guest.id);
@@ -124,5 +125,12 @@ export const currentGuest =
     const proven = !creds.authProtected || actor.guest.level === "verified";
     if (!proven) return { guestId: null, locale: null, awaitingLogin: true };
     const guest = await repos.guests.findById(actor.guest.id);
-    return { guestId: actor.guest.id, locale: guest?.info.locale ?? null };
+    const identity = {
+      guestId: actor.guest.id,
+      locale: guest?.info.locale ?? null,
+    };
+    if (actor.guest.via !== "proxy") return identity;
+    const { logoutUrl } = await repos.settings.getProxySignIn();
+    const siteAdmin = await repos.guests.getSiteAdmin(actor.guest.id);
+    return { ...identity, fixedBy: { logoutUrl, siteAdmin } };
   };

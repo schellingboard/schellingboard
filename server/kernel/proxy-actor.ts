@@ -58,6 +58,8 @@ export async function withProxyIdentity(
       level: "verified",
       via: "proxy",
       siteAdmin,
+      // Lets Log out end the cookie session this request keeps.
+      ...(cookie?.id === proxy.guestId && { sessionId: cookie.sessionId }),
     },
   };
 }

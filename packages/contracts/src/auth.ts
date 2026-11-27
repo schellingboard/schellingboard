@@ -24,6 +24,15 @@ export const chosenIdentitySchema = identitySchema.extend({
 });
 
 export const currentIdentitySchema = chosenIdentitySchema.extend({
+  fixedBy: z
+    .object({
+      logoutUrl: z.string().describe("Where Sign out leads; empty hides it"),
+      siteAdmin: z.boolean().describe("Whether the person administers"),
+    })
+    .optional()
+    .describe(
+      "Present when a sign-in proxy decides who the browser acts as: no name picker, no switching"
+    ),
   awaitingLogin: z
     .boolean()
     .optional()

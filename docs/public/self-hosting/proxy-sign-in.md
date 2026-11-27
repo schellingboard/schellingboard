@@ -20,6 +20,9 @@ request without the header signs in the normal way.
   into a profile never counts. Create guests or import them first; an unknown email carries on
   without a name.
 - The header counts only on a request from the app's own pages, never on a cross-site request.
+- A signed-in person sees their name, with no name picker, and the password and login-code settings
+  are hidden (site admins keep them). **Log out** leads to the **Sign out address**, and is hidden
+  when that is empty.
 - Nothing is stored in the browser, so signing out at the proxy takes effect on the next request.
 
 ## The header is only as safe as the network

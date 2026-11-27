@@ -43,9 +43,13 @@ const remembered = {
 
 export type ChooseResult = { ok: true } | { ok: false; code: string };
 
+export type FixedIdentity = { logoutUrl: string; siteAdmin: boolean };
+
 /** `guestId` is undefined until the server has said who the browser acts as. */
 export type Viewer = {
   guestId: string | null | undefined;
+  /** Set while a sign-in proxy decides who the browser acts as. */
+  fixed?: FixedIdentity;
   choose: (guestId: string) => Promise<ChooseResult>;
   signOut: () => Promise<void>;
   /** Asks the server again, for a change it made without this page: a password reset ends the session. */
@@ -73,6 +77,7 @@ export function ViewerProvider({
   children: ReactNode;
 }) {
   const [guestId, setGuestId] = useState<string | null | undefined>(undefined);
+  const [fixed, setFixed] = useState<FixedIdentity>();
   // The first answer can arrive after the viewer has already taken a name,
   // and must not take it back.
   const decided = useRef(false);
@@ -93,6 +98,7 @@ export function ViewerProvider({
           if (decided.current) return;
           remembered.write(data.guestId);
           if (data.guestId) setStored(data.locale);
+          setFixed(data.fixedBy);
           setGuestId(data.guestId);
         })
         .catch(() => {
@@ -149,6 +155,7 @@ export function ViewerProvider({
       decided.current = true;
       remembered.write(data.guestId);
       if (data.guestId) setStored(data.locale);
+      setFixed(data.fixedBy);
       setGuestId(data.guestId);
     } catch {
       // Offline: the known viewer stands until the next load asks again.
@@ -156,8 +163,8 @@ export function ViewerProvider({
   }, [api, persistence, guestId, setStored]);
 
   const value = useMemo(
-    () => ({ guestId, choose, signOut, refresh }),
-    [guestId, choose, signOut, refresh]
+    () => ({ guestId, fixed, choose, signOut, refresh }),
+    [guestId, fixed, choose, signOut, refresh]
   );
   return (
     <ViewerContext.Provider value={value}>{children}</ViewerContext.Provider>

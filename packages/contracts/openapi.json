@@ -5666,6 +5666,21 @@
                       "type": ["string", "null"],
                       "description": "The guest's chosen language; null follows the browser"
                     },
+                    "fixedBy": {
+                      "type": "object",
+                      "properties": {
+                        "logoutUrl": {
+                          "type": "string",
+                          "description": "Where Sign out leads; empty hides it"
+                        },
+                        "siteAdmin": {
+                          "type": "boolean",
+                          "description": "Whether the person administers"
+                        }
+                      },
+                      "required": ["logoutUrl", "siteAdmin"],
+                      "description": "Present when a sign-in proxy decides who the browser acts as: no name picker, no switching"
+                    },
                     "awaitingLogin": {
                       "type": "boolean",
                       "description": "True when the browser holds a protected name it has not logged in to"

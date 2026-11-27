@@ -3112,6 +3112,13 @@ export interface paths {
               guestId: string | null;
               /** @description The guest's chosen language; null follows the browser */
               locale: string | null;
+              /** @description Present when a sign-in proxy decides who the browser acts as: no name picker, no switching */
+              fixedBy?: {
+                /** @description Where Sign out leads; empty hides it */
+                logoutUrl: string;
+                /** @description Whether the person administers */
+                siteAdmin: boolean;
+              };
               /** @description True when the browser holds a protected name it has not logged in to */
               awaitingLogin?: boolean;
             };

@@ -61,4 +61,39 @@ test.describe("Admin proxy sign-in", () => {
     await card.getByRole("button", { name: "Save proxy sign-in" }).click();
     await expect(card.getByText("Proxy sign-in saved.")).toBeVisible();
   });
+
+  test("a person behind the proxy has a fixed name and a Log out link @025-US2", async ({
+    page,
+    browser,
+  }) => {
+    await adminLogin(page);
+    await page
+      .getByRole("navigation", { name: "Admin" })
+      .getByRole("link", { name: "Settings" })
+      .click();
+    const card = page.getByRole("region", { name: "Sign-in through a proxy" });
+    await card.getByLabel("Sign in through a proxy").check();
+    await card
+      .getByLabel("Sign out address")
+      .fill("https://sso.example/logout");
+    await card.getByRole("button", { name: "Save proxy sign-in" }).click();
+    await expect(card.getByText("Proxy sign-in saved.")).toBeVisible();
+
+    const context = await browser.newContext({
+      extraHTTPHeaders: { "X-Forwarded-Email": "alice@test.com" },
+    });
+    const person = await context.newPage();
+    await person.goto("/Hackathon");
+    await person.getByRole("button", { name: /^Your name: Alice/ }).click();
+    await expect(
+      person.getByRole("menuitem", { name: "Log out" })
+    ).toHaveAttribute("href", "https://sso.example/logout");
+
+    await person.getByRole("menuitem", { name: "Settings" }).click();
+    await expect(person.getByText(/Email me when/)).toBeVisible();
+    await expect(
+      person.getByRole("heading", { name: "Account security" })
+    ).toHaveCount(0);
+    await context.close();
+  });
 });
