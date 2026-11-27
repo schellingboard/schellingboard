@@ -28,21 +28,32 @@ export function isTrustedOrigin(req: Request): boolean {
  * Only a cross-site request or one with no guest cookie is turned away here;
  * the use cases check the site-admin role.
  */
-export function adminApiRefusal(req: Request): Problem | null {
+export function adminApiRefusal(
+  req: Request,
+  proxySignedIn = false
+): Problem | null {
   if (!isTrustedOrigin(req)) return { status: 403, code: "request.crossSite" };
-  if (!cookieOf(req, GUEST_COOKIE_NAME))
+  if (!proxySignedIn && !cookieOf(req, GUEST_COOKIE_NAME))
     return { status: 401, code: "admin.unauthenticated" };
   return null;
 }
 
 // The site password route and the version open before the cookie exists.
-export async function siteApiRefusal(req: Request): Promise<Problem | null> {
+export async function siteApiRefusal(
+  req: Request,
+  proxySignedIn = false
+): Promise<Problem | null> {
   const { pathname } = new URL(req.url);
   if (pathname.startsWith("/api/v1/auth/") && !isTrustedOrigin(req))
     return { status: 403, code: "request.crossSite" };
   const open =
     pathname === "/api/v1/auth/site" || pathname === "/api/v1/health";
-  if (!open && isPasswordProtectionEnabled() && !(await hasSiteCookie(req)))
+  if (
+    !open &&
+    !proxySignedIn &&
+    isPasswordProtectionEnabled() &&
+    !(await hasSiteCookie(req))
+  )
     return { status: 401, code: "site.unauthenticated" };
   return null;
 }

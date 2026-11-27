@@ -1,6 +1,8 @@
+import { getConnInfo } from "@hono/node-server/conninfo";
 import { type Context, Hono } from "hono";
 
 import { dispatchReminders, pageReads } from "@/server/composition";
+import { readProxyIdentity } from "@/server/kernel/proxy-actor";
 import { isPasswordProtectionEnabled } from "@/utils/auth";
 import { getBuildId } from "@/utils/build-id";
 import { getImageRepositories, requestedWidth } from "@/utils/images";
@@ -10,7 +12,12 @@ import { LIGHT_SURFACE } from "@/utils/theme";
 
 import { api } from "./app";
 import { addDevRoutes } from "./dev";
-import { adminApiRefusal, hasSiteCookie, siteApiRefusal } from "./gates";
+import {
+  adminApiRefusal,
+  hasSiteCookie,
+  isTrustedOrigin,
+  siteApiRefusal,
+} from "./gates";
 import { problemResponse } from "./problem";
 
 const MEDIA_CACHE_CONTROL = "private, max-age=31536000, immutable";
@@ -46,16 +53,45 @@ addDevRoutes(web, dispatchReminders);
 
 web.get("/api/health", (c) => c.json({ status: "ok" }));
 
+const remoteAddressOf = (c: Parameters<typeof getConnInfo>[0]) => {
+  try {
+    return getConnInfo(c).remote.address;
+  } catch {
+    return undefined;
+  }
+};
+
+const proxyIdentityOf = (
+  c: Parameters<typeof getConnInfo>[0],
+  anyOrigin = false
+) =>
+  readProxyIdentity(
+    c.req.raw,
+    remoteAddressOf(c),
+    anyOrigin || isTrustedOrigin(c.req.raw)
+  );
+
+// Pages and media only read, so a link from a mail or chat (a cross-site
+// navigation) must pass the gate; the origin rule guards acting, in the API.
+const pageSignedInByProxy = async (c: Parameters<typeof getConnInfo>[0]) =>
+  (await proxyIdentityOf(c, true)).guestId !== null;
+
 web.all("/api/v1/*", async (c) => {
   const { pathname } = new URL(c.req.url);
+  const proxy = await proxyIdentityOf(c);
+  const proxySignedIn = proxy.guestId !== null;
   const refusal = underRoot(pathname, "/api/v1/admin")
-    ? adminApiRefusal(c.req.raw)
-    : await siteApiRefusal(c.req.raw);
-  return refusal ? problemResponse(refusal) : api.fetch(c.req.raw);
+    ? adminApiRefusal(c.req.raw, proxySignedIn)
+    : await siteApiRefusal(c.req.raw, proxySignedIn);
+  return refusal ? problemResponse(refusal) : api.fetch(c.req.raw, { proxy });
 });
 
 const requireSiteCookie = async (c: Context) => {
-  if (!isPasswordProtectionEnabled() || (await hasSiteCookie(c.req.raw)))
+  if (
+    !isPasswordProtectionEnabled() ||
+    (await hasSiteCookie(c.req.raw)) ||
+    (await pageSignedInByProxy(c))
+  )
     return null;
   const url = new URL(c.req.url);
   const login = new URL("/login", url);
@@ -65,8 +101,12 @@ const requireSiteCookie = async (c: Context) => {
 
 // Answers 401 rather than redirecting: an <img> that follows a redirect to an
 // HTML page renders a broken image either way.
-web.use("/media/*", async (c, next) => {
-  if (!isPasswordProtectionEnabled() || (await hasSiteCookie(c.req.raw)))
+web.use("/media/*", async (c: Context, next) => {
+  if (
+    !isPasswordProtectionEnabled() ||
+    (await hasSiteCookie(c.req.raw)) ||
+    (await pageSignedInByProxy(c))
+  )
     return next();
   return c.text("Unauthorized", 401, { "cache-control": "no-store" });
 });

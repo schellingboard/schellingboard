@@ -7943,6 +7943,207 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/proxy-sign-in": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The sign-in through a proxy, and what this request carried (never the secret). */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The proxy sign-in settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              enabled: boolean;
+              /** @description The request header that carries the email */
+              headerName: string;
+              /** @description IPs or CIDR ranges of the proxy; empty means no address check */
+              addresses: string[];
+              /** @description Where Sign out leads; empty hides it */
+              logoutUrl: string;
+              /** @description Whether site admins sign in through the proxy */
+              siteAdmins: boolean;
+              /** @description Whether a secret is required of the proxy */
+              secretSet: boolean;
+              /** @description What this request carried; null while the sign-in is off */
+              ownRequest: {
+                headerSeen: boolean;
+                trusted: boolean;
+              } | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    /** @description Replaces the proxy sign-in options; the secret is kept. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            enabled: boolean;
+            /** @description The request header that carries the email */
+            headerName: string;
+            /** @description IPs or CIDR ranges of the proxy; empty means no address check */
+            addresses: string[];
+            /** @description Where Sign out leads; empty hides it */
+            logoutUrl: string;
+            /** @description Whether site admins sign in through the proxy */
+            siteAdmins: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description The saved settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              enabled: boolean;
+              /** @description The request header that carries the email */
+              headerName: string;
+              /** @description IPs or CIDR ranges of the proxy; empty means no address check */
+              addresses: string[];
+              /** @description Where Sign out leads; empty hides it */
+              logoutUrl: string;
+              /** @description Whether site admins sign in through the proxy */
+              siteAdmins: boolean;
+              /** @description Whether a secret is required of the proxy */
+              secretSet: boolean;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/proxy-sign-in/secret": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes a new secret the proxy must send in `X-SchellingBoard-Proxy-Secret`, replacing any earlier one. It is shown only in this answer. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The new secret */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description Shown once; only its hash is kept */
+              secret: string;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    /** @description Stops requiring a secret of the proxy. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The secret is removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/updates": {
     parameters: {
       query?: never;

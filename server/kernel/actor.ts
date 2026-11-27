@@ -7,7 +7,7 @@ export interface Actor {
   guest: {
     id: string;
     level: LoginAssurance;
-    via?: LoginVia;
+    via?: LoginVia | "proxy";
     sessionId?: string;
     siteAdmin?: boolean;
   } | null;

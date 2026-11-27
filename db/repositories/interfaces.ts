@@ -41,6 +41,10 @@ import type {
   Notification,
 } from "@schellingboard/domain/notification";
 import type {
+  ProxySignIn,
+  ProxySignInState,
+} from "@schellingboard/domain/proxy-sign-in";
+import type {
   DueReminderCandidate,
   ReminderKey,
 } from "@schellingboard/domain/reminder";
@@ -60,6 +64,11 @@ export interface SettingsRepository {
   get(): Promise<SiteSettings>;
   /** Upserts the singleton row and returns the merged settings. */
   update(patch: Partial<SiteSettings>): Promise<SiteSettings>;
+  getProxySignIn(): Promise<ProxySignInState>;
+  /** The secret's sha256 hash, kept apart so no read of the settings carries it. */
+  getProxySecretHash(): Promise<string | null>;
+  updateProxySignIn(patch: Partial<ProxySignIn>): Promise<ProxySignInState>;
+  setProxySecretHash(hash: string | null): Promise<void>;
 }
 
 export interface DaysRepository {

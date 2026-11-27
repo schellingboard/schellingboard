@@ -10943,6 +10943,261 @@
         "security": [{ "guestAuth": [] }]
       }
     },
+    "/api/v1/admin/proxy-sign-in": {
+      "get": {
+        "tags": ["admin"],
+        "description": "The sign-in through a proxy, and what this request carried (never the secret).",
+        "responses": {
+          "200": {
+            "description": "The proxy sign-in settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": { "type": "boolean" },
+                    "headerName": {
+                      "type": "string",
+                      "description": "The request header that carries the email"
+                    },
+                    "addresses": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "IPs or CIDR ranges of the proxy; empty means no address check"
+                    },
+                    "logoutUrl": {
+                      "type": "string",
+                      "description": "Where Sign out leads; empty hides it"
+                    },
+                    "siteAdmins": {
+                      "type": "boolean",
+                      "description": "Whether site admins sign in through the proxy"
+                    },
+                    "secretSet": {
+                      "type": "boolean",
+                      "description": "Whether a secret is required of the proxy"
+                    },
+                    "ownRequest": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "headerSeen": { "type": "boolean" },
+                        "trusted": { "type": "boolean" }
+                      },
+                      "required": ["headerSeen", "trusted"],
+                      "description": "What this request carried; null while the sign-in is off"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "headerName",
+                    "addresses",
+                    "logoutUrl",
+                    "siteAdmins",
+                    "secretSet",
+                    "ownRequest"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      },
+      "put": {
+        "tags": ["admin"],
+        "description": "Replaces the proxy sign-in options; the secret is kept.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "headerName": {
+                    "type": "string",
+                    "description": "The request header that carries the email"
+                  },
+                  "addresses": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "IPs or CIDR ranges of the proxy; empty means no address check"
+                  },
+                  "logoutUrl": {
+                    "type": "string",
+                    "description": "Where Sign out leads; empty hides it"
+                  },
+                  "siteAdmins": {
+                    "type": "boolean",
+                    "description": "Whether site admins sign in through the proxy"
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "headerName",
+                  "addresses",
+                  "logoutUrl",
+                  "siteAdmins"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The saved settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": { "type": "boolean" },
+                    "headerName": {
+                      "type": "string",
+                      "description": "The request header that carries the email"
+                    },
+                    "addresses": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "IPs or CIDR ranges of the proxy; empty means no address check"
+                    },
+                    "logoutUrl": {
+                      "type": "string",
+                      "description": "Where Sign out leads; empty hides it"
+                    },
+                    "siteAdmins": {
+                      "type": "boolean",
+                      "description": "Whether site admins sign in through the proxy"
+                    },
+                    "secretSet": {
+                      "type": "boolean",
+                      "description": "Whether a secret is required of the proxy"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "headerName",
+                    "addresses",
+                    "logoutUrl",
+                    "siteAdmins",
+                    "secretSet"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/proxy-sign-in/secret": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Makes a new secret the proxy must send in `X-SchellingBoard-Proxy-Secret`, replacing any earlier one. It is shown only in this answer.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new secret",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "secret": {
+                      "type": "string",
+                      "description": "Shown once; only its hash is kept"
+                    }
+                  },
+                  "required": ["secret"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      },
+      "delete": {
+        "tags": ["admin"],
+        "description": "Stops requiring a secret of the proxy.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "The secret is removed" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
     "/api/v1/updates": {
       "get": {
         "tags": ["admin"],

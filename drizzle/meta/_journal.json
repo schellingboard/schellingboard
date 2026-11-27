@@ -484,6 +484,13 @@
       "when": 1794561853726,
       "tag": "0068_event_read_access",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "6",
+      "when": 1795616794880,
+      "tag": "0069_proxy_sign_in",
+      "breakpoints": true
     }
   ]
 }

@@ -26,6 +26,19 @@ export const siteSettings = sqliteTable("site_settings", {
     .notNull()
     .default("Welcome! Browse the schedules for each event below."),
   mapImageUrl: text("map_image_url").notNull().default(""),
+  proxyEnabled: integer("proxy_enabled", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  proxyHeader: text("proxy_header").notNull().default("X-Forwarded-Email"),
+  proxySecretHash: text("proxy_secret_hash"),
+  proxyAddresses: text("proxy_addresses", { mode: "json" })
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  proxyLogoutUrl: text("proxy_logout_url").notNull().default(""),
+  proxySiteAdmins: integer("proxy_site_admins", { mode: "boolean" })
+    .notNull()
+    .default(false),
 });
 
 export const guests = sqliteTable(
