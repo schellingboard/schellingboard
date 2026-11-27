@@ -62,25 +62,60 @@ export type BootstrapInput = {
   guestId?: string;
   name?: string;
   email?: string;
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
   device?: string | null;
+  /** Whether a proxy person acts as site admin: the setting, from the request's proxy. */
+  proxySiteAdmins?: boolean;
 };
+
+export type BootstrapOutcome = { guestId: string; session?: SignedIn };
 
 /**
  * Spends the link: the chosen or new guest becomes a site admin with a
- * username and password, and the visitor is signed in as them.
+ * username and password, and the visitor is signed in as them. A proxy person
+ * becomes the admin themselves; the form's fields are ignored and no session
+ * is made.
  */
 export const bootstrapAdmin = (deps: PeopleDeps) => {
   const start = signIn(deps);
   return async (
     actor: Actor,
     input: BootstrapInput
-  ): Promise<Result<SignedIn>> => {
+  ): Promise<Result<BootstrapOutcome>> => {
     const hash = hashSessionToken(input.token);
     // Before the scrypt work, so a wrong link cannot make the server spend it.
     if (!(await deps.repos.bootstrapTokens.findLive(hash, realNow())))
       return tokenWrong();
+    const proxyGuestId =
+      actor.guest?.via === "proxy" ? actor.guest.id : undefined;
+    if (proxyGuestId !== undefined) {
+      // Else the link would be spent for a role that never acts.
+      if (!input.proxySiteAdmins)
+        return forbidden(
+          "bootstrap.proxyAdminsOff",
+          "Site admins do not sign in through the proxy. Start the server with SB_DISABLE_PROXY_SIGN_IN=1 to use the form"
+        );
+      const spent = await deps.uow.run(async (tx) => {
+        if (!(await tx.bootstrapTokens.findLive(hash, realNow()))) return false;
+        await recordingShownGuests(
+          tx,
+          await tx.guests.listShownEventIds(proxyGuestId),
+          () => tx.guests.setSiteAdmin(proxyGuestId, true),
+          byAdmin(actor, realNow())
+        );
+        await tx.bootstrapTokens.delete(hash);
+        return true;
+      });
+      if (!spent) return tokenWrong();
+      credentialsChanged(proxyGuestId);
+      return ok({ guestId: proxyGuestId });
+    }
+    if (input.username === undefined || input.password === undefined)
+      return invalidFields("bootstrap.credentials", [
+        { path: "username", message: "Choose a username and a password" },
+      ]);
+    const { username: chosenName } = input;
     const passwordHash = await hashUserPassword(input.password);
     const done = await deps.uow.run(async (tx) => {
       if (!(await tx.bootstrapTokens.findLive(hash, realNow())))
@@ -115,7 +150,7 @@ export const bootstrapAdmin = (deps: PeopleDeps) => {
         tx,
         await tx.guests.listShownEventIds(id),
         async () => {
-          const stored = await tx.guests.setUsername(id, input.username);
+          const stored = await tx.guests.setUsername(id, chosenName);
           await tx.guests.setAuthProtection(id, {
             authProtected: true,
             passwordHash,
@@ -133,13 +168,14 @@ export const bootstrapAdmin = (deps: PeopleDeps) => {
     });
     if (!done.ok) return done;
     credentialsChanged(done.value);
-    return ok(
-      await start(actor, {
+    return ok({
+      guestId: done.value,
+      session: await start(actor, {
         guestId: done.value,
         level: "verified",
         via: "code",
         device: input.device,
-      })
-    );
+      }),
+    });
   };
 };

@@ -803,6 +803,122 @@ describe("the emergency switch SB_DISABLE_PROXY_SIGN_IN", () => {
   });
 });
 
+describe(
+  "a bootstrap link spent by a proxy person",
+  { tags: ["025-US1"] },
+  () => {
+    beforeEach(() => vi.stubEnv("SITE_PASSWORD", ""));
+    const TOKEN = "bootstrap-token-for-the-test";
+    const issue = () =>
+      getRepositories().bootstrapTokens.replace({
+        hash: hashSessionToken(TOKEN),
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 3_600_000),
+      });
+    const spend = (body: Record<string, unknown>) =>
+      request(
+        "/api/v1/auth/bootstrap",
+        { "content-type": "application/json", "X-Forwarded-Email": EMAIL },
+        { method: "POST", body: JSON.stringify(body) }
+      );
+
+    it("makes that person a site admin, with no cookie and no session", async () => {
+      const ada = await createGuest({ email: EMAIL });
+      await configure({ siteAdmins: true });
+      await issue();
+
+      const res = await spend({ token: TOKEN });
+
+      expect(res.status).toBe(200);
+      expect(((await res.json()) as { guestId: string }).guestId).toBe(ada.id);
+      expect(res.headers.get("set-cookie")).toBeNull();
+      expect(await getRepositories().guests.getSiteAdmin(ada.id)).toBe(true);
+      expect(sessionRows()).toBe(0);
+      expect((await spend({ token: TOKEN })).status).toBe(403);
+    });
+
+    it("ignores the person the form names", async () => {
+      const ada = await createGuest({ email: EMAIL });
+      const other = await createGuest();
+      await configure({ siteAdmins: true });
+      await issue();
+
+      const res = await spend({
+        token: TOKEN,
+        guestId: other.id,
+        username: "someone",
+        password: "a-long-password-1",
+      });
+
+      expect(res.status).toBe(200);
+      expect(await getRepositories().guests.getSiteAdmin(ada.id)).toBe(true);
+      expect(await getRepositories().guests.getSiteAdmin(other.id)).toBe(false);
+    });
+
+    it("keeps the link while site admins do not sign in through the proxy", async () => {
+      const ada = await createGuest({ email: EMAIL });
+      await configure({ siteAdmins: false });
+      await issue();
+
+      const res = await spend({ token: TOKEN });
+
+      expect(res.status).toBe(403);
+      expect(((await res.json()) as { code: string }).code).toBe(
+        "bootstrap.proxyAdminsOff"
+      );
+      expect(await getRepositories().guests.getSiteAdmin(ada.id)).toBe(false);
+      expect(
+        await getRepositories().bootstrapTokens.findLive(
+          hashSessionToken(TOKEN),
+          new Date()
+        )
+      ).toBeTruthy();
+    });
+
+    it("asks a visitor who is no proxy person for a username and password", async () => {
+      await createGuest({ email: EMAIL });
+      await issue();
+      const res = await request(
+        "/api/v1/auth/bootstrap",
+        { "content-type": "application/json" },
+        { method: "POST", body: JSON.stringify({ token: TOKEN }) }
+      );
+
+      expect(res.status).toBe(400);
+      expect(((await res.json()) as { code: string }).code).toBe(
+        "bootstrap.credentials"
+      );
+    });
+
+    it("refuses a wrong link and changes nothing", async () => {
+      const ada = await createGuest({ email: EMAIL });
+      await configure({ siteAdmins: true });
+      await issue();
+
+      expect((await spend({ token: "wrong" })).status).toBe(403);
+      expect(await getRepositories().guests.getSiteAdmin(ada.id)).toBe(false);
+    });
+
+    it("works as before with the form when the switch is set", async () => {
+      await createGuest({ email: EMAIL });
+      await configure();
+      await issue();
+      vi.stubEnv("SB_DISABLE_PROXY_SIGN_IN", "1");
+
+      const res = await spend({
+        token: TOKEN,
+        name: "Fresh Admin",
+        email: "fresh@x.example",
+        username: "fresh",
+        password: "a-long-password-1",
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get("set-cookie")).toContain(GUEST_COOKIE_NAME);
+    });
+  }
+);
+
 describe("events the proxy people join", { tags: ["025-US1"] }, () => {
   beforeEach(() => vi.stubEnv("SITE_PASSWORD", ""));
 

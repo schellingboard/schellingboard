@@ -36,6 +36,35 @@ async function pick(label: string, option: string) {
 
 const ok = () => Response.json({ guestId: "g1" });
 
+describe("the bootstrap page for a proxy person", { tags: ["025-US1"] }, () => {
+  it("shows a note and one button, and sends only the link", async () => {
+    const { calls, onDone } = setup(ok, { proxyPerson: { name: "Ada" } });
+
+    expect(screen.getByText(/identifies you as Ada/)).toBeTruthy();
+    expect(screen.queryByLabelText("Username")).toBeNull();
+    expect(screen.queryByLabelText("Who are you?")).toBeNull();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Become site admin" })
+    );
+
+    await vi.waitFor(() => expect(onDone).toHaveBeenCalled());
+    expect(calls[0].path).toBe("/api/v1/auth/bootstrap");
+    expect(calls[0].body).toEqual({ token: "tok" });
+  });
+
+  it("explains a refusal while the proxy gives no site admin rights", async () => {
+    setup(() => problem(403, "bootstrap.proxyAdminsOff"), {
+      proxyPerson: { name: "Ada" },
+    });
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Become site admin" })
+    );
+
+    expect(await screen.findByText(/SB_DISABLE_PROXY_SIGN_IN/)).toBeTruthy();
+  });
+});
+
 describe("the bootstrap page", { tags: ["015-US6"] }, () => {
   it("makes an existing person the site admin", async () => {
     const { calls, onDone } = setup(ok);

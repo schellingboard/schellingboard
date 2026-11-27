@@ -6149,6 +6149,10 @@ msgstr "Seit {0}"
 msgid "Site admin"
 msgstr "Site-Admin"
 
+#: src/features/sign-in/bootstrap-screen.tsx
+msgid "Site admins do not sign in through the proxy, so this link would not let you in. Ask whoever runs the server to start it with SB_DISABLE_PROXY_SIGN_IN=1 and use the link again."
+msgstr "Site-Admins melden sich nicht über den Proxy an, daher würde dieser Link dich nicht hineinlassen. Bitte die Person, die den Server betreibt, ihn mit SB_DISABLE_PROXY_SIGN_IN=1 zu starten, und nutze den Link erneut."
+
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "Site admins sign in through the proxy too"
 msgstr "Site-Admins melden sich auch über den Proxy an"
@@ -6644,6 +6648,15 @@ msgstr "Der Server hat das abgelehnt. Bitte versuche es erneut."
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "The server was started with SB_DISABLE_PROXY_SIGN_IN, so these settings are not in effect and nobody is signed in by the proxy."
 msgstr "Der Server wurde mit SB_DISABLE_PROXY_SIGN_IN gestartet, daher gelten diese Einstellungen nicht und der Proxy meldet niemanden an."
+
+#. placeholder {0}: proxyPerson.name
+#: src/features/sign-in/bootstrap-screen.tsx
+msgid "The sign-in proxy identifies you as {0}. This one-time link makes you a site admin; you need no username or password."
+msgstr "Der Anmelde-Proxy erkennt dich als {0}. Dieser einmalige Link macht dich zum Site-Admin; du brauchst weder Benutzernamen noch Passwort."
+
+#: src/features/sign-in/bootstrap-screen.tsx
+msgid "The sign-in proxy identifies you. This one-time link makes you a site admin; you need no username or password."
+msgstr "Der Anmelde-Proxy erkennt dich. Dieser einmalige Link macht dich zum Site-Admin; du brauchst weder Benutzernamen noch Passwort."
 
 #: src/features/people/prompt-text.ts
 msgid "The strangest job I ever had"

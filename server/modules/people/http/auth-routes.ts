@@ -81,7 +81,7 @@ const bootstrap = createRoute({
   path: "/auth/bootstrap",
   tags: ["auth"],
   description:
-    "Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409).",
+    "Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. A person the sign-in proxy identifies becomes the site admin themselves, with no other field and no cookie. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409).",
   request: { body: body(bootstrapBodySchema) },
   responses: {
     200: json(identitySchema, "The site admin the browser now acts as"),
@@ -142,10 +142,11 @@ export function addAuthRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(bootstrap, async (c) => {
     const result = await people().bootstrapAdmin(c.var.actor, {
       ...c.req.valid("json"),
+      proxySiteAdmins: c.var.proxy.siteAdmins,
       device: c.req.header("user-agent")?.slice(0, 200) ?? null,
     });
     if (!result.ok) return problem(result.error);
-    setGuestCookie(c, result.value);
+    if (result.value.session) setGuestCookie(c, result.value.session);
     return c.json({ guestId: result.value.guestId }, 200);
   });
 

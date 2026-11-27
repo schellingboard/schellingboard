@@ -336,12 +336,19 @@ function Bootstrap({
 }: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
   const { params } = useUrlSearchParams();
   const calls = useMemo(() => signInCalls(api), [api]);
-  if (!loaded) return <DirectoryWait failed={failed} />;
+  const viewer = useViewer();
+  if (!loaded || viewer.guestId === undefined)
+    return <DirectoryWait failed={failed} />;
   return (
     <BootstrapScreen
       calls={calls}
       token={params.get("token") ?? undefined}
       guests={entries}
+      proxyPerson={
+        viewer.fixed
+          ? { name: entries.find((e) => e.id === viewer.guestId)?.name }
+          : undefined
+      }
       onBootstrapped={() => hardNavigate("/admin/events")}
     />
   );
