@@ -36,6 +36,31 @@ One global row shown when there's more than one event (see
   browser tab and the installed app.
 - **Map image** — JPEG/PNG/WebP, max 5 MB.
 
+### Sign-in through a proxy
+
+If a sign-in proxy such as oauth2-proxy or Authelia sits in front of the site, this card lets it
+identify attendees, so nobody picks a name or enters a code. Set the proxy up first, following
+[Sign-in through a proxy](../self-hosting/proxy-sign-in.md). The card is off by default.
+
+- **Header with the email** — the request header that carries the person's email. The email must
+  match the **system email** of a guest; a contact email typed into a profile never counts. A
+  request without the header signs in the normal way, and a request with an unknown email carries on
+  without a name.
+- **Secret** — **Make secret** shows a value once; configure the proxy to send it in the
+  `X-SchellingBoard-Proxy-Secret` header. Requests without it are not signed in. **Replace secret**
+  makes a new one, **Remove secret** stops requiring it.
+- **Proxy addresses** — IP addresses or ranges of the proxy. If you set both a secret and addresses,
+  a request needs both.
+- **Sign out address** — where **Sign out** leads (the proxy's logout page). Empty hides **Sign
+  out**.
+- **Site admins sign in through the proxy too** — off by default: a site admin behind the proxy is a
+  normal person and signs in with a password to administer.
+
+While the sign-in is on and neither a secret nor an address is set, the card shows a warning: anyone
+who reaches the app without the proxy can send the header and become any person. Under the card, a
+line tells you what your own request to the page carried (header missing, header trusted, or header
+ignored), so a wrong setup is visible at once.
+
 ## Events
 
 - **Name** (required) — the URL slug is derived from the name once, at creation, and never changes

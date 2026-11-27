@@ -31,11 +31,11 @@ proxy, it can send the header itself and become any person.
 3. **Trust checks are optional.** The admin can set a shared secret, a list of proxy addresses (IP
    or CIDR, compared with the socket address, never with `X-Forwarded-For`), both or neither. The
    app generates the secret and stores only its sha256 hash; the proxy sends it in
-   `X-SchellingBoard-Proxy-Secret`. While neither is set, the card shows a clear, permanent warning:
-   a client that reaches the app without the proxy can become anyone, so set a secret or an address
-   list. An admin who knows that the network allows no other path can leave both empty. The card
-   also shows what the admin's own current request carried (header seen, trusted or not), so a wrong
-   setup is visible at once.
+   `X-SchellingBoard-Proxy-Secret`. While the sign-in is on and neither is set, the card shows a
+   clear, permanent warning: a client that reaches the app without the proxy can become anyone, so
+   set a secret or an address list. An admin who knows that the network allows no other path can
+   leave both empty. The card also shows what the admin's own current request carried (header seen,
+   trusted or not), so a wrong setup is visible at once.
 4. **The header wins, on each request.** A trusted request with a known email acts as that person: a
    `verified` actor with `via: "proxy"`, made from the header alone. No login session row and no
    cookie are made. Thus there is nothing to copy, and a sign-out at the proxy or an email change
