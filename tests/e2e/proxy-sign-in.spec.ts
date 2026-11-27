@@ -24,6 +24,10 @@ test.describe("Admin proxy sign-in", () => {
     }
     if (await card.getByRole("button", { name: "Remove secret" }).isVisible()) {
       await card.getByRole("button", { name: "Remove secret" }).click();
+      await page
+        .getByRole("dialog")
+        .getByRole("button", { name: "Remove secret" })
+        .click();
       await expect(card.getByText("Secret removed.")).toBeVisible();
     }
   });
@@ -58,6 +62,10 @@ test.describe("Admin proxy sign-in", () => {
     ).toBeVisible();
 
     await card.getByRole("button", { name: "Remove secret" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Remove secret" })
+      .click();
     await expect(card.getByText("Secret removed.")).toBeVisible();
     await card.getByLabel("Sign in through a proxy").uncheck();
     await card.getByRole("button", { name: "Save proxy sign-in" }).click();
