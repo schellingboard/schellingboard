@@ -6111,6 +6111,10 @@ msgstr "Iniciar sesión como {name}"
 msgid "Sign in through a proxy"
 msgstr "Iniciar sesión mediante proxy"
 
+#: src/app/account-pages.tsx
+msgid "Sign in with your password to use admin."
+msgstr "Inicia sesión con tu contraseña para usar la administración."
+
 #: src/features/sign-in/account-security.tsx
 msgid "Sign out"
 msgstr "Cerrar sesión"

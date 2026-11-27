@@ -87,7 +87,7 @@ export const chooseGuest = (deps: PeopleDeps) => {
           await start(actor, {
             guestId,
             level: "verified",
-            via: actor.guest.via ?? "password",
+            via: actor.guest.via ?? "name",
             device,
           })
         )
@@ -118,6 +118,7 @@ export const currentGuest =
     locale: string | null;
     awaitingLogin?: true;
     fixedBy?: { logoutUrl: string; siteAdmin: boolean };
+    adminNeedsSignIn?: true;
     nameToConfirm?: string;
     proxyUnknownEmail?: true;
   }> => {
@@ -132,14 +133,15 @@ export const currentGuest =
     const proven = !creds.authProtected || actor.guest.level === "verified";
     if (!proven) return { guestId: null, locale: null, awaitingLogin: true };
     const guest = await repos.guests.findById(actor.guest.id);
+    const siteAdmin = await repos.guests.getSiteAdmin(actor.guest.id);
     const identity = {
       guestId: actor.guest.id,
       locale: guest?.info.locale ?? null,
+      ...(siteAdmin && !actor.admin && { adminNeedsSignIn: true as const }),
       ...((await repos.guests.isNameUnconfirmed(actor.guest.id)) &&
         guest && { nameToConfirm: guest.name }),
     };
     if (actor.guest.via !== "proxy") return identity;
     const { logoutUrl } = await repos.settings.getProxySignIn();
-    const siteAdmin = await repos.guests.getSiteAdmin(actor.guest.id);
     return { ...identity, fixedBy: { logoutUrl, siteAdmin } };
   };

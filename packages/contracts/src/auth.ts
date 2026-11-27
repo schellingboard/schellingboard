@@ -33,6 +33,12 @@ export const currentIdentitySchema = chosenIdentitySchema.extend({
     .describe(
       "Present when a sign-in proxy decides who the browser acts as: no name picker, no switching"
     ),
+  adminNeedsSignIn: z
+    .boolean()
+    .optional()
+    .describe(
+      "True when the person is a site admin but this session gives no admin rights: only a password or an emailed code does"
+    ),
   nameToConfirm: z
     .string()
     .optional()

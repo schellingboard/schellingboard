@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
 import { useRouter } from "@tanstack/react-router";
@@ -313,12 +314,19 @@ function Login({
       </div>
     );
   }
-  const guestId = params.get("guest");
+  // Such a person may have neither an email nor a username to type.
+  const guestId =
+    params.get("guest") ?? (viewer.adminNeedsSignIn ? viewer.guestId : null);
   const named = entries.find((e) => e.id === guestId);
   if (guestId && !named && !loaded) return <DirectoryWait failed={failed} />;
   return (
     <LoginScreen
       calls={calls}
+      notice={
+        viewer.adminNeedsSignIn
+          ? t`Sign in with your password to use admin.`
+          : undefined
+      }
       guest={guestId ? (named ?? null) : undefined}
       code={params.get("code") ?? undefined}
       onSignedIn={() =>

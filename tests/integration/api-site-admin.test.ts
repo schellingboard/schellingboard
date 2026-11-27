@@ -5,7 +5,7 @@ import { peopleUseCases } from "@/server/composition";
 import { openApiDocument } from "@/server/http/openapi";
 import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { hashSessionToken } from "@/utils/login-session-token";
-import { verifyUserPassword } from "@/utils/user-credentials";
+import { hashUserPassword, verifyUserPassword } from "@/utils/user-credentials";
 
 import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
@@ -98,6 +98,119 @@ describe("the site-admin role", () => {
     expect(res.status).toBe(403);
     expect(await code(res)).toBe("siteAdmin.protected");
   });
+});
+
+describe("a link never gives admin rights", () => {
+  const sessionOf = (res: Response) =>
+    (res.headers.get("set-cookie") ?? "").split(";")[0].split("=")[1];
+
+  async function joinedByLink() {
+    const event = await createEvent();
+    const guest = await createGuest();
+    await getRepositories().joinTokens.replace({
+      hash: hashSessionToken("join-token"),
+      guestId: guest.id,
+      eventId: event.id,
+      createdAt: new Date(),
+    });
+    const res = await call("POST", "/auth/join", { token: "join-token" });
+    return { guest, token: sessionOf(res) };
+  }
+
+  const adminStatus = async (token: string) =>
+    (await call("GET", "/admin/guests", undefined, token)).status;
+
+  it(
+    "not to a session made by a link before its person became site admin",
+    { tags: ["016-US4"] },
+    async () => {
+      const { guest, token } = await joinedByLink();
+      await getRepositories().guests.setSiteAdmin(guest.id, true);
+
+      expect(await adminStatus(token)).toBe(403);
+      const picked = await call(
+        "PUT",
+        "/me/identity",
+        { guestId: guest.id },
+        token
+      );
+      expect(picked.status).toBe(200);
+      expect(await adminStatus(sessionOf(picked))).toBe(403);
+
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: await hashUserPassword("correct horse"),
+      });
+      const login = await call("POST", "/auth/login", {
+        guestId: guest.id,
+        credential: "correct horse",
+      });
+      expect(await adminStatus(sessionOf(login))).toBe(200);
+    }
+  );
+
+  it.each([
+    ["password", 200],
+    ["code", 200],
+    ["link", 403],
+    ["name", 403],
+  ] as const)(
+    "answers a verified site-admin session made by %s with %i",
+    { tags: ["016-US4"] },
+    async (via, status) => {
+      const admin = await siteAdmin();
+
+      expect(await adminStatus(await verifiedGuestValue(admin.id, via))).toBe(
+        status
+      );
+    }
+  );
+
+  it.each(["link", "code", "password"] as const)(
+    "refuses a site admin who sets a password from a %s session",
+    { tags: ["016-US4"] },
+    async (via) => {
+      const admin = await siteAdmin();
+      const token = await verifiedGuestValue(admin.id, via);
+
+      const res = await call(
+        "POST",
+        "/me/credentials/password",
+        { newPassword: "correct horse" },
+        token
+      );
+
+      expect(res.status).toBe(403);
+      expect(await code(res)).toBe("siteAdmin.passwordLink");
+      const creds = await getRepositories().guests.getAuthCredentials(admin.id);
+      expect(creds?.passwordHash).toBeNull();
+      const shown = await call("GET", "/me/credentials", undefined, token);
+      expect(await shown.json()).toMatchObject({ canSetPassword: false });
+    }
+  );
+
+  it(
+    "tells a site admin whose session gives no rights to sign in",
+    { tags: ["016-US4"] },
+    async () => {
+      const admin = await siteAdmin();
+      const attendee = await createGuest();
+      const flag = async (guestId: string, via: "password" | "link") => {
+        const res = await call(
+          "GET",
+          "/me/identity",
+          undefined,
+          await verifiedGuestValue(guestId, via)
+        );
+        return ((await res.json()) as { adminNeedsSignIn?: boolean })
+          .adminNeedsSignIn;
+      };
+
+      expect(await flag(admin.id, "link")).toBe(true);
+      expect(await flag(admin.id, "password")).toBeUndefined();
+      expect(await flag(attendee.id, "link")).toBeUndefined();
+    }
+  );
 });
 
 describe("admin views and records", () => {
@@ -324,7 +437,11 @@ describe("POST /api/v1/auth/bootstrap", () => {
         .split(";")[0]
         .split("=")[1];
       const row = await loginSessions.get(hashSessionToken(cookie));
-      expect(row).toMatchObject({ guestId: guest!.id, assurance: "verified" });
+      expect(row).toMatchObject({
+        guestId: guest!.id,
+        assurance: "verified",
+        via: "password",
+      });
     }
   );
 

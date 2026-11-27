@@ -53,7 +53,7 @@ const setFirstPassword = createRoute({
   path: "/me/credentials/password",
   tags: ["auth"],
   description:
-    "Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a reset link replaces it. Only a join-link login may replace a forgotten password here, and only where no mail can reset it (no email on file, or the site sends none); never for a site admin.",
+    "Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a reset link replaces it. Only a join-link login may replace a forgotten password here, and only where no mail can reset it (no email on file, or the site sends none). A site admin is refused with `siteAdmin.passwordLink` (403): their password changes only with the old one or through a reset link.",
   request: {
     headers: idempotencyHeaders,
     body: body(firstPasswordBodySchema),

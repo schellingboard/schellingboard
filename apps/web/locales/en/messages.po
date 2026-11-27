@@ -6111,6 +6111,10 @@ msgstr "Sign in as {name}"
 msgid "Sign in through a proxy"
 msgstr "Sign in through a proxy"
 
+#: src/app/account-pages.tsx
+msgid "Sign in with your password to use admin."
+msgstr "Sign in with your password to use admin."
+
 #: src/features/sign-in/account-security.tsx
 msgid "Sign out"
 msgstr "Sign out"

@@ -256,6 +256,10 @@ describe("sign-in through a proxy", { tags: ["025-US2"] }, () => {
       request("/api/v1/admin/guests", headers).then((r) => r.status);
 
     expect(await admin(email)).toBe(403);
+    const link = await verifiedGuestValue(ada.id, "link");
+    expect(
+      await admin({ ...email, cookie: `${GUEST_COOKIE_NAME}=${link}` })
+    ).toBe(403);
     const password = `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(ada.id)}`;
     expect(await admin({ ...email, cookie: password })).toBe(200);
 

@@ -3119,6 +3119,8 @@ export interface paths {
                 /** @description Whether the person administers */
                 siteAdmin: boolean;
               };
+              /** @description True when the person is a site admin but this session gives no admin rights: only a password or an emailed code does */
+              adminNeedsSignIn?: boolean;
               /** @description The name a proxy sign-in gave the person, present until they confirm it */
               nameToConfirm?: string;
               /** @description True when a sign-in proxy sent an email that this site has no person for */
@@ -4299,7 +4301,7 @@ export interface paths {
         };
       };
     };
-    /** @description Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a reset link replaces it. Only a join-link login may replace a forgotten password here, and only where no mail can reset it (no email on file, or the site sends none); never for a site admin. */
+    /** @description Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a reset link replaces it. Only a join-link login may replace a forgotten password here, and only where no mail can reset it (no email on file, or the site sends none). A site admin is refused with `siteAdmin.passwordLink` (403): their password changes only with the old one or through a reset link. */
     post: {
       parameters: {
         query?: never;

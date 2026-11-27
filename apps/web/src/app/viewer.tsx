@@ -50,6 +50,8 @@ export type Viewer = {
   guestId: string | null | undefined;
   /** Set while a sign-in proxy decides who the browser acts as. */
   fixed?: FixedIdentity;
+  /** A site admin whose session gives no admin rights. */
+  adminNeedsSignIn?: boolean;
   /** The name a proxy gave this person, until they confirm it. */
   nameToConfirm?: string;
   /** A sign-in proxy sent an email this site has no person for. */
@@ -61,9 +63,11 @@ export type Viewer = {
 };
 
 const flagsOf = (data: {
+  adminNeedsSignIn?: boolean;
   nameToConfirm?: string;
   proxyUnknownEmail?: boolean;
 }) => ({
+  adminNeedsSignIn: data.adminNeedsSignIn === true,
   nameToConfirm: data.nameToConfirm,
   proxyUnknownEmail: data.proxyUnknownEmail === true,
 });
@@ -91,6 +95,7 @@ export function ViewerProvider({
   const [guestId, setGuestId] = useState<string | null | undefined>(undefined);
   const [fixed, setFixed] = useState<FixedIdentity>();
   const [flags, setFlags] = useState({
+    adminNeedsSignIn: false,
     nameToConfirm: undefined as string | undefined,
     proxyUnknownEmail: false,
   });
