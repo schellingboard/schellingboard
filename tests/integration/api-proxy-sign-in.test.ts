@@ -20,6 +20,7 @@ import { handleRequest } from "@/server/http/handler";
 import { makePerson } from "@/server/kernel/make-person";
 import { hashProxySecret } from "@/server/kernel/proxy-sign-in";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { hashSessionToken } from "@/utils/login-session-token";
 
 import {
   createEventAction,
@@ -316,6 +317,75 @@ describe("sign-in through a proxy", { tags: ["025-US2"] }, () => {
       "identity.fixed"
     );
   });
+});
+
+describe("login and join screens for a proxy person", () => {
+  const post = (path: string, body: unknown) =>
+    request(
+      path,
+      { "content-type": "application/json", "X-Forwarded-Email": EMAIL },
+      { method: "POST", body: JSON.stringify(body) }
+    );
+  const code = async (res: Response) =>
+    ((await res.json()) as { code: string }).code;
+
+  it("refuses a login and a login code", { tags: ["025-US2"] }, async () => {
+    const other = await createGuest();
+    await createGuest({ email: EMAIL });
+    await configure();
+
+    const login = await post("/api/v1/auth/login", {
+      guestId: other.id,
+      credential: "x",
+    });
+    expect(login.status).toBe(403);
+    expect(await code(login)).toBe("identity.fixed");
+    const mail = await post("/api/v1/auth/login-code", { guestId: other.id });
+    expect(mail.status).toBe(403);
+    expect(await code(mail)).toBe("identity.fixed");
+  });
+
+  it(
+    "joins the event through a link but signs no one in",
+    { tags: ["025-US2"] },
+    async () => {
+      const ada = await adminGuest();
+      const other = await createGuest();
+      const event = await createEvent();
+      await configure();
+      const token = "join-token-for-the-test";
+      await getRepositories().joinTokens.replace({
+        hash: hashSessionToken(token),
+        guestId: other.id,
+        eventId: event.id,
+        createdAt: new Date(),
+      });
+
+      const res = await post("/api/v1/auth/join", { token });
+      expect(res.status).toBe(403);
+      expect(await code(res)).toBe("identity.fixed");
+      expect(res.headers.get("set-cookie")).toBeNull();
+      expect(
+        (await getRepositories().guests.listByEvent(event.id)).map((g) => g.id)
+      ).not.toContain(other.id);
+
+      const own = hashSessionToken("own-token-for-the-test");
+      await getRepositories().joinTokens.replace({
+        hash: own,
+        guestId: ada.id,
+        eventId: event.id,
+        createdAt: new Date(),
+      });
+      const ownRes = await post("/api/v1/auth/join", {
+        token: "own-token-for-the-test",
+      });
+      expect(ownRes.status).toBe(200);
+      expect(ownRes.headers.get("set-cookie")).toBeNull();
+      expect(
+        (await getRepositories().guests.listByEvent(event.id)).map((g) => g.id)
+      ).toContain(ada.id);
+    }
+  );
 });
 
 describe("the identity the web app reads", { tags: ["025-US2"] }, () => {

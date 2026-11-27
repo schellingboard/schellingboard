@@ -8,7 +8,7 @@ import { useCredentialForm } from "./use-credential-form";
 type Outcome =
   | { kind: "working" }
   | { kind: "signIn"; guestId: string }
-  | { kind: "failed"; message: string; replaced: boolean };
+  | { kind: "failed"; message: string; replaced: boolean; fixed: boolean };
 
 export function JoinScreen({
   calls,
@@ -36,6 +36,7 @@ export function JoinScreen({
           message: result.message,
           replaced:
             result.kind === "refused" && result.code === "join.tokenWrong",
+          fixed: result.kind === "refused" && result.code === "identity.fixed",
         });
       const joined = result.data;
       if (!joined) return;
@@ -66,7 +67,9 @@ export function JoinScreen({
           <p role="alert" className="text-danger-fg">
             {outcome.replaced
               ? t`This link no longer works: a newer one replaced it. Ask an organizer for a new link.`
-              : outcome.message}
+              : outcome.fixed
+                ? t`The proxy decides who you are on this site, so this link for someone else cannot sign you in.`
+                : outcome.message}
           </p>
           <a href="/" className="self-start text-sm underline">
             <Trans>Go to the start page</Trans>

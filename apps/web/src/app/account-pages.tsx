@@ -281,6 +281,38 @@ function Login({
 }: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
   const { params } = useUrlSearchParams();
   const calls = useMemo(() => signInCalls(api), [api]);
+  const viewer = useViewer();
+  if (viewer.guestId === undefined)
+    return (
+      <p role="status">
+        <Trans>Loading…</Trans>
+      </p>
+    );
+  if (viewer.fixed) {
+    const me = entries.find((e) => e.id === viewer.guestId);
+    return (
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 sm:px-0">
+        <h1 className="text-2xl font-bold">
+          <Trans>Log in</Trans>
+        </h1>
+        <p role="status" className="text-fg-muted">
+          {me ? (
+            <Trans>
+              The proxy signs you in as {me.name}. There is nothing to log in to
+              here.
+            </Trans>
+          ) : (
+            <Trans>
+              The proxy signs you in. There is nothing to log in to here.
+            </Trans>
+          )}
+        </p>
+        <a href="/" className="self-start text-sm underline">
+          <Trans>Go to the start page</Trans>
+        </a>
+      </div>
+    );
+  }
   const guestId = params.get("guest");
   const named = entries.find((e) => e.id === guestId);
   if (guestId && !named && !loaded) return <DirectoryWait failed={failed} />;

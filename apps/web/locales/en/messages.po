@@ -3260,6 +3260,7 @@ msgstr "Go to sign in"
 msgid "Go to the events"
 msgstr "Go to the events"
 
+#: src/app/account-pages.tsx
 #: src/features/sign-in/join-screen.tsx
 msgid "Go to the start page"
 msgstr "Go to the start page"
@@ -3921,6 +3922,7 @@ msgstr "Locations"
 msgid "Locations to leave out"
 msgstr "Locations to leave out"
 
+#: src/app/account-pages.tsx
 #: src/app/user-menu.tsx
 #: src/features/sign-in/guest-login-form.tsx
 msgid "Log in"
@@ -6601,9 +6603,22 @@ msgstr "The predicted columns come from the attendance model, fitted on one even
 msgid "The proposal phase is over."
 msgstr "The proposal phase is over."
 
+#: src/features/sign-in/join-screen.tsx
+msgid "The proxy decides who you are on this site, so this link for someone else cannot sign you in."
+msgstr "The proxy decides who you are on this site, so this link for someone else cannot sign you in."
+
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "The proxy sends the secret in the X-SchellingBoard-Proxy-Secret header. Requests without it are not signed in."
 msgstr "The proxy sends the secret in the X-SchellingBoard-Proxy-Secret header. Requests without it are not signed in."
+
+#. placeholder {0}: me.name
+#: src/app/account-pages.tsx
+msgid "The proxy signs you in as {0}. There is nothing to log in to here."
+msgstr "The proxy signs you in as {0}. There is nothing to log in to here."
+
+#: src/app/account-pages.tsx
+msgid "The proxy signs you in. There is nothing to log in to here."
+msgstr "The proxy signs you in. There is nothing to log in to here."
 
 #: src/features/people/prompt-text.ts
 msgid "The rabbit hole I fell down recently"
