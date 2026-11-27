@@ -20,6 +20,12 @@ const proxySignInFields = {
   siteAdmins: z
     .boolean()
     .describe("Whether site admins sign in through the proxy"),
+  createPeople: z
+    .boolean()
+    .describe("Whether an email no person has makes a new person"),
+  nameHeader: z
+    .string()
+    .describe("The header with a new person's name; empty uses the email"),
 };
 
 export const proxySignInInputSchema = z.object(proxySignInFields);

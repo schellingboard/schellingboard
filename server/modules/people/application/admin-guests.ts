@@ -9,6 +9,7 @@ import type { z } from "zod";
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
 import { credentialsChanged } from "@/server/kernel/credential-changes";
+import { makePerson } from "@/server/kernel/make-person";
 import { recordingProposalCascade } from "@/server/kernel/proposal-cascade";
 import {
   conflict,
@@ -167,27 +168,17 @@ export const createGuest =
     return uow.run(async (tx) => {
       for (const eventId of eventIds)
         if (!(await tx.events.findById(eventId))) return eventNotFound();
-      // findOrCreateByEmail is atomic (unique index on lower(email)), so a
-      // concurrent create with the same email can't slip past this check.
-      const { guest, created } = await tx.guests.findOrCreateByEmail({
-        name,
-        info: { email },
-      });
+      const { guest, created } = await makePerson(
+        tx,
+        { name, email, eventIds },
+        byAdmin(actor, now)
+      );
       if (!created) return emailTaken();
       if (
         username !== null &&
         (await tx.guests.setUsername(guest.id, username)) === "taken"
       )
         return usernameTaken();
-      await recordingShownGuests(
-        tx,
-        eventIds,
-        async () => {
-          for (const eventId of eventIds)
-            await tx.guests.assignToEvent(eventId, [guest.id]);
-        },
-        byAdmin(actor, now)
-      );
       const stored = (await tx.guests.findById(guest.id)) ?? guest;
       return ok(toAdminGuest(stored, eventIds, false, false, username));
     });

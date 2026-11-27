@@ -37,6 +37,7 @@ import {
 } from "./labels";
 import { updateMyLocale } from "./locale";
 import {
+  confirmMyName,
   getProfile,
   getProfileActivity,
   listAttendees,
@@ -70,6 +71,7 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     listEventProfiles: listEventProfiles(deps),
     updateMyLocale: updateMyLocale(deps),
     updateMyProfile: updateMyProfile(deps),
+    confirmMyName: confirmMyName(deps),
     replaceMyAvatar: replaceMyAvatar(deps),
     removeMyAvatar: removeMyAvatar(deps),
     listGuests: listGuests(deps),

@@ -2402,6 +2402,10 @@ msgstr "Erstellen"
 msgid "Create event"
 msgstr "Veranstaltung erstellen"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Create people the site does not know"
+msgstr "Unbekannte Personen anlegen"
+
 #: src/features/admin/event-proposals.tsx
 msgid "Create session"
 msgstr "Session erstellen"
@@ -3315,6 +3319,10 @@ msgstr "Er/They"
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "Header with the email"
 msgstr "Header mit der E-Mail-Adresse"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Header with the name"
+msgstr "Header mit dem Namen"
 
 #: src/features/admin/stats-text.ts
 msgid "Headline numbers"
@@ -4249,8 +4257,8 @@ msgstr "k. A."
 #: src/features/admin/events-screen.tsx
 #: src/features/admin/guests-screen.tsx
 #: src/features/admin/locations-screen.tsx
-#: src/features/people/profile-form.tsx
 #: src/features/sign-in/bootstrap-screen.tsx
+#: src/ui/name-field.tsx
 msgid "Name"
 msgstr "Name"
 
@@ -4614,6 +4622,10 @@ msgid "Now · {at}"
 msgstr "Jetzt · {at}"
 
 #: src/features/admin/proxy-sign-in-card.tsx
+msgid "Off: a person the site does not know gets a notice and no sign-in. On: they are made at their first visit and confirm their name."
+msgstr "Aus: Eine unbekannte Person sieht einen Hinweis und wird nicht angemeldet. An: Sie wird beim ersten Besuch angelegt und bestätigt ihren Namen."
+
+#: src/features/admin/proxy-sign-in-card.tsx
 msgid "Off: a site admin behind the proxy is a normal person and signs in with a password to administer."
 msgstr "Aus: Ein Site-Admin hinter dem Proxy ist eine normale Person und meldet sich zum Verwalten mit einem Passwort an."
 
@@ -4744,6 +4756,10 @@ msgstr "Öffnet sich über die Schaltfläche „Brauchst du Ideen?“. Markdown 
 #: src/features/people/profile-form.tsx
 msgid "Optional prompts that give people something to ask you about"
 msgstr "Optionale Fragen, die Leuten einen Anlass geben, dich anzusprechen"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Optional, for example Remote-Name. Empty uses the part of the email before the @."
+msgstr "Optional, zum Beispiel Remote-Name. Leer nimmt den Teil der E-Mail vor dem @."
 
 #: src/features/admin/event-moments.tsx
 msgid "Optional, one line."
@@ -5464,6 +5480,7 @@ msgstr "Zusagen pro laufender Session am {day}"
 msgid "RSVPs to running sessions (average)"
 msgstr "Zusagen zu laufenden Sessions (Durchschnitt)"
 
+#: src/app/name-confirm-dialog.tsx
 #: src/features/admin/event-days.tsx
 #: src/features/admin/event-labels.tsx
 #: src/features/admin/event-meetings.tsx
@@ -5526,6 +5543,7 @@ msgstr "Gespeichert"
 msgid "Saved!"
 msgstr "Gespeichert!"
 
+#: src/app/name-confirm-dialog.tsx
 #: src/features/admin/event-config.tsx
 #: src/features/admin/event-days.tsx
 #: src/features/admin/event-labels.tsx
@@ -6192,6 +6210,11 @@ msgstr "Jemand anderes"
 msgid "Someone else changed this while you were editing it."
 msgstr "Jemand anderes hat das geändert, während du es bearbeitet hast."
 
+#. placeholder {0}: field.value.trim()
+#: src/ui/name-field.tsx
+msgid "Someone is already called {0}. You can keep it, but people may mix you up."
+msgstr "Jemand heißt bereits {0}. Du kannst den Namen behalten, aber man könnte dich verwechseln."
+
 #: src/features/settings/email-settings-form.tsx
 msgid "someone joins a proposal I’m hosting as a co-host"
 msgstr "jemand einem Vorschlag, den ich hoste, als Co-Host beitritt"
@@ -6697,6 +6720,10 @@ msgstr "Das ist eine geschlossene Session, das heißt, du darfst höchstens 5 Mi
 msgid "This is a test email sent to {name}."
 msgstr "Das ist eine Test-E-Mail an {name}."
 
+#: src/app/name-confirm-dialog.tsx
+msgid "This is how other people see you. Change it if it is not right."
+msgstr "So sehen dich andere. Ändere ihn, wenn er nicht stimmt."
+
 #: src/commands/failure-message.ts
 msgid "This is turned off on this site."
 msgstr "Das ist auf dieser Website ausgeschaltet."
@@ -6813,6 +6840,10 @@ msgstr "Diese Session gibt es nicht mehr."
 #: src/features/sessions/session-form.tsx
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr "Diese Session wurde aus einem Vorschlag eingeplant. Sieh ihn dir <0>hier</0> an."
+
+#: src/app/proxy-notice.tsx
+msgid "This site has no person with the email your sign-in sent. Ask an organizer to add you."
+msgstr "Diese Seite kennt keine Person mit der E-Mail-Adresse deiner Anmeldung. Bitte einen Organizer, dich hinzuzufügen."
 
 #: src/app/footer.tsx
 msgid "This site is running {shown}."
@@ -7618,6 +7649,7 @@ msgstr "dein 1:1-Gespräch mit {otherName}"
 msgid "Your link to {eventName}"
 msgstr "Dein Link zu {eventName}"
 
+#: src/app/name-confirm-dialog.tsx
 #: src/app/user-menu.tsx
 #: src/features/people/profile-form.tsx
 msgid "Your name"

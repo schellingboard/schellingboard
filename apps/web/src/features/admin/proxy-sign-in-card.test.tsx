@@ -16,6 +16,8 @@ const off: ProxySignInSettings = {
   addresses: [],
   logoutUrl: "",
   siteAdmins: false,
+  createPeople: false,
+  nameHeader: "",
   secretSet: false,
   ownRequest: null,
 };
@@ -58,6 +60,13 @@ describe("the proxy sign-in card", { tags: ["025-US1"] }, () => {
       "https://sso.example/logout"
     );
     await userEvent.click(
+      screen.getByLabelText("Create people the site does not know")
+    );
+    await userEvent.type(
+      screen.getByLabelText("Header with the name"),
+      "Remote-Name"
+    );
+    await userEvent.click(
       screen.getByRole("button", { name: "Save proxy sign-in" })
     );
 
@@ -72,6 +81,8 @@ describe("the proxy sign-in card", { tags: ["025-US1"] }, () => {
         addresses: ["10.0.0.1", "172.16.0.0/12"],
         logoutUrl: "https://sso.example/logout",
         siteAdmins: false,
+        createPeople: true,
+        nameHeader: "Remote-Name",
       },
     });
   });

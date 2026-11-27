@@ -14,7 +14,9 @@ import { useHealth } from "./health";
 import { IdentityPrompt } from "./identity-prompt";
 import { Layout } from "./layout";
 import { MapButton } from "./map-button";
+import { NameConfirmDialog } from "./name-confirm-dialog";
 import { NavBar, type NavItem } from "./nav-bar";
+import { ProxyNotice } from "./proxy-notice";
 import { ReloadOffer } from "./reload-offer";
 import type { AppServices } from "./services";
 import { useSite } from "./site";
@@ -41,6 +43,16 @@ export function ShellFrame({
   const kiosk = useKioskMode(new URLSearchParams(search));
   return (
     <IdentityPrompt guests={guests}>
+      {viewer.nameToConfirm !== undefined && (
+        <NameConfirmDialog
+          api={api}
+          names={(guests ?? [])
+            .filter((g) => g.id !== viewer.guestId)
+            .map((g) => g.name)}
+          initial={viewer.nameToConfirm}
+          onConfirmed={() => void viewer.refresh()}
+        />
+      )}
       <Layout
         nav={
           <NavBar items={events} currentPath={currentPath}>
@@ -51,6 +63,7 @@ export function ShellFrame({
         }
         footer={<Footer api={api} version={health?.version} update={update} />}
       >
+        <ProxyNotice unknownEmail={viewer.proxyUnknownEmail === true} />
         <ReloadOffer api={api} kiosk={kiosk} onReload={hardReload} />
         <ErrorBoundary resetKey={currentPath}>{children}</ErrorBoundary>
         <DevToolbar

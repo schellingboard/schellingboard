@@ -17,10 +17,12 @@ import {
 import { getRepositories } from "@/db/container";
 import { resolveDbPath } from "@/db/migrate";
 import { handleRequest } from "@/server/http/handler";
+import { makePerson } from "@/server/kernel/make-person";
 import { hashProxySecret } from "@/server/kernel/proxy-sign-in";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 
 import { resetTestDb, setupTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
+import { createEvent, createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
@@ -36,6 +38,8 @@ const on: ProxySignIn = {
   addresses: [],
   logoutUrl: "",
   siteAdmins: false,
+  createPeople: false,
+  nameHeader: "",
 };
 
 // The pages need a shell to serve, and CI tests without building the web app.
@@ -51,12 +55,19 @@ const configure = (patch: Partial<ProxySignIn> = {}) =>
 function request(
   path: string,
   headers: Record<string, string> = {},
-  { peer = "10.0.0.5", method = "GET" } = {}
+  {
+    peer = "10.0.0.5",
+    method = "GET",
+    body,
+  }: { peer?: string; method?: string; body?: string } = {}
 ) {
   return Promise.resolve(
-    handleRequest(new Request(`http://test${path}`, { method, headers }), {
-      incoming: { socket: { remoteAddress: peer } },
-    })
+    handleRequest(
+      new Request(`http://test${path}`, { method, headers, body }),
+      {
+        incoming: { socket: { remoteAddress: peer } },
+      }
+    )
   );
 }
 
@@ -334,6 +345,202 @@ describe("the identity the web app reads", { tags: ["025-US2"] }, () => {
     await configure();
 
     expect((await identity({})).fixedBy).toBeUndefined();
+  });
+});
+
+describe("people the proxy brings", { tags: ["025-US2"] }, () => {
+  beforeEach(() => vi.stubEnv("SITE_PASSWORD", ""));
+
+  const identity = async (headers: Record<string, string>) =>
+    (await (await request("/api/v1/me/identity", headers)).json()) as {
+      guestId: string | null;
+      nameToConfirm?: string;
+      proxyUnknownEmail?: boolean;
+    };
+  const named = async (id: string) =>
+    (await getRepositories().guests.findById(id))?.name;
+
+  it("continues without identity and says why, also over another person's cookie", async () => {
+    const bob = await createGuest();
+    await configure();
+    const asBob = `${GUEST_COOKIE_NAME}=${openGuestValue(bob.id)}`;
+
+    const answer = await identity({
+      "X-Forwarded-Email": "new@proxy.example",
+      cookie: asBob,
+    });
+
+    expect(answer).toMatchObject({ guestId: null, proxyUnknownEmail: true });
+    expect(
+      await getRepositories().guests.findByEmail("new@proxy.example")
+    ).toBe(undefined);
+    expect((await identity({ cookie: asBob })).guestId).toBe(bob.id);
+  });
+
+  it("keeps an admin's session over an unknown email, and drops anyone else's", async () => {
+    const admin = await adminGuest("admin@proxy.example");
+    const bob = await createGuest();
+    await configure();
+    const unknown = { "X-Forwarded-Email": "stranger@proxy.example" };
+    const asAdmin = `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(admin.id)}`;
+    const asBob = `${GUEST_COOKIE_NAME}=${openGuestValue(bob.id)}`;
+
+    expect((await identity({ ...unknown, cookie: asAdmin })).guestId).toBe(
+      admin.id
+    );
+    expect((await identity({ ...unknown, cookie: asBob })).guestId).toBeNull();
+  });
+
+  it("makes nobody for a header value that is not an email", async () => {
+    await configure({ createPeople: true });
+
+    const answer = await identity({ "X-Forwarded-Email": "just-a-username" });
+
+    expect(answer).toMatchObject({ guestId: null, proxyUnknownEmail: true });
+    expect(await getRepositories().guests.list()).toHaveLength(0);
+  });
+
+  it("reads a UTF-8 name header", async () => {
+    await configure({ createPeople: true, nameHeader: "X-Forwarded-Name" });
+    const utf8AsLatin1 = Buffer.from("Jürgen", "utf8").toString("latin1");
+
+    const { guestId } = await identity({
+      "X-Forwarded-Email": "j@proxy.example",
+      "X-Forwarded-Name": utf8AsLatin1,
+    });
+
+    expect(await named(guestId!)).toBe("Jürgen");
+  });
+
+  it("makes the person from the email, once, with a name to confirm", async () => {
+    await configure({ createPeople: true });
+    const headers = { "X-Forwarded-Email": "New.Person@proxy.example" };
+
+    const first = await identity(headers);
+    const second = await identity(headers);
+
+    expect(first.guestId).toBeTruthy();
+    expect(second.guestId).toBe(first.guestId);
+    expect(first.nameToConfirm).toBe("New.Person");
+    expect(await named(first.guestId!)).toBe("New.Person");
+    expect(await getRepositories().guests.list()).toHaveLength(1);
+  });
+
+  it("takes the name from the name header when there is one", async () => {
+    await configure({ createPeople: true, nameHeader: "X-Forwarded-Name" });
+
+    const withName = await identity({
+      "X-Forwarded-Email": "a@proxy.example",
+      "X-Forwarded-Name": "Ada Lovelace",
+    });
+    const without = await identity({ "X-Forwarded-Email": "b@proxy.example" });
+
+    expect(await named(withName.guestId!)).toBe("Ada Lovelace");
+    expect(await named(without.guestId!)).toBe("b");
+  });
+
+  it("makes nobody for an untrusted request", async () => {
+    await configure({ createPeople: true, addresses: ["10.0.0.0/24"] });
+
+    expect(
+      (await identity({ "X-Forwarded-Email": "a@proxy.example" })).guestId
+    ).toBeTruthy();
+    const res = await request(
+      "/api/v1/me/identity",
+      { "X-Forwarded-Email": "b@proxy.example" },
+      { peer: "192.168.1.1" }
+    );
+    expect(((await res.json()) as { guestId: null }).guestId).toBeNull();
+    expect(
+      (await request("/api/v1/me/identity", {
+        "X-Forwarded-Email": "c@proxy.example",
+        "sec-fetch-site": "cross-site",
+      }).then((r) => r.json())) as { guestId: null }
+    ).toMatchObject({ guestId: null });
+    expect(await getRepositories().guests.list()).toHaveLength(1);
+  });
+
+  it("lets a made person past the site password", async () => {
+    vi.stubEnv("SITE_PASSWORD", "site-pw");
+    vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
+    await configure({ createPeople: true });
+
+    const res = await request("/api/v1/me/identity", {
+      "X-Forwarded-Email": "a@proxy.example",
+    });
+
+    expect(res.status).toBe(200);
+  });
+
+  it("clears the flag when the person confirms their name", async () => {
+    await configure({ createPeople: true });
+    const headers = { "X-Forwarded-Email": "a@proxy.example" };
+    const { guestId } = await identity(headers);
+
+    const res = await request(
+      "/api/v1/me/name",
+      { ...headers, "content-type": "application/json" },
+      { method: "POST", body: JSON.stringify({ name: "Ada L" }) }
+    );
+
+    expect(res.status).toBe(200);
+    expect(await named(guestId!)).toBe("Ada L");
+    expect((await identity(headers)).nameToConfirm).toBeUndefined();
+  });
+
+  it("refuses to confirm a name that is already confirmed", async () => {
+    await configure({ createPeople: true });
+    const headers = { "X-Forwarded-Email": "a@proxy.example" };
+    await identity(headers);
+    const confirm = () =>
+      request(
+        "/api/v1/me/name",
+        { ...headers, "content-type": "application/json" },
+        { method: "POST", body: JSON.stringify({ name: "Ada L" }) }
+      );
+
+    expect((await confirm()).status).toBe(200);
+    expect((await confirm()).status).toBe(409);
+  });
+
+  it("refuses to confirm an empty name", async () => {
+    await configure({ createPeople: true });
+    const headers = { "X-Forwarded-Email": "a@proxy.example" };
+    await identity(headers);
+
+    const res = await request(
+      "/api/v1/me/name",
+      { ...headers, "content-type": "application/json" },
+      { method: "POST", body: JSON.stringify({ name: "  " }) }
+    );
+
+    expect(res.status).toBe(400);
+  });
+});
+
+describe("making a person", { tags: ["025-US1"] }, () => {
+  const make = (email: string, eventIds: string[]) =>
+    unitOfWork.run((tx) =>
+      makePerson(
+        tx,
+        { name: "Ada", email, eventIds, nameUnconfirmed: true },
+        { actor: { type: "system" }, at: new Date() }
+      )
+    );
+
+  it("adds a new person to the events, and leaves an existing one alone", async () => {
+    const event = await createEvent();
+    const created = await make("a@x.example", [event.id]);
+    expect(created.created).toBe(true);
+    expect(
+      (await getRepositories().guests.listEventsByGuests([created.guest.id]))
+        .get(created.guest.id)
+        ?.map((e) => e.id)
+    ).toEqual([event.id]);
+
+    const again = await make("A@x.example", [event.id]);
+    expect(again.created).toBe(false);
+    expect(again.guest.id).toBe(created.guest.id);
   });
 });
 

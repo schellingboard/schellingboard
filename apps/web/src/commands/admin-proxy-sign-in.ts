@@ -6,6 +6,8 @@ export type ProxySignInInput = {
   addresses: string[];
   logoutUrl: string;
   siteAdmins: boolean;
+  createPeople: boolean;
+  nameHeader: string;
 };
 
 export function adminProxySignInCalls(api: ApiClient) {

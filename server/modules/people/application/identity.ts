@@ -112,14 +112,22 @@ export const signOut =
 export const currentGuest =
   ({ repos }: PeopleDeps) =>
   async (
-    actor: Actor
+    actor: Actor,
+    { unknownEmail = false }: { unknownEmail?: boolean } = {}
   ): Promise<{
     guestId: string | null;
     locale: string | null;
     awaitingLogin?: true;
     fixedBy?: { logoutUrl: string; siteAdmin: boolean };
+    nameToConfirm?: string;
+    proxyUnknownEmail?: true;
   }> => {
-    if (!actor.guest) return { guestId: null, locale: null };
+    if (!actor.guest)
+      return {
+        guestId: null,
+        locale: null,
+        ...(unknownEmail && { proxyUnknownEmail: true as const }),
+      };
     const creds = await repos.guests.getAuthCredentials(actor.guest.id);
     if (!creds) return { guestId: null, locale: null };
     const proven = !creds.authProtected || actor.guest.level === "verified";
@@ -128,6 +136,8 @@ export const currentGuest =
     const identity = {
       guestId: actor.guest.id,
       locale: guest?.info.locale ?? null,
+      ...((await repos.guests.isNameUnconfirmed(actor.guest.id)) &&
+        guest && { nameToConfirm: guest.name }),
     };
     if (actor.guest.via !== "proxy") return identity;
     const { logoutUrl } = await repos.settings.getProxySignIn();

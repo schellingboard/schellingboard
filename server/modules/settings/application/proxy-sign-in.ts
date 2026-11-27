@@ -41,6 +41,10 @@ export const updateProxySignIn =
     const headerName = input.headerName.trim();
     const problem = proxyHeaderNameProblem(headerName);
     if (problem) return invalid("settings.proxyHeaderInvalid", problem);
+    const nameHeader = input.nameHeader.trim();
+    const nameProblem = nameHeader && proxyHeaderNameProblem(nameHeader);
+    if (nameProblem)
+      return invalid("settings.proxyNameHeaderInvalid", nameProblem);
     const addresses = input.addresses
       .map((a) => a.trim())
       .filter((a) => a !== "");
@@ -66,6 +70,8 @@ export const updateProxySignIn =
           ),
           logoutUrl,
           siteAdmins: input.siteAdmins,
+          createPeople: input.createPeople,
+          nameHeader,
         })
       )
     );

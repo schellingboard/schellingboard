@@ -50,11 +50,23 @@ export type Viewer = {
   guestId: string | null | undefined;
   /** Set while a sign-in proxy decides who the browser acts as. */
   fixed?: FixedIdentity;
+  /** The name a proxy gave this person, until they confirm it. */
+  nameToConfirm?: string;
+  /** A sign-in proxy sent an email this site has no person for. */
+  proxyUnknownEmail?: boolean;
   choose: (guestId: string) => Promise<ChooseResult>;
   signOut: () => Promise<void>;
   /** Asks the server again, for a change it made without this page: a password reset ends the session. */
   refresh: () => Promise<void>;
 };
+
+const flagsOf = (data: {
+  nameToConfirm?: string;
+  proxyUnknownEmail?: boolean;
+}) => ({
+  nameToConfirm: data.nameToConfirm,
+  proxyUnknownEmail: data.proxyUnknownEmail === true,
+});
 
 export const ViewerContext = createContext<Viewer | null>(null);
 
@@ -78,6 +90,10 @@ export function ViewerProvider({
 }) {
   const [guestId, setGuestId] = useState<string | null | undefined>(undefined);
   const [fixed, setFixed] = useState<FixedIdentity>();
+  const [flags, setFlags] = useState({
+    nameToConfirm: undefined as string | undefined,
+    proxyUnknownEmail: false,
+  });
   // The first answer can arrive after the viewer has already taken a name,
   // and must not take it back.
   const decided = useRef(false);
@@ -99,6 +115,7 @@ export function ViewerProvider({
           remembered.write(data.guestId);
           if (data.guestId) setStored(data.locale);
           setFixed(data.fixedBy);
+          setFlags(flagsOf(data));
           setGuestId(data.guestId);
         })
         .catch(() => {
@@ -156,6 +173,7 @@ export function ViewerProvider({
       remembered.write(data.guestId);
       if (data.guestId) setStored(data.locale);
       setFixed(data.fixedBy);
+      setFlags(flagsOf(data));
       setGuestId(data.guestId);
     } catch {
       // Offline: the known viewer stands until the next load asks again.
@@ -163,8 +181,8 @@ export function ViewerProvider({
   }, [api, persistence, guestId, setStored]);
 
   const value = useMemo(
-    () => ({ guestId, fixed, choose, signOut, refresh }),
-    [guestId, fixed, choose, signOut, refresh]
+    () => ({ guestId, fixed, ...flags, choose, signOut, refresh }),
+    [guestId, fixed, flags, choose, signOut, refresh]
   );
   return (
     <ViewerContext.Provider value={value}>{children}</ViewerContext.Provider>

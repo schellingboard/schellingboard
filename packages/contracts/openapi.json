@@ -5681,6 +5681,14 @@
                       "required": ["logoutUrl", "siteAdmin"],
                       "description": "Present when a sign-in proxy decides who the browser acts as: no name picker, no switching"
                     },
+                    "nameToConfirm": {
+                      "type": "string",
+                      "description": "The name a proxy sign-in gave the person, present until they confirm it"
+                    },
+                    "proxyUnknownEmail": {
+                      "type": "boolean",
+                      "description": "True when a sign-in proxy sent an email that this site has no person for"
+                    },
                     "awaitingLogin": {
                       "type": "boolean",
                       "description": "True when the browser holds a protected name it has not logged in to"
@@ -6135,6 +6143,59 @@
                   },
                   "required": ["type", "title", "status", "code"]
                 }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
+    "/api/v1/me/name": {
+      "post": {
+        "tags": ["people"],
+        "description": "Sets the acting guest's name and marks it as confirmed: the answer to the first-visit dialog after a proxy sign-in made the person.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "minLength": 1, "maxLength": 100 }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The profile with the confirmed name",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PublicProfile" }
               }
             }
           },
@@ -10988,6 +11049,14 @@
                       "type": "boolean",
                       "description": "Whether site admins sign in through the proxy"
                     },
+                    "createPeople": {
+                      "type": "boolean",
+                      "description": "Whether an email no person has makes a new person"
+                    },
+                    "nameHeader": {
+                      "type": "string",
+                      "description": "The header with a new person's name; empty uses the email"
+                    },
                     "secretSet": {
                       "type": "boolean",
                       "description": "Whether a secret is required of the proxy"
@@ -11008,6 +11077,8 @@
                     "addresses",
                     "logoutUrl",
                     "siteAdmins",
+                    "createPeople",
+                    "nameHeader",
                     "secretSet",
                     "ownRequest"
                   ]
@@ -11067,6 +11138,14 @@
                   "siteAdmins": {
                     "type": "boolean",
                     "description": "Whether site admins sign in through the proxy"
+                  },
+                  "createPeople": {
+                    "type": "boolean",
+                    "description": "Whether an email no person has makes a new person"
+                  },
+                  "nameHeader": {
+                    "type": "string",
+                    "description": "The header with a new person's name; empty uses the email"
                   }
                 },
                 "required": [
@@ -11074,7 +11153,9 @@
                   "headerName",
                   "addresses",
                   "logoutUrl",
-                  "siteAdmins"
+                  "siteAdmins",
+                  "createPeople",
+                  "nameHeader"
                 ]
               }
             }
@@ -11106,6 +11187,14 @@
                       "type": "boolean",
                       "description": "Whether site admins sign in through the proxy"
                     },
+                    "createPeople": {
+                      "type": "boolean",
+                      "description": "Whether an email no person has makes a new person"
+                    },
+                    "nameHeader": {
+                      "type": "string",
+                      "description": "The header with a new person's name; empty uses the email"
+                    },
                     "secretSet": {
                       "type": "boolean",
                       "description": "Whether a secret is required of the proxy"
@@ -11117,6 +11206,8 @@
                     "addresses",
                     "logoutUrl",
                     "siteAdmins",
+                    "createPeople",
+                    "nameHeader",
                     "secretSet"
                   ]
                 }

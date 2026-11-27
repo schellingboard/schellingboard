@@ -15,8 +15,10 @@ test.describe("Admin proxy sign-in", () => {
       .click();
     const card = page.getByRole("region", { name: "Sign-in through a proxy" });
     const enabled = card.getByLabel("Sign in through a proxy");
-    if (await enabled.isChecked()) {
+    const create = card.getByLabel("Create people the site does not know");
+    if ((await enabled.isChecked()) || (await create.isChecked())) {
       await enabled.uncheck();
+      await create.uncheck();
       await card.getByRole("button", { name: "Save proxy sign-in" }).click();
       await expect(card.getByText("Proxy sign-in saved.")).toBeVisible();
     }
@@ -95,5 +97,56 @@ test.describe("Admin proxy sign-in", () => {
       person.getByRole("heading", { name: "Account security" })
     ).toHaveCount(0);
     await context.close();
+  });
+
+  test("a person made from an unknown email confirms the name @025-US2", async ({
+    browser,
+  }) => {
+    test.slow();
+    // The admin's own request must not carry the person-making header.
+    const adminContext = await browser.newContext({
+      extraHTTPHeaders: { "X-Forwarded-Email": "" },
+    });
+    const page = await adminContext.newPage();
+    await adminLogin(page);
+    await page
+      .getByRole("navigation", { name: "Admin" })
+      .getByRole("link", { name: "Settings" })
+      .click();
+    const card = page.getByRole("region", { name: "Sign-in through a proxy" });
+    await card.getByLabel("Sign in through a proxy").check();
+    await card.getByRole("button", { name: "Save proxy sign-in" }).click();
+    await expect(card.getByText("Proxy sign-in saved.")).toBeVisible();
+
+    const context = await browser.newContext({
+      extraHTTPHeaders: {
+        "X-Forwarded-Email": "grace@proxy.test",
+        "X-Forwarded-Name": "Grace Hopper",
+      },
+    });
+    const person = await context.newPage();
+    await card.getByLabel("Create people the site does not know").check();
+    await card.getByLabel("Header with the name").fill("X-Forwarded-Name");
+    await card.getByRole("button", { name: "Save proxy sign-in" }).click();
+    await expect(card.getByText("Proxy sign-in saved.")).toBeVisible();
+
+    await person.goto("/Hackathon");
+    const dialog = person.getByRole("dialog", { name: "Your name" });
+    await expect(dialog.getByRole("textbox", { name: /Name/ })).toHaveValue(
+      "Grace Hopper"
+    );
+    await person.keyboard.press("Escape");
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await expect(dialog).toHaveCount(0);
+    await person.reload();
+    await expect(person.getByRole("main")).toBeVisible();
+    await expect(person.getByRole("dialog")).toHaveCount(0);
+    await context.close();
+
+    await card.getByLabel("Create people the site does not know").uncheck();
+    await card.getByRole("button", { name: "Save proxy sign-in" }).click();
+    await expect(card.getByText("Proxy sign-in saved.")).toBeVisible();
+    await adminContext.close();
   });
 });
