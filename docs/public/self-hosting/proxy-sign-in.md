@@ -135,6 +135,23 @@ proxy_set_header X-SchellingBoard-Proxy-Secret "…";  # if you use the secret
 In Traefik, every router that reaches the app must use the forward-auth middleware. For Caddy, use
 `forward_auth` on every route to the app with `copy_headers Remote-Email`.
 
+## If you lock yourself out
+
+A wrong address list, a lost secret or a misconfigured proxy can leave nobody able to sign in. The
+way back is two environment variables:
+
+1. Set `SB_DISABLE_PROXY_SIGN_IN=1` and restart the app. The app then ignores the proxy header
+   completely: no one is signed in by it, no person is made, no event is joined, and the site
+   password and name rules apply as usual. With `SITE_PASSWORD` empty, the site is open to everyone
+   until you unset the variable.
+2. If no site admin can sign in, also set `SB_BOOTSTRAP_LINK=1` for that start. The app logs a link
+   that makes its visitor a site admin.
+3. Sign in as a site admin and open **Admin → Settings**. The card says the settings are not in
+   effect.
+4. Fix the settings: the header, the addresses, or **Replace secret** and give the new one to the
+   proxy. The line under the card still says whether your own request would be trusted.
+5. Remove both variables and restart. The settings apply again.
+
 ## Check the setup
 
 Open **Admin → Settings** through the proxy. Under the card, a line says whether your own request

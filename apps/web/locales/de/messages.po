@@ -6641,6 +6641,10 @@ msgstr "Das Kaninchenloch, in das ich kürzlich gefallen bin"
 msgid "The server refused this. Please try again."
 msgstr "Der Server hat das abgelehnt. Bitte versuche es erneut."
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "The server was started with SB_DISABLE_PROXY_SIGN_IN, so these settings are not in effect and nobody is signed in by the proxy."
+msgstr "Der Server wurde mit SB_DISABLE_PROXY_SIGN_IN gestartet, daher gelten diese Einstellungen nicht und der Proxy meldet niemanden an."
+
 #: src/features/people/prompt-text.ts
 msgid "The strangest job I ever had"
 msgstr "Der seltsamste Job, den ich je hatte"

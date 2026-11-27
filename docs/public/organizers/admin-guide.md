@@ -40,7 +40,9 @@ One global row shown when there's more than one event (see
 
 If a sign-in proxy such as oauth2-proxy or Authelia sits in front of the site, this card lets it
 identify attendees, so nobody picks a name or enters a code. Set the proxy up first, following
-[Sign-in through a proxy](../self-hosting/proxy-sign-in.md). The card is off by default.
+[Sign-in through a proxy](../self-hosting/proxy-sign-in.md). The card is off by default. If a
+setting locks everyone out, see
+[If you lock yourself out](../self-hosting/proxy-sign-in.md#if-you-lock-yourself-out).
 
 - **Header with the email** — the request header that carries the person's email. The email must
   match the **system email** of a guest; a contact email typed into a profile never counts. A

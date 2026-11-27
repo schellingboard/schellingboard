@@ -8056,6 +8056,8 @@ export interface paths {
                 headerSeen: boolean;
                 trusted: boolean;
               } | null;
+              /** @description Whether SB_DISABLE_PROXY_SIGN_IN makes the server ignore these settings */
+              disabledByEnvironment: boolean;
             };
           };
         };

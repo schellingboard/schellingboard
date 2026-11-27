@@ -11,6 +11,7 @@ import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import { type App, json } from "@/server/http/route-parts";
+import { proxySignInDisabledByEnvironment } from "@/server/kernel/proxy-actor";
 
 import type { SettingsUseCases } from "../application/use-cases";
 
@@ -102,7 +103,7 @@ const updateProxy = createRoute({
   },
   responses: {
     200: json(
-      proxySignInSchema.omit({ ownRequest: true }),
+      proxySignInSchema.omit({ ownRequest: true, disabledByEnvironment: true }),
       "The saved settings"
     ),
     ...problemDefault,
@@ -177,7 +178,13 @@ export function addAdminSettingsRoutes(
       }
     );
     if (!result.ok) return problem(result.error);
-    return c.json(result.value, 200);
+    return c.json(
+      {
+        ...result.value,
+        disabledByEnvironment: proxySignInDisabledByEnvironment(),
+      },
+      200
+    );
   });
 
   app.openapi(updateProxy, async (c) => {

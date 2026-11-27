@@ -6641,6 +6641,10 @@ msgstr ""
 msgid "The server refused this. Please try again."
 msgstr ""
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "The server was started with SB_DISABLE_PROXY_SIGN_IN, so these settings are not in effect and nobody is signed in by the proxy."
+msgstr ""
+
 #: src/features/people/prompt-text.ts
 msgid "The strangest job I ever had"
 msgstr ""

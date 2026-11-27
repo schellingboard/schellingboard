@@ -20,7 +20,8 @@ proxy, it can send the header itself and become any person.
 
 1. **Admin settings, not environment variables.** A "Sign-in through a proxy" card in the site
    settings holds every option below. It is off by default. The settings live in the database, like
-   the other site settings.
+   the other site settings. The one exception is `SB_DISABLE_PROXY_SIGN_IN=1`, an emergency switch
+   that makes the server ignore the proxy, so a wrong setting cannot lock everyone out for good.
 2. **The header names an email.** The admin gives the header name. The app refuses names that carry
    something else: `Cookie`, `Authorization`, `Host`, `Forwarded`, `X-Forwarded-For`, and
    `X-SchellingBoard-Proxy-Secret`. The value is matched case-insensitively against the private

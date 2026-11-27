@@ -26,6 +26,7 @@ const off: ProxySignInSettings = {
   nameHeader: "",
   secretSet: false,
   ownRequest: null,
+  disabledByEnvironment: false,
 };
 
 const setup = (
@@ -136,6 +137,15 @@ describe("the proxy sign-in card", { tags: ["025-US1"] }, () => {
     cleanup();
     setup(off);
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("says when the environment switches the sign-in off", () => {
+    setup({ ...off, enabled: true, disabledByEnvironment: true });
+
+    expect(screen.getByText(/these settings are not in effect/)).toBeTruthy();
+    cleanup();
+    setup({ ...off, enabled: true });
+    expect(screen.queryByText(/these settings are not in effect/)).toBeNull();
   });
 
   it("shows a new secret once", async () => {

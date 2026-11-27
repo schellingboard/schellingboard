@@ -31,6 +31,12 @@ export function proxyPersonName(email: string, headerValue: string | null) {
   );
 }
 
+/** The way back in when a proxy or its secret locks everyone out. */
+export const proxySignInDisabledByEnvironment = () =>
+  ["1", "true", "yes", "on"].includes(
+    process.env.SB_DISABLE_PROXY_SIGN_IN?.trim().toLowerCase() ?? ""
+  );
+
 export async function readProxyIdentity(
   req: Request,
   remoteAddress: string | undefined,
@@ -44,6 +50,10 @@ export async function readProxyIdentity(
     req.headers,
     remoteAddress
   );
+  // The request is still inspected while disabled, so an admin can check a fix
+  // before restarting; it just never becomes an identity.
+  if (proxySignInDisabledByEnvironment())
+    return { request, guestId: null, unknownEmail: false, siteAdmins: false };
   const email = request?.trusted && trustedOrigin ? request.email : null;
   let guest = email ? await guests.findByEmail(email) : undefined;
   if (email && !guest && config.createPeople && isEmail(email)) {
