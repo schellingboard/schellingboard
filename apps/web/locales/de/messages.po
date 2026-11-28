@@ -1650,6 +1650,7 @@ msgstr "Kalender"
 #: src/features/admin/guests-screen.tsx
 #: src/features/admin/join-links.tsx
 #: src/features/admin/locations-screen.tsx
+#: src/features/admin/proxy-sign-in-card.tsx
 #: src/features/comments/comments-section.tsx
 #: src/features/meetings/meeting-request-fields.tsx
 #: src/features/notifications/notifications-screen.tsx
@@ -5324,6 +5325,10 @@ msgstr "Auswahl entfernen"
 msgid "Remove site admin"
 msgstr "Site-Admin entfernen"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Remove the secret? The proxy no longer needs to send it, so only the proxy addresses protect the sign-in."
+msgstr "Geheimnis entfernen? Der Proxy muss es nicht mehr senden, sodass nur die Proxy-Adressen die Anmeldung schützen."
+
 #: src/features/comments/comments-section.tsx
 msgid "Remove this comment? Its author is not notified."
 msgstr "Diesen Kommentar entfernen? Die Autorin oder der Autor wird nicht benachrichtigt."
@@ -5335,6 +5340,10 @@ msgstr "Entfernen?"
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "Replace secret"
 msgstr "Geheimnis ersetzen"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Replace the secret? The proxy sign-in stops working until the proxy has the new secret."
+msgstr "Geheimnis ersetzen? Die Proxy-Anmeldung funktioniert nicht mehr, bis der Proxy das neue Geheimnis hat."
 
 #: src/features/admin/stats-text.ts
 msgid "Replies"

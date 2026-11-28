@@ -1,4 +1,10 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -40,6 +46,9 @@ const setup = (
   );
   return { calls, onChanged };
 };
+
+const inDialog = (name: string) =>
+  within(screen.getByRole("dialog")).getByRole("button", { name });
 
 describe("the proxy sign-in card", { tags: ["025-US1"] }, () => {
   it("saves the options, one address per line", async () => {
@@ -142,7 +151,61 @@ describe("the proxy sign-in card", { tags: ["025-US1"] }, () => {
     expect(onChanged).toHaveBeenCalled();
   });
 
-  it("removes the secret", async () => {
+  it("asks before replacing the secret, and Cancel changes nothing", async () => {
+    const { calls } = setup({ ...off, secretSet: true });
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Replace secret" })
+    );
+    expect(
+      screen.getByText(/The proxy sign-in stops working until the proxy has/)
+    ).toBeTruthy();
+    expect(calls).toHaveLength(0);
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+
+  it("replaces the secret once confirmed", async () => {
+    const { calls } = setup({ ...off, secretSet: true });
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Replace secret" })
+    );
+    await userEvent.click(inDialog("Replace secret"));
+
+    expect(await screen.findByText("s3cret-value")).toBeTruthy();
+    expect(calls[0]).toMatchObject({ method: "POST" });
+  });
+
+  it("leaves the secret when Remove is cancelled", async () => {
+    const { calls } = setup({ ...off, secretSet: true });
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Remove secret" })
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+
+  it("warns before removing the last protection of a live sign-in", async () => {
+    setup({ ...off, enabled: true, secretSet: true });
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Remove secret" })
+    );
+
+    expect(
+      within(screen.getByRole("dialog")).getByText(
+        /Anyone who reaches the app without the proxy/
+      )
+    ).toBeTruthy();
+  });
+
+  it("removes the secret only once confirmed", async () => {
     const { calls } = setup(
       { ...off, secretSet: true },
       () => new Response(null, { status: 204 })
@@ -151,6 +214,8 @@ describe("the proxy sign-in card", { tags: ["025-US1"] }, () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Remove secret" })
     );
+    expect(calls).toHaveLength(0);
+    await userEvent.click(inDialog("Remove secret"));
 
     expect(await screen.findByText("Secret removed.")).toBeTruthy();
     expect(calls[0]).toMatchObject({

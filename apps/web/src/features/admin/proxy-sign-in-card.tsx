@@ -6,6 +6,7 @@ import type { AdminProxySignInCalls } from "../../commands/admin-proxy-sign-in";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { ProxySignInSettings } from "../../queries/admin-proxy-sign-in";
 import { Button } from "../../ui/button";
+import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { CheckboxField, TextAreaField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { ExclamationTriangleIcon } from "../../ui/icons";
@@ -45,6 +46,10 @@ function OwnRequest({ settings }: { settings: ProxySignInSettings }) {
   );
 }
 
+const REPLACE = "replace";
+const REMOVE = "remove";
+type Confirming = typeof REPLACE | typeof REMOVE;
+
 function SecretSection({
   settings,
   calls,
@@ -57,6 +62,7 @@ function SecretSection({
   const [secret, setSecret] = useState<string>();
   const [removed, setRemoved] = useState(false);
   const [copy, setCopy] = useState<boolean>();
+  const [confirming, setConfirming] = useState<Confirming>();
   const make = useFormMutation<{ secret: string }>({
     call: (key) => calls.makeSecret(key),
     explainRefusals: true,
@@ -67,6 +73,7 @@ function SecretSection({
   });
 
   const makeSecret = async () => {
+    setConfirming(undefined);
     setRemoved(false);
     setCopy(undefined);
     const result = await make.submit();
@@ -76,6 +83,7 @@ function SecretSection({
     }
   };
   const removeSecret = async () => {
+    setConfirming(undefined);
     setSecret(undefined);
     const result = await remove.submit();
     if (result?.ok) {
@@ -91,6 +99,14 @@ function SecretSection({
       setCopy(false);
     }
   };
+
+  const opensSite = settings.enabled && settings.addresses.length === 0;
+  const confirmMessage =
+    confirming === REPLACE
+      ? t`Replace the secret? The proxy sign-in stops working until the proxy has the new secret.`
+      : opensSite
+        ? t`Anyone who reaches the app without the proxy can send the header and become any person. Set a secret or proxy addresses, unless no other path to the app exists.`
+        : t`Remove the secret? The proxy no longer needs to send it, so only the proxy addresses protect the sign-in.`;
 
   return (
     <div className="space-y-2">
@@ -137,7 +153,9 @@ function SecretSection({
           variant="quiet"
           className="border border-line"
           disabled={make.pending}
-          onClick={() => void makeSecret()}
+          onClick={() =>
+            settings.secretSet ? setConfirming(REPLACE) : void makeSecret()
+          }
         >
           {settings.secretSet ? t`Replace secret` : t`Make secret`}
         </Button>
@@ -146,7 +164,7 @@ function SecretSection({
             variant="quiet"
             className="border border-line"
             disabled={remove.pending}
-            onClick={() => void removeSecret()}
+            onClick={() => setConfirming(REMOVE)}
           >
             <Trans>Remove secret</Trans>
           </Button>
@@ -157,6 +175,20 @@ function SecretSection({
           </p>
         )}
       </div>
+      <ConfirmDialog
+        open={confirming !== undefined}
+        title={confirming === REMOVE ? t`Remove secret` : t`Replace secret`}
+        message={confirmMessage}
+        confirmLabel={
+          confirming === REMOVE ? t`Remove secret` : t`Replace secret`
+        }
+        cancelLabel={t`Cancel`}
+        destructive={confirming === REMOVE}
+        onConfirm={() =>
+          void (confirming === REPLACE ? makeSecret() : removeSecret())
+        }
+        onCancel={() => setConfirming(undefined)}
+      />
       {(make.error ?? remove.error) && (
         <p role="alert" className="text-sm text-danger-fg">
           {make.error ?? remove.error}
