@@ -270,6 +270,17 @@ export function ProxySignInCard({
           it sends. They pick no name.
         </Trans>
       </p>
+      {settings.disabledByEnvironment && (
+        <p
+          role="status"
+          className="rounded-md border-2 border-danger bg-danger-tint p-3 text-sm text-danger-fg"
+        >
+          <Trans>
+            The server was started with SB_DISABLE_PROXY_SIGN_IN, so these
+            settings are not in effect and nobody is signed in by the proxy.
+          </Trans>
+        </p>
+      )}
       {unprotected && (
         <p
           role="alert"

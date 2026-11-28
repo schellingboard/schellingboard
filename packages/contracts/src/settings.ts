@@ -39,6 +39,11 @@ export const proxySignInSchema = proxySignInInputSchema.extend({
     })
     .nullable()
     .describe("What this request carried; null while the sign-in is off"),
+  disabledByEnvironment: z
+    .boolean()
+    .describe(
+      "Whether SB_DISABLE_PROXY_SIGN_IN makes the server ignore these settings"
+    ),
 });
 
 export const proxySecretSchema = z.object({

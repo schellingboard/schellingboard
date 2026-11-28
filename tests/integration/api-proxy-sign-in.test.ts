@@ -730,6 +730,79 @@ describe("the proxy sign-in settings", { tags: ["025-US1"] }, () => {
   });
 });
 
+describe("the emergency switch SB_DISABLE_PROXY_SIGN_IN", () => {
+  beforeEach(() => vi.stubEnv("SITE_PASSWORD", ""));
+
+  it(
+    "makes a valid trusted header act as no one, and makes no one",
+    { tags: ["025-US1"] },
+    async () => {
+      const ada = await createGuest({ email: EMAIL });
+      const event = await createEvent({ proxyJoins: true });
+      await configure({ createPeople: true });
+      vi.stubEnv("SB_DISABLE_PROXY_SIGN_IN", "1");
+
+      expect(await whoAmI({ "X-Forwarded-Email": EMAIL })).toBeNull();
+      expect(await whoAmI({ "X-Forwarded-Email": "new@x.example" })).toBeNull();
+      expect(
+        await getRepositories().guests.findByEmail("new@x.example")
+      ).toBeUndefined();
+      expect(
+        (await getRepositories().guests.listByEvent(event.id)).map((g) => g.id)
+      ).not.toContain(ada.id);
+      expect(sessionRows()).toBe(0);
+    }
+  );
+
+  it(
+    "sends a page request back to the normal rules",
+    { tags: ["025-US1"] },
+    async () => {
+      vi.stubEnv("SITE_PASSWORD", "pw");
+      await createGuest({ email: EMAIL });
+      await configure();
+      const linked = {
+        "X-Forwarded-Email": EMAIL,
+        "sec-fetch-site": "cross-site",
+      };
+      expect((await request("/", linked)).status).toBe(200);
+
+      vi.stubEnv("SB_DISABLE_PROXY_SIGN_IN", "1");
+      expect((await request("/", linked)).status).toBe(307);
+    }
+  );
+
+  it("still tells the admin whether a request would be trusted", async () => {
+    const admin = await adminGuest("admin@x.example");
+    const cookie = `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(admin.id)}`;
+    await configure();
+    vi.stubEnv("SB_DISABLE_PROXY_SIGN_IN", "1");
+
+    const res = await request("/api/v1/admin/proxy-sign-in", {
+      cookie,
+      "X-Forwarded-Email": EMAIL,
+    });
+
+    expect(((await res.json()) as { ownRequest: unknown }).ownRequest).toEqual({
+      headerSeen: true,
+      trusted: true,
+    });
+  });
+
+  it("is reported to the admin", { tags: ["025-US1"] }, async () => {
+    const admin = await adminGuest("admin@x.example");
+    const cookie = `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(admin.id)}`;
+    const read = async () =>
+      (await (
+        await request("/api/v1/admin/proxy-sign-in", { cookie })
+      ).json()) as { disabledByEnvironment: boolean };
+
+    expect((await read()).disabledByEnvironment).toBe(false);
+    vi.stubEnv("SB_DISABLE_PROXY_SIGN_IN", " True ");
+    expect((await read()).disabledByEnvironment).toBe(true);
+  });
+});
+
 describe("events the proxy people join", { tags: ["025-US1"] }, () => {
   beforeEach(() => vi.stubEnv("SITE_PASSWORD", ""));
 

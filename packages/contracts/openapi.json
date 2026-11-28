@@ -11081,6 +11081,10 @@
                       },
                       "required": ["headerSeen", "trusted"],
                       "description": "What this request carried; null while the sign-in is off"
+                    },
+                    "disabledByEnvironment": {
+                      "type": "boolean",
+                      "description": "Whether SB_DISABLE_PROXY_SIGN_IN makes the server ignore these settings"
                     }
                   },
                   "required": [
@@ -11092,7 +11096,8 @@
                     "createPeople",
                     "nameHeader",
                     "secretSet",
-                    "ownRequest"
+                    "ownRequest",
+                    "disabledByEnvironment"
                   ]
                 }
               }

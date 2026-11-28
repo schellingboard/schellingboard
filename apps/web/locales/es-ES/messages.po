@@ -6641,6 +6641,10 @@ msgstr "La madriguera en la que caí hace poco"
 msgid "The server refused this. Please try again."
 msgstr "El servidor rechazó esto. Vuelve a intentarlo."
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "The server was started with SB_DISABLE_PROXY_SIGN_IN, so these settings are not in effect and nobody is signed in by the proxy."
+msgstr "El servidor se inició con SB_DISABLE_PROXY_SIGN_IN, así que estos ajustes no están en vigor y el proxy no identifica a nadie."
+
 #: src/features/people/prompt-text.ts
 msgid "The strangest job I ever had"
 msgstr "El trabajo más extraño que tuve"
