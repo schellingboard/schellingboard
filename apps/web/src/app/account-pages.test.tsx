@@ -95,6 +95,44 @@ const withBo = (call: FakeCall): Response | undefined =>
     ? Response.json({ items: [bo], nextCursor: null })
     : answers(call);
 
+describe(
+  "login and join links for a proxy person",
+  { tags: ["025-US2"] },
+  () => {
+    const fixed = (call: FakeCall): Response | undefined =>
+      call.path === "/api/v1/me/identity"
+        ? Response.json({
+            guestId: "bo",
+            fixedBy: { logoutUrl: "", siteAdmin: false },
+          })
+        : withBo(call);
+
+    it("shows the fixed name instead of the login form", async () => {
+      await open({ handler: fixed, path: "/auth/login", identity: "bo" });
+
+      expect(
+        await screen.findByText(/The proxy signs you in as Bo/)
+      ).toBeTruthy();
+      expect(screen.queryByLabelText("Password")).toBeNull();
+    });
+
+    it("says so when the join link is another person's", async () => {
+      await open({
+        handler: (call) =>
+          call.path === "/api/v1/auth/join"
+            ? problem(403, "identity.fixed")
+            : fixed(call),
+        path: "/join/tok",
+        identity: "bo",
+      });
+
+      expect(
+        await screen.findByText(/The proxy decides who you are/)
+      ).toBeTruthy();
+    });
+  }
+);
+
 describe("the site password page", { tags: ["002-US1"] }, () => {
   it("is the screen at /login, not an event of that name", async () => {
     await open({ path: "/login", identity: null });

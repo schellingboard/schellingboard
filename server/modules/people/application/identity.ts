@@ -56,6 +56,9 @@ export const signIn =
     return { guestId, level, sessionToken: token };
   };
 
+export const proxyFixed = () =>
+  forbidden("identity.fixed", "The proxy decides who you are on this site");
+
 export const chooseGuest = (deps: PeopleDeps) => {
   const start = signIn(deps);
   const withLocale = async (signed: SignedIn) => ({
@@ -67,11 +70,7 @@ export const chooseGuest = (deps: PeopleDeps) => {
     actor: Actor,
     { guestId, device }: { guestId: string; device?: string | null }
   ): Promise<Result<SignedIn & { locale: string | null }>> => {
-    if (actor.guest?.via === "proxy")
-      return forbidden(
-        "identity.fixed",
-        "The proxy decides who you are on this site"
-      );
+    if (actor.guest?.via === "proxy") return proxyFixed();
     const creds = await deps.repos.guests.getAuthCredentials(guestId);
     if (!creds) return notFound("guest.notFound", "Unknown user");
     if (!creds.authProtected)

@@ -105,6 +105,7 @@ const join = createRoute({
 export function addAuthRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(requestLoginCode, async (c) => {
     const result = await people().requestLoginCode(
+      c.var.actor,
       targetOf(c.req.valid("json"))
     );
     if (!result.ok) return problem(result.error);

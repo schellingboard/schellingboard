@@ -36,14 +36,15 @@ import {
   recentlyIssued,
   resolveTarget,
 } from "./auth-tokens";
-import { type SignedIn, signIn } from "./identity";
+import { proxyFixed, type SignedIn, signIn } from "./identity";
 
 let dummy: Promise<string> | undefined;
 const dummyHash = () => (dummy ??= hashUserPassword("no such guest"));
 
 export const requestLoginCode =
   ({ repos, loginMail }: PeopleDeps) =>
-  async (target: GuestTarget): Promise<Result<null>> => {
+  async (actor: Actor, target: GuestTarget): Promise<Result<null>> => {
+    if (actor.guest?.via === "proxy") return proxyFixed();
     if (!loginMail.configured())
       return unavailable(
         "auth.mailUnavailable",
@@ -135,6 +136,7 @@ export const logIn = (deps: PeopleDeps) => {
       device?: string | null;
     }
   ): Promise<Result<SignedIn>> => {
+    if (actor.guest?.via === "proxy") return proxyFixed();
     let guestId = named;
     if (identifier !== undefined) {
       // Unknown identifiers share a bucket per spelling, so guessing them is

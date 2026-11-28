@@ -3260,6 +3260,7 @@ msgstr "Ir a iniciar sesión"
 msgid "Go to the events"
 msgstr "Ir a los eventos"
 
+#: src/app/account-pages.tsx
 #: src/features/sign-in/join-screen.tsx
 msgid "Go to the start page"
 msgstr "Ir a la página de inicio"
@@ -3921,6 +3922,7 @@ msgstr "Ubicaciones"
 msgid "Locations to leave out"
 msgstr "Ubicaciones que se excluyen"
 
+#: src/app/account-pages.tsx
 #: src/app/user-menu.tsx
 #: src/features/sign-in/guest-login-form.tsx
 msgid "Log in"
@@ -6601,9 +6603,22 @@ msgstr "Las columnas previstas salen del modelo de asistencia, ajustado con un e
 msgid "The proposal phase is over."
 msgstr "La fase de propuestas ha terminado."
 
+#: src/features/sign-in/join-screen.tsx
+msgid "The proxy decides who you are on this site, so this link for someone else cannot sign you in."
+msgstr "El proxy decide quién eres en este sitio, así que este enlace de otra persona no puede iniciar tu sesión."
+
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "The proxy sends the secret in the X-SchellingBoard-Proxy-Secret header. Requests without it are not signed in."
 msgstr "El proxy envía el secreto en la cabecera X-SchellingBoard-Proxy-Secret. Las solicitudes sin él no inician sesión."
+
+#. placeholder {0}: me.name
+#: src/app/account-pages.tsx
+msgid "The proxy signs you in as {0}. There is nothing to log in to here."
+msgstr "El proxy te identifica como {0}. Aquí no hay nada que iniciar."
+
+#: src/app/account-pages.tsx
+msgid "The proxy signs you in. There is nothing to log in to here."
+msgstr "El proxy te identifica. Aquí no hay nada que iniciar."
 
 #: src/features/people/prompt-text.ts
 msgid "The rabbit hole I fell down recently"

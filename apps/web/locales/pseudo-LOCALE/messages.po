@@ -3260,6 +3260,7 @@ msgstr ""
 msgid "Go to the events"
 msgstr ""
 
+#: src/app/account-pages.tsx
 #: src/features/sign-in/join-screen.tsx
 msgid "Go to the start page"
 msgstr ""
@@ -3921,6 +3922,7 @@ msgstr ""
 msgid "Locations to leave out"
 msgstr ""
 
+#: src/app/account-pages.tsx
 #: src/app/user-menu.tsx
 #: src/features/sign-in/guest-login-form.tsx
 msgid "Log in"
@@ -6601,8 +6603,21 @@ msgstr ""
 msgid "The proposal phase is over."
 msgstr ""
 
+#: src/features/sign-in/join-screen.tsx
+msgid "The proxy decides who you are on this site, so this link for someone else cannot sign you in."
+msgstr ""
+
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "The proxy sends the secret in the X-SchellingBoard-Proxy-Secret header. Requests without it are not signed in."
+msgstr ""
+
+#. placeholder {0}: me.name
+#: src/app/account-pages.tsx
+msgid "The proxy signs you in as {0}. There is nothing to log in to here."
+msgstr ""
+
+#: src/app/account-pages.tsx
+msgid "The proxy signs you in. There is nothing to log in to here."
 msgstr ""
 
 #: src/features/people/prompt-text.ts
