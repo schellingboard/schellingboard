@@ -259,6 +259,8 @@ export interface AuthCodesRepository {
 export type NewGuest = {
   name: string;
   info: { email: string | null };
+  /** The name was guessed, not typed by the person. */
+  nameUnconfirmed?: boolean;
 };
 
 export interface GuestsRepository {
@@ -344,6 +346,7 @@ export interface GuestsRepository {
   findOrCreateByEmail(
     data: NewGuest
   ): Promise<{ guest: CompleteGuest; created: boolean }>;
+  isNameUnconfirmed(id: string): Promise<boolean>;
   // Usage: an admin updates a user (name and email). Email settings are not
   // touched: those belong to the guest, via updateProfile. Undefined, changing
   // nothing, if the guest is gone or not at `expectedVersion`.

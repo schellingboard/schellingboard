@@ -66,6 +66,8 @@ export class SqliteSettingsRepository implements SettingsRepository {
       addresses: row.proxyAddresses,
       logoutUrl: row.proxyLogoutUrl,
       siteAdmins: row.proxySiteAdmins,
+      createPeople: row.proxyCreatePeople,
+      nameHeader: row.proxyNameHeader,
       secretSet: row.proxySecretHash !== null,
     };
   }
@@ -84,6 +86,8 @@ export class SqliteSettingsRepository implements SettingsRepository {
       proxyAddresses: next.addresses,
       proxyLogoutUrl: next.logoutUrl,
       proxySiteAdmins: next.siteAdmins,
+      proxyCreatePeople: next.createPeople,
+      proxyNameHeader: next.nameHeader,
     };
     this.db
       .insert(schema.siteSettings)

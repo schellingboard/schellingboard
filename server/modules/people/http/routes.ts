@@ -7,6 +7,7 @@ import {
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   attendeeListSchema,
+  confirmNameBodySchema,
   localeBodySchema,
   profileActivitySchema,
   profileBodySchema,
@@ -114,6 +115,19 @@ const updateMyProfile = createRoute({
   },
 });
 
+const confirmMyName = createRoute({
+  method: "post",
+  path: "/me/name",
+  tags: ["people"],
+  description:
+    "Sets the acting guest's name and marks it as confirmed: the answer to the first-visit dialog after a proxy sign-in made the person.",
+  request: { headers: idempotencyHeaders, body: body(confirmNameBodySchema) },
+  responses: {
+    200: json(publicProfileSchema, "The profile with the confirmed name"),
+    ...problemDefault,
+  },
+});
+
 const replaceMyAvatar = createRoute({
   method: "put",
   path: "/me/avatar",
@@ -185,7 +199,12 @@ const updateMyLocale = createRoute({
 
 export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(getIdentity, async (c) =>
-    c.json(await people().currentGuest(c.var.actor), 200)
+    c.json(
+      await people().currentGuest(c.var.actor, {
+        unknownEmail: c.var.proxy.unknownEmail,
+      }),
+      200
+    )
   );
 
   app.openapi(chooseIdentity, async (c) => {
@@ -264,6 +283,16 @@ export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
       c.var.now
     );
     if (!result.ok) return problem(result.error, toProfileView);
+    return c.json(toProfileView(result.value), 200);
+  });
+
+  app.openapi(confirmMyName, async (c) => {
+    const result = await people().confirmMyName(
+      c.var.actor,
+      c.req.valid("json"),
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
     return c.json(toProfileView(result.value), 200);
   });
 

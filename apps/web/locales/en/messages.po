@@ -2402,6 +2402,10 @@ msgstr "Create"
 msgid "Create event"
 msgstr "Create event"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Create people the site does not know"
+msgstr "Create people the site does not know"
+
 #: src/features/admin/event-proposals.tsx
 msgid "Create session"
 msgstr "Create session"
@@ -3315,6 +3319,10 @@ msgstr "He/They"
 #: src/features/admin/proxy-sign-in-card.tsx
 msgid "Header with the email"
 msgstr "Header with the email"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Header with the name"
+msgstr "Header with the name"
 
 #: src/features/admin/stats-text.ts
 msgid "Headline numbers"
@@ -4249,8 +4257,8 @@ msgstr "n/a"
 #: src/features/admin/events-screen.tsx
 #: src/features/admin/guests-screen.tsx
 #: src/features/admin/locations-screen.tsx
-#: src/features/people/profile-form.tsx
 #: src/features/sign-in/bootstrap-screen.tsx
+#: src/ui/name-field.tsx
 msgid "Name"
 msgstr "Name"
 
@@ -4614,6 +4622,10 @@ msgid "Now · {at}"
 msgstr "Now · {at}"
 
 #: src/features/admin/proxy-sign-in-card.tsx
+msgid "Off: a person the site does not know gets a notice and no sign-in. On: they are made at their first visit and confirm their name."
+msgstr "Off: a person the site does not know gets a notice and no sign-in. On: they are made at their first visit and confirm their name."
+
+#: src/features/admin/proxy-sign-in-card.tsx
 msgid "Off: a site admin behind the proxy is a normal person and signs in with a password to administer."
 msgstr "Off: a site admin behind the proxy is a normal person and signs in with a password to administer."
 
@@ -4744,6 +4756,10 @@ msgstr "Opens from the Need ideas? button. Markdown supported."
 #: src/features/people/profile-form.tsx
 msgid "Optional prompts that give people something to ask you about"
 msgstr "Optional prompts that give people something to ask you about"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Optional, for example Remote-Name. Empty uses the part of the email before the @."
+msgstr "Optional, for example Remote-Name. Empty uses the part of the email before the @."
 
 #: src/features/admin/event-moments.tsx
 msgid "Optional, one line."
@@ -5464,6 +5480,7 @@ msgstr "RSVPs per running session on {day}"
 msgid "RSVPs to running sessions (average)"
 msgstr "RSVPs to running sessions (average)"
 
+#: src/app/name-confirm-dialog.tsx
 #: src/features/admin/event-days.tsx
 #: src/features/admin/event-labels.tsx
 #: src/features/admin/event-meetings.tsx
@@ -5526,6 +5543,7 @@ msgstr "Saved"
 msgid "Saved!"
 msgstr "Saved!"
 
+#: src/app/name-confirm-dialog.tsx
 #: src/features/admin/event-config.tsx
 #: src/features/admin/event-days.tsx
 #: src/features/admin/event-labels.tsx
@@ -6192,6 +6210,11 @@ msgstr "Someone else"
 msgid "Someone else changed this while you were editing it."
 msgstr "Someone else changed this while you were editing it."
 
+#. placeholder {0}: field.value.trim()
+#: src/ui/name-field.tsx
+msgid "Someone is already called {0}. You can keep it, but people may mix you up."
+msgstr "Someone is already called {0}. You can keep it, but people may mix you up."
+
 #: src/features/settings/email-settings-form.tsx
 msgid "someone joins a proposal I’m hosting as a co-host"
 msgstr "someone joins a proposal I’m hosting as a co-host"
@@ -6697,6 +6720,10 @@ msgstr "This is a closed session, meaning you can at most arrive 5 minutes late.
 msgid "This is a test email sent to {name}."
 msgstr "This is a test email sent to {name}."
 
+#: src/app/name-confirm-dialog.tsx
+msgid "This is how other people see you. Change it if it is not right."
+msgstr "This is how other people see you. Change it if it is not right."
+
 #: src/commands/failure-message.ts
 msgid "This is turned off on this site."
 msgstr "This is turned off on this site."
@@ -6813,6 +6840,10 @@ msgstr "This session no longer exists."
 #: src/features/sessions/session-form.tsx
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr "This session was scheduled from a proposal. See it <0>here</0>."
+
+#: src/app/proxy-notice.tsx
+msgid "This site has no person with the email your sign-in sent. Ask an organizer to add you."
+msgstr "This site has no person with the email your sign-in sent. Ask an organizer to add you."
 
 #: src/app/footer.tsx
 msgid "This site is running {shown}."
@@ -7618,6 +7649,7 @@ msgstr "your 1-on-1 with {otherName}"
 msgid "Your link to {eventName}"
 msgstr "Your link to {eventName}"
 
+#: src/app/name-confirm-dialog.tsx
 #: src/app/user-menu.tsx
 #: src/features/people/profile-form.tsx
 msgid "Your name"

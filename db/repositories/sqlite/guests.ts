@@ -559,7 +559,10 @@ export class SqliteGuestsRepository implements GuestsRepository {
     } = data;
 
     // Email settings are left to their column defaults.
-    this.db.insert(schema.guests).values({ id, name, email }).run();
+    this.db
+      .insert(schema.guests)
+      .values({ id, name, email, nameUnconfirmed: data.nameUnconfirmed })
+      .run();
     return {
       id,
       name,
@@ -574,6 +577,10 @@ export class SqliteGuestsRepository implements GuestsRepository {
     };
   }
 
+  async isNameUnconfirmed(id: string): Promise<boolean> {
+    return this.findRow(id)?.nameUnconfirmed ?? false;
+  }
+
   async findOrCreateByEmail(
     data: NewGuest
   ): Promise<{ guest: CompleteGuest; created: boolean }> {
@@ -581,6 +588,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
     const {
       name,
       info: { email },
+      nameUnconfirmed = false,
     } = data;
 
     // Atomic under concurrency: the unique index on lower(email) makes the
@@ -589,7 +597,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
       return { guest: await this.create(data), created: true };
     const inserted = this.db
       .insert(schema.guests)
-      .values({ id, name, email })
+      .values({ id, name, email, nameUnconfirmed })
       .onConflictDoNothing()
       .returning()
       .all();
@@ -702,6 +710,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
             prompts: data.prompts,
             languages: data.languages,
             contacts: data.contacts,
+            nameUnconfirmed: false,
             profileUpdatedAt: changed
               ? now.toISOString()
               : before.profileUpdatedAt,

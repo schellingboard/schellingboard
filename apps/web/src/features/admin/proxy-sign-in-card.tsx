@@ -16,6 +16,7 @@ const REFUSED_FIELD: Record<string, string> = {
   "settings.proxyHeaderInvalid": "headerName",
   "settings.proxyAddressInvalid": "addresses",
   "settings.proxyLogoutUrlInvalid": "logoutUrl",
+  "settings.proxyNameHeaderInvalid": "nameHeader",
 };
 /* eslint-enable lingui/no-unlocalized-strings */
 
@@ -179,6 +180,8 @@ export function ProxySignInCard({
   const [addresses, setAddresses] = useState(settings.addresses.join("\n"));
   const [logoutUrl, setLogoutUrl] = useState(settings.logoutUrl);
   const [siteAdmins, setSiteAdmins] = useState(settings.siteAdmins);
+  const [createPeople, setCreatePeople] = useState(settings.createPeople);
+  const [nameHeader, setNameHeader] = useState(settings.nameHeader);
   const [saved, setSaved] = useState(false);
   const [refused, setRefused] = useState<Record<string, string>>({});
   const mutation = useFormMutation({
@@ -193,10 +196,12 @@ export function ProxySignInCard({
             .filter((a) => a !== ""),
           logoutUrl,
           siteAdmins,
+          createPeople,
+          nameHeader,
         },
         key
       ),
-    fieldNames: ["headerName", "addresses", "logoutUrl"],
+    fieldNames: ["headerName", "addresses", "logoutUrl", "nameHeader"],
     explainRefusals: true,
   });
   const fields = { ...mutation.fields, ...refused };
@@ -285,6 +290,23 @@ export function ProxySignInCard({
           onChange={setSiteAdmins}
           hint={t`Off: a site admin behind the proxy is a normal person and signs in with a password to administer.`}
         />
+        <CheckboxField
+          label={t`Create people the site does not know`}
+          name="createPeople"
+          checked={createPeople}
+          onChange={setCreatePeople}
+          hint={t`Off: a person the site does not know gets a notice and no sign-in. On: they are made at their first visit and confirm their name.`}
+        />
+        {createPeople && (
+          <TextField
+            label={t`Header with the name`}
+            name="nameHeader"
+            value={nameHeader}
+            onChange={setNameHeader}
+            hint={t`Optional, for example Remote-Name. Empty uses the part of the email before the @.`}
+            error={fields.nameHeader}
+          />
+        )}
         <FormErrorSummary
           fields={fields}
           error={Object.keys(refused).length > 0 ? null : shown(mutation)}

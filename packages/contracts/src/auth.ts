@@ -33,6 +33,18 @@ export const currentIdentitySchema = chosenIdentitySchema.extend({
     .describe(
       "Present when a sign-in proxy decides who the browser acts as: no name picker, no switching"
     ),
+  nameToConfirm: z
+    .string()
+    .optional()
+    .describe(
+      "The name a proxy sign-in gave the person, present until they confirm it"
+    ),
+  proxyUnknownEmail: z
+    .boolean()
+    .optional()
+    .describe(
+      "True when a sign-in proxy sent an email that this site has no person for"
+    ),
   awaitingLogin: z
     .boolean()
     .optional()

@@ -26,6 +26,7 @@ export function Dialog({
   label,
   titleAction,
   fullScreen,
+  required,
 }: {
   open: boolean;
   onClose: () => void;
@@ -38,6 +39,8 @@ export function Dialog({
   titleAction?: ReactNode;
   /** On phones, fills the screen instead of rising from the bottom. */
   fullScreen?: boolean;
+  /** Cannot be closed: no close button, Escape or backdrop click; only the form inside ends it. */
+  required?: boolean;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -55,7 +58,11 @@ export function Dialog({
     const me = Symbol();
     openDialogs.push(me);
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape" && openDialogs[openDialogs.length - 1] === me)
+      if (
+        e.key === "Escape" &&
+        !required &&
+        openDialogs[openDialogs.length - 1] === me
+      )
         escape();
     };
     document.addEventListener("keydown", onKey);
@@ -65,7 +72,7 @@ export function Dialog({
       openDialogs.splice(openDialogs.indexOf(me), 1);
       opener?.focus?.();
     };
-  }, [open, escape, reset]);
+  }, [open, escape, reset, required]);
 
   const keepFocusInside = (e: KeyboardEvent) => {
     if (e.key !== "Tab" || !panel.current) return;
@@ -99,7 +106,7 @@ export function Dialog({
           ? { top: area.top, bottom: "auto", height: area.height }
           : undefined
       }
-      onClick={() => guard.requestClose()}
+      onClick={() => !required && guard.requestClose()}
     >
       <div
         ref={panel}
@@ -123,14 +130,16 @@ export function Dialog({
           </h2>
           {titleAction}
         </div>
-        <button
-          type="button"
-          aria-label={t`Close`}
-          onClick={() => guard.requestClose()}
-          className="absolute right-3 top-3 rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
-        >
-          <span aria-hidden>✕</span>
-        </button>
+        {!required && (
+          <button
+            type="button"
+            aria-label={t`Close`}
+            onClick={() => guard.requestClose()}
+            className="absolute right-3 top-3 rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
+          >
+            <span aria-hidden>✕</span>
+          </button>
+        )}
         {guard.prompt}
         <div
           className={`mt-3 ${fullScreen ? "flex min-h-0 flex-1 flex-col sm:block" : ""}`}

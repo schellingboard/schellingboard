@@ -17,13 +17,28 @@ request without the header signs in the normal way.
 
 - The proxy sends the person's email in a request header, `X-Forwarded-Email` by default.
 - The app matches it, ignoring case, with the **system email** of a guest. A contact email typed
-  into a profile never counts. Create guests or import them first; an unknown email carries on
-  without a name.
+  into a profile never counts. An unknown email is handled as
+  [below](#people-the-site-does-not-know).
 - The header counts only on a request from the app's own pages, never on a cross-site request.
 - A signed-in person sees their name, with no name picker, and the password and login-code settings
   are hidden (site admins keep them). **Log out** leads to the **Sign out address**, and is hidden
   when that is empty.
 - Nothing is stored in the browser, so signing out at the proxy takes effect on the next request.
+
+## People the site does not know
+
+By default, a person whose email matches no guest is not signed in. They see a notice that the site
+has no person with that email, and an organizer can add them.
+
+Tick **Create people the site does not know** to make them at their first visit instead. The name is
+the value of the **Header with the name** (for example `Remote-Name` for Authelia, or
+`X-Forwarded-Preferred-Username` for oauth2-proxy), else the part of the email before the `@`. On
+the first visit a **Your name** window shows it, and the person must press **Save** (changing the
+name if they like) before going on. Everyone the proxy lets in then becomes a guest, so the proxy's
+own access rules decide who may join. A new person is in no event until an organizer adds them, so
+they see no name menu (and no profile or log out) until then.
+
+The proxy must also remove any name header the client sends. The name is read as UTF-8.
 
 ## The header is only as safe as the network
 

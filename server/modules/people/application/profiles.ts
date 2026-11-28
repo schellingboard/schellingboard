@@ -13,6 +13,7 @@ import type { Actor } from "@/server/kernel/actor";
 import { byGuest } from "@/server/kernel/change-context";
 import { recordingProposalCascade } from "@/server/kernel/proposal-cascade";
 import {
+  conflict,
   forbidden,
   invalidFields,
   notFound,
@@ -229,6 +230,29 @@ const currentFields = (current: CompleteGuest): ProfileFields => ({
   languages: current.languages ?? null,
   contacts: current.contacts ?? null,
 });
+
+export const confirmMyName =
+  (deps: PeopleDeps) =>
+  async (
+    actor: Actor,
+    { name }: { name: string },
+    now: Date
+  ): Promise<Result<Guest>> => {
+    const acting = await actingGuest(actor, deps.repos.guests);
+    if (!acting.ok) return acting;
+    const current = await deps.repos.guests.findById(acting.value);
+    if (!current) return profileNotFound();
+    if (!(await deps.repos.guests.isNameUnconfirmed(acting.value)))
+      return conflict("name.confirmed", "The name is already confirmed");
+    return saveProfile(
+      deps,
+      acting.value,
+      undefined,
+      (guest) => ({ ...currentFields(guest), name }),
+      now,
+      current.profileVersion
+    );
+  };
 
 export const replaceMyAvatar =
   (deps: PeopleDeps) =>

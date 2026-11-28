@@ -3119,6 +3119,10 @@ export interface paths {
                 /** @description Whether the person administers */
                 siteAdmin: boolean;
               };
+              /** @description The name a proxy sign-in gave the person, present until they confirm it */
+              nameToConfirm?: string;
+              /** @description True when a sign-in proxy sent an email that this site has no person for */
+              proxyUnknownEmail?: boolean;
               /** @description True when the browser holds a protected name it has not logged in to */
               awaitingLogin?: boolean;
             };
@@ -3546,6 +3550,60 @@ export interface paths {
       };
     };
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/name": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Sets the acting guest's name and marks it as confirmed: the answer to the first-visit dialog after a proxy sign-in made the person. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            name: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The profile with the confirmed name */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["PublicProfile"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -7983,6 +8041,10 @@ export interface paths {
               logoutUrl: string;
               /** @description Whether site admins sign in through the proxy */
               siteAdmins: boolean;
+              /** @description Whether an email no person has makes a new person */
+              createPeople: boolean;
+              /** @description The header with a new person's name; empty uses the email */
+              nameHeader: string;
               /** @description Whether a secret is required of the proxy */
               secretSet: boolean;
               /** @description What this request carried; null while the sign-in is off */
@@ -8027,6 +8089,10 @@ export interface paths {
             logoutUrl: string;
             /** @description Whether site admins sign in through the proxy */
             siteAdmins: boolean;
+            /** @description Whether an email no person has makes a new person */
+            createPeople: boolean;
+            /** @description The header with a new person's name; empty uses the email */
+            nameHeader: string;
           };
         };
       };
@@ -8047,6 +8113,10 @@ export interface paths {
               logoutUrl: string;
               /** @description Whether site admins sign in through the proxy */
               siteAdmins: boolean;
+              /** @description Whether an email no person has makes a new person */
+              createPeople: boolean;
+              /** @description The header with a new person's name; empty uses the email */
+              nameHeader: string;
               /** @description Whether a secret is required of the proxy */
               secretSet: boolean;
             };

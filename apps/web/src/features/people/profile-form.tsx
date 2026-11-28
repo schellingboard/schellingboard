@@ -42,6 +42,7 @@ import {
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { ArrowPathIcon } from "../../ui/icons";
 import { ImageCropDialog } from "../../ui/image-crop-dialog";
+import { NameField } from "../../ui/name-field";
 import { cropImage } from "../../ui/resize-image";
 import { SearchableSelect } from "../../ui/searchable-select";
 import { Tooltip } from "../../ui/tooltip";
@@ -386,8 +387,7 @@ export function ProfileForm({
 
         <div className="flex flex-col gap-4 md:flex-row">
           <div className="flex-1">
-            <TextField
-              label={t`Name`}
+            <NameField
               name="name"
               required
               value={name}

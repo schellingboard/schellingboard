@@ -20,6 +20,10 @@ export type ProxySignIn = {
   addresses: string[];
   logoutUrl: string;
   siteAdmins: boolean;
+  /** Whether a trusted email no person has makes one. */
+  createPeople: boolean;
+  /** The header that carries the new person's name; empty uses the email. */
+  nameHeader: string;
 };
 
 export type ProxySignInState = ProxySignIn & { secretSet: boolean };
@@ -30,6 +34,8 @@ export const DEFAULT_PROXY_SIGN_IN: ProxySignIn = {
   addresses: [],
   logoutUrl: "",
   siteAdmins: false,
+  createPeople: false,
+  nameHeader: "",
 };
 
 /** Null when `name` may carry the person's email. */

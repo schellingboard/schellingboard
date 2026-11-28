@@ -143,6 +143,11 @@ const optionalEmail = z
   .transform((value) => value || null)
   .pipe(z.email({ pattern: /^\S+@\S+\.\S+$/ }).nullable());
 
+export const isEmail = (value: string) =>
+  z.email({ pattern: /^\S+@\S+\.\S+$/ }).safeParse(value).success;
+
+export const MAX_NAME_LENGTH = 100;
+
 const eventIdsField = z
   .array(z.string())
   .optional()
@@ -163,6 +168,14 @@ export const createGuestSchema = z.object({
 export const updateGuestSchema = createGuestSchema.extend({
   id: z.string().nonempty(),
   expectedVersion,
+});
+
+export const confirmNameBodySchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Name is required" })
+    .max(MAX_NAME_LENGTH),
 });
 
 export const profileBodySchema = profileSchema

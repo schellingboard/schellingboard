@@ -55,6 +55,10 @@ identify attendees, so nobody picks a name or enters a code. Set the proxy up fi
   out**.
 - **Site admins sign in through the proxy too** — off by default: a site admin behind the proxy is a
   normal person and signs in with a password to administer.
+- **Create people the site does not know** — off by default: a person whose email matches no guest
+  sees a notice. On, they are made at their first visit and confirm their name in a **Your name**
+  window. **Header with the name** (optional) gives the name; otherwise the part of the email before
+  the `@` is used.
 
 While the sign-in is on and neither a secret nor an address is set, the card shows a warning: anyone
 who reaches the app without the proxy can send the header and become any person. Under the card, a

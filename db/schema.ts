@@ -39,6 +39,10 @@ export const siteSettings = sqliteTable("site_settings", {
   proxySiteAdmins: integer("proxy_site_admins", { mode: "boolean" })
     .notNull()
     .default(false),
+  proxyCreatePeople: integer("proxy_create_people", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  proxyNameHeader: text("proxy_name_header").notNull().default(""),
 });
 
 export const guests = sqliteTable(
@@ -135,6 +139,11 @@ export const guests = sqliteTable(
     // Verified sessions of a site admin act with admin rights; the role also
     // protects the name, whatever authProtected says.
     siteAdmin: integer("site_admin", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    // A name taken from an email or a proxy header, not yet seen by the
+    // person; saving a profile clears it.
+    nameUnconfirmed: integer("name_unconfirmed", { mode: "boolean" })
       .notNull()
       .default(false),
     version: integer("version").notNull().default(1),
