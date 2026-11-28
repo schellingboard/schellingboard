@@ -23,6 +23,8 @@ request without the header signs in the normal way.
 - A signed-in person sees their name, with no name picker, and the password and login-code settings
   are hidden (site admins keep them). **Log out** leads to the **Sign out address**, and is hidden
   when that is empty.
+- With **Site admins sign in through the proxy too** off, a site admin opens `/admin` and logs in
+  with their password or an emailed code, for their own name only.
 - Nothing is stored in the browser, so signing out at the proxy takes effect on the next request.
 
 ## People the site does not know

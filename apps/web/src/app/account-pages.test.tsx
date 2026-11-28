@@ -116,6 +116,28 @@ describe(
       expect(screen.queryByLabelText("Password")).toBeNull();
     });
 
+    it("lets a site admin without admin rights log in as themself", async () => {
+      await open({
+        handler: (call) =>
+          call.path === "/api/v1/me/identity"
+            ? Response.json({
+                guestId: "bo",
+                fixedBy: { logoutUrl: "", siteAdmin: true },
+                adminNeedsSignIn: true,
+              })
+            : withBo(call),
+        path: "/auth/login?redirect=%2Fadmin&guest=someone-else",
+        identity: "bo",
+      });
+
+      expect(
+        await screen.findByRole("heading", { name: "Log in as Bo" })
+      ).toBeTruthy();
+      expect(
+        screen.getByText("Sign in with your password to use admin.")
+      ).toBeTruthy();
+    });
+
     it("says so when the join link is another person's", async () => {
       await open({
         handler: (call) =>

@@ -54,7 +54,8 @@ proxy, it can send the header itself and become any person.
    site admin.
 8. **Site admins are excluded by default.** An option lets a `proxy` actor carry the site-admin
    role. Without it, a site admin behind the proxy is signed in as a normal person and signs in with
-   a password to administer.
+   a password or an emailed code to administer. The login page accepts this from them only, and for
+   their own account only.
 9. **Unknown email.** By default, the request continues without identity, and the app shows a notice
    that this site has no person with that email. An option creates the person. The name comes from
    an optional name header (Authelia's `Remote-Name`, oauth2-proxy's
