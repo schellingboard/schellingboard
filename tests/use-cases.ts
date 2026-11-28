@@ -840,6 +840,23 @@ export const features = {
       },
     },
   },
+  "025": {
+    slug: "proxy-sign-in",
+    component: "auth",
+    stories: {
+      US1: {
+        title: "Organizer lets a sign-in proxy identify attendees",
+        actor: "organizer",
+        priority: "P1",
+      },
+      US2: {
+        title:
+          "Attendee behind the proxy acts as themselves without picking a name",
+        actor: "attendee",
+        priority: "P1",
+      },
+    },
+  },
 } as const satisfies Record<string, Feature>;
 
 type Features = typeof features;

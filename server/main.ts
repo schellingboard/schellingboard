@@ -2,8 +2,7 @@ import { serve } from "@hono/node-server";
 
 import { warnAboutAdminPassword } from "@/server/admin-password-notice";
 import { logBootstrapLink } from "@/server/bootstrap-link";
-import { withForwardedProto } from "@/server/http/forwarded";
-import { web } from "@/server/http/web";
+import { handleRequest } from "@/server/http/handler";
 import { startJobsLoop, stopJobsLoop } from "@/utils/jobs/loop";
 import { initMailer } from "@/utils/mailer";
 
@@ -16,9 +15,8 @@ logBootstrapLink().catch((err) =>
 );
 
 const port = Number(process.env.PORT ?? 3000);
-const server = serve(
-  { fetch: (req) => web.fetch(withForwardedProto(req)), port },
-  () => console.log(`Listening on port ${port}`)
+const server = serve({ fetch: handleRequest, port }, () =>
+  console.log(`Listening on port ${port}`)
 );
 
 for (const signal of ["SIGINT", "SIGTERM"] as const)

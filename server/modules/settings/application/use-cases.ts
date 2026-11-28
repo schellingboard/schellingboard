@@ -1,5 +1,11 @@
 import type { SettingsDeps } from "../ports";
 import {
+  clearProxySecret,
+  generateProxySecret,
+  getProxySignIn,
+  updateProxySignIn,
+} from "./proxy-sign-in";
+import {
   getPublicSiteSettings,
   getSiteSettings,
   updateSiteSettings,
@@ -10,6 +16,10 @@ export function createSettingsUseCases(deps: SettingsDeps) {
     getSiteSettings: getSiteSettings(deps),
     getPublicSiteSettings: getPublicSiteSettings(deps),
     updateSiteSettings: updateSiteSettings(deps),
+    getProxySignIn: getProxySignIn(deps),
+    updateProxySignIn: updateProxySignIn(deps),
+    generateProxySecret: generateProxySecret(deps),
+    clearProxySecret: clearProxySecret(deps),
   };
 }
 

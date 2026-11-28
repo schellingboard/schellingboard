@@ -67,6 +67,11 @@ export const chooseGuest = (deps: PeopleDeps) => {
     actor: Actor,
     { guestId, device }: { guestId: string; device?: string | null }
   ): Promise<Result<SignedIn & { locale: string | null }>> => {
+    if (actor.guest?.via === "proxy")
+      return forbidden(
+        "identity.fixed",
+        "The proxy decides who you are on this site"
+      );
     const creds = await deps.repos.guests.getAuthCredentials(guestId);
     if (!creds) return notFound("guest.notFound", "Unknown user");
     if (!creds.authProtected)
