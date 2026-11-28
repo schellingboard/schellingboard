@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Verified events ask you to log in instead of listing names**: the header shows Log in, and a
+  first action such as Add Proposal opens the login page, then returns you to the same page.
 - **Actions that need your name now open the name picker**: Add Proposal, voting, "My proposals" and
   Join as co-host used to say "Select a user first"; Add Proposal and the filters then carry on.
 

@@ -50,13 +50,7 @@ export function snapshotFor(
   now: Date
 ): Promise<Result<Snapshot>> {
   return uow.read(async (q) => {
-    const viewer = await actingGuest(actor, q.guests);
-    const snapshot = await assemble(
-      q,
-      slug,
-      viewer.ok ? viewer.value : null,
-      now
-    );
+    const snapshot = await assemble(q, actor, slug, now);
     return snapshot
       ? ok(snapshot)
       : notFound("event.notFound", "Event not found");
@@ -65,12 +59,18 @@ export function snapshotFor(
 
 async function assemble(
   q: SnapshotReads,
+  actor: Actor,
   slug: string,
-  viewerId: string | null,
   now: Date
 ): Promise<Snapshot | undefined> {
   const schedule = await eventScheduleBySlug(q, slug);
   if (!schedule) return undefined;
+  const viewer = await actingGuest(
+    actor,
+    q.guests,
+    schedule.event.identityMode
+  );
+  const viewerId = viewer.ok ? viewer.value : null;
   const eventId = schedule.event.id;
   const [seq, sessions, locations, guests, meetings, proposals, votes] =
     await Promise.all([

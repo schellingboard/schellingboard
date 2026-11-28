@@ -4,13 +4,19 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useRequireIdentity } from "../ui/require-identity";
 import { IdentityPrompt } from "./identity-prompt";
+import { goToSignIn } from "./sign-in-redirect";
 import { ViewerContext } from "./viewer";
+
+vi.mock("./sign-in-redirect", () => ({ goToSignIn: vi.fn() }));
 
 afterEach(cleanup);
 
 const guests = [{ id: "g1", name: "Ada", authProtected: false }];
 
-function setup(fixed?: { logoutUrl: string; siteAdmin: boolean }) {
+function setup(
+  fixed?: { logoutUrl: string; siteAdmin: boolean },
+  signInOnly = false
+) {
   const then = vi.fn();
   const choose = vi.fn().mockResolvedValue({ ok: true });
   function Action() {
@@ -32,7 +38,7 @@ function setup(fixed?: { logoutUrl: string; siteAdmin: boolean }) {
         refresh: vi.fn(),
       }}
     >
-      <IdentityPrompt guests={guests}>
+      <IdentityPrompt guests={guests} signInOnly={signInOnly}>
         <Action />
       </IdentityPrompt>
     </ViewerContext.Provider>
@@ -72,5 +78,16 @@ describe("IdentityPrompt", () => {
     await userEvent.click(screen.getByRole("option", { name: "Ada" }));
 
     expect(then).not.toHaveBeenCalled();
+  });
+
+  it("sends a verified event's visitor to sign in, with no list of names", async () => {
+    const { then } = setup(undefined, true);
+
+    await userEvent.click(screen.getByRole("button", { name: "Act" }));
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByText("Ada")).toBeNull();
+    expect(then).not.toHaveBeenCalled();
+    expect(goToSignIn).toHaveBeenCalledWith();
   });
 });

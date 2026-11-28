@@ -99,7 +99,11 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
     const target = await deps.uow.read(async (q) => {
       const schedule = await eventScheduleBySlug(q, slug);
       if (!schedule) return undefined;
-      const guest = await actingGuest(c.var.actor, q.guests);
+      const guest = await actingGuest(
+        c.var.actor,
+        q.guests,
+        schedule.event.identityMode
+      );
       return {
         eventId: schedule.event.id,
         viewer: {

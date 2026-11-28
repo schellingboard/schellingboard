@@ -112,10 +112,16 @@ function EventHost({
     () => store?.get().guests ?? NO_GUESTS
   );
 
+  const verified = useSyncExternalStore(
+    (listener) => store?.subscribe(listener) ?? noSubscribe(),
+    () => store?.get().event.identityMode === "verified"
+  );
+
   return (
     <ShellFrame
       api={api}
       events={events}
+      signInOnly={verified}
       guests={
         store &&
         guests.map((g) => ({

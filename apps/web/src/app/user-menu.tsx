@@ -5,6 +5,7 @@ import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { Dialog } from "../ui/dialog";
 import { useDismiss } from "../ui/use-dismiss";
 import { hardNavigate, hardReload } from "./hard-navigate";
+import { goToSignIn } from "./sign-in-redirect";
 import { endSiteSession } from "./site-session";
 import type { Viewer } from "./viewer";
 
@@ -24,9 +25,11 @@ const optionBase = "block w-full cursor-pointer px-4 py-2 text-left text-sm";
 export function UserMenu({
   viewer,
   guests,
+  signInOnly = false,
 }: {
   viewer: Viewer;
   guests: PickableGuest[] | undefined;
+  signInOnly?: boolean;
 }) {
   const [picking, setPicking] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -64,6 +67,16 @@ export function UserMenu({
   };
 
   if (!current && viewer.fixed) return null;
+  if (signInOnly && !current)
+    return (
+      <button
+        type="button"
+        onClick={() => goToSignIn()}
+        className={`${chip} bg-brand-tint text-brand-fg hover:bg-brand-tint-hover`}
+      >
+        {t`Log in`}
+      </button>
+    );
   if (!current) {
     return (
       <>
@@ -217,12 +230,7 @@ export function NamePicker({
       onClose();
       return onChosen?.();
     }
-    if (result.code === "guest.protected")
-      return hardNavigate(
-        `/auth/login?guest=${guest.id}&redirect=${encodeURIComponent(
-          location.pathname + location.search + location.hash
-        )}`
-      );
+    if (result.code === "guest.protected") return goToSignIn(guest.id);
     setError(msg`Could not select that name — try again`);
   };
 
