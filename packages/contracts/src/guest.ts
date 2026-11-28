@@ -317,7 +317,23 @@ export const guestImportResultSchema = z.object({
     ),
 });
 
-export const siteAdminBodySchema = z.object({ siteAdmin: z.boolean() });
+export const siteAdminBodySchema = z.object({
+  siteAdmin: z.boolean(),
+  resetPassword: z
+    .boolean()
+    .optional()
+    .describe(
+      "While granting the role to someone not yet a site admin: removes the password and ends the guest's sessions, so only a password link or an emailed code lets them in"
+    ),
+});
+
+export const passwordLinkViewSchema = z.object({
+  token: z
+    .string()
+    .describe(
+      "Shown once; put it in `/auth/reset?guest={id}&token={token}`. Works once, for 24 hours, and ends the earlier link."
+    ),
+});
 
 export const joinLinkViewSchema = z.object({
   token: z

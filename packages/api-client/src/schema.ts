@@ -3860,7 +3860,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Sets the password the emailed link allows and protects the name; signs no one in. Other browsers' sessions of the guest end (all of them when the name was already protected). `auth.credentialWrong` (403) for a wrong, expired or used token; `password.invalid` (400). */
+    /** @description Sets the password a password link allows (emailed by the guest's request, or handed out by an admin) and protects the name; signs no one in. Other browsers' sessions of the guest end (all of them when the guest had a password). `auth.credentialWrong` (403) for a wrong, expired or used token; `password.invalid` (400). */
     post: {
       parameters: {
         query?: never;
@@ -4032,7 +4032,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Exchanges a personal join link. While its guest set no password since the link was made, signs the browser in as them (verified), joins the event and sets the guest cookie. Afterwards it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link. */
+    /** @description Exchanges a personal join link. While its guest has no password and is no site admin, signs the browser in as them (verified), joins the event and sets the guest cookie. Otherwise it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link. */
     post: {
       parameters: {
         query?: never;
@@ -4060,7 +4060,7 @@ export interface paths {
               guestId: string;
               /** @description The event the link opens */
               eventSlug: string;
-              /** @description False when the guest set a password after the link was made: sign in as them, then send the token again. Nothing changed. */
+              /** @description False when the guest has a password or is a site admin: sign in as them, then send the token again. Nothing changed. */
               joined: boolean;
             };
           };
@@ -4231,7 +4231,7 @@ export interface paths {
               username: string | null;
               /** @description False for a guest without an email address */
               hasEmail: boolean;
-              /** @description Whether this login may set the password without the old one: a verified one for a name with none, or a join-link one where no mail can reset it */
+              /** @description Whether this login may set the first password: a verified one, for a name with none that is no site admin */
               canSetPassword: boolean;
             };
           };
@@ -4301,7 +4301,7 @@ export interface paths {
         };
       };
     };
-    /** @description Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a reset link replaces it. Only a join-link login may replace a forgotten password here, and only where no mail can reset it (no email on file, or the site sends none). A site admin is refused with `siteAdmin.passwordLink` (403): their password changes only with the old one or through a reset link. */
+    /** @description Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a password link replaces it. A site admin is refused with `siteAdmin.passwordLink` (403): their password changes only with the old one or through a password link. */
     post: {
       parameters: {
         query?: never;
@@ -7158,7 +7158,7 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** @description Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last. */
+    /** @description Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last. `resetPassword` also takes away the password the guest has. */
     put: {
       parameters: {
         query?: never;
@@ -7175,6 +7175,8 @@ export interface paths {
         content: {
           "application/json": {
             siteAdmin: boolean;
+            /** @description While granting the role to someone not yet a site admin: removes the password and ends the guest's sessions, so only a password link or an emailed code lets them in */
+            resetPassword?: boolean;
           };
         };
       };
@@ -7200,6 +7202,104 @@ export interface paths {
       };
     };
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/guests/{id}/password-link": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes a link to set the guest's password, for the admin to hand over; it ends the guest's earlier password link and signs no one in. The token is shown only in this answer. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The new link */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description Shown once; put it in `/auth/reset?guest={id}&token={token}`. Works once, for 24 hours, and ends the earlier link. */
+              token: string;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/guests/{id}/password-link/mail": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes a password link, valid 24 hours, and mails it to the guest. `guest.noEmail` (409) without an email; `auth.mailUnavailable` (503) when the server cannot send email; `auth.mailFailed` (503) when sending failed. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Sent */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;

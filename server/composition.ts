@@ -130,7 +130,15 @@ export function peopleUseCases(): PeopleUseCases {
             translatorFor(locale)
           ),
         }),
-      sendResetLink: ({ guestId, name, email, locale, token, validMinutes }) =>
+      sendResetLink: ({
+        guestId,
+        name,
+        email,
+        locale,
+        token,
+        validMinutes,
+        fromAdmin,
+      }) =>
         sendMail({
           to: email,
           ...authPasswordResetEmail(
@@ -140,6 +148,7 @@ export function peopleUseCases(): PeopleUseCases {
                 guestId
               )}&token=${encodeURIComponent(token)}`,
               validMinutes,
+              fromAdmin,
             },
             translatorFor(locale)
           ),

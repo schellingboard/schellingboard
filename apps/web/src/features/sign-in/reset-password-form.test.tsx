@@ -62,32 +62,32 @@ describe(
       });
     });
 
-    it("says why a spent link was refused", async () => {
-      setup(() =>
-        problem(
-          403,
-          "auth.credentialWrong",
-          "This link is invalid or has expired"
-        )
-      );
-      await userEvent.type(
-        screen.getByLabelText("New password (at least 8 characters)"),
-        "a brand new password"
-      );
+    it(
+      "says that an expired or used link no longer works",
+      { tags: ["016-US6"] },
+      async () => {
+        setup(() =>
+          problem(403, "auth.credentialWrong", "the server's own wording")
+        );
+        await userEvent.type(
+          screen.getByLabelText("New password (at least 8 characters)"),
+          "a brand new password"
+        );
 
-      await userEvent.click(
-        screen.getByRole("button", { name: "Set password" })
-      );
+        await userEvent.click(
+          screen.getByRole("button", { name: "Set password" })
+        );
 
-      expect((await screen.findByRole("alert")).textContent).toContain(
-        "This link is invalid or has expired"
-      );
-    });
+        expect((await screen.findByRole("alert")).textContent).toBe(
+          "This link no longer works. Request a new one, or ask an admin."
+        );
+      }
+    );
 
     it("explains a link that names nobody or carries no token", () => {
       setup(() => new Response(null, { status: 204 }), { guest: null });
 
-      expect(screen.getByText(/This password link is invalid/)).toBeTruthy();
+      expect(screen.getByText(/This link no longer works/)).toBeTruthy();
       expect(screen.queryByRole("button", { name: "Set password" })).toBeNull();
     });
   }

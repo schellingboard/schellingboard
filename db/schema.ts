@@ -133,9 +133,6 @@ export const guests = sqliteTable(
     passwordHash: text("password_hash"),
     // Lowercase, optional; password sign-in takes it or the email.
     username: text("username"),
-    // When the password last changed to a non-empty one; a join link made
-    // before it asks for a sign-in instead. NULL for passwords set earlier.
-    passwordSetAt: text("password_set_at"),
     // Verified sessions of a site admin act with admin rights; the role also
     // protects the name, whatever authProtected says.
     siteAdmin: integer("site_admin", { mode: "boolean" })

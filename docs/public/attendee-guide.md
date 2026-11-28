@@ -45,7 +45,7 @@ rather it _were_ a login, see [Protect your name](#protect-your-name).
 
 Organizers may send you a personal link, by email or message. Opening it signs you in as yourself
 and adds you to the event, with no name to pick and no password. Keep it to yourself: whoever opens
-it acts as you. Once you set a password, the link asks you to sign in first, and a newer link from
+it acts as you. Once you have a password, the link asks you to sign in first, and a newer link from
 the organizers replaces an older one.
 
 ## Propose a session
@@ -554,10 +554,11 @@ needs either the current password or a fresh code, and you'll get an email telli
 - **Protection is what makes your sessions yours.** Only a session's hosts can edit or delete it —
   but an unprotected name can be picked by anyone, who then edits as you.
 - **No email address on file, or a site that sends no email?** Open your personal join link, then
-  set a password under **Account security** without a code. Forgot it later? Ask an organizer for a
-  new link and set a new password the same way. A password or code login cannot do this.
-- **Lost both your password and your email?** Ask an organizer to update the address on file; codes
-  then go to the new one.
+  set a password under **Account security**. A site admin can also send you a password link.
+- **Forgot your password and get no email?** Ask a site admin for a password link. It works once,
+  for 24 hours; open it, set a new password, then log in with it.
+- **Lost both your password and your email?** The password link works for you too. Ask the
+  organizers to correct your address as well, so that codes reach you again.
 
 ## Install it on your phone
 

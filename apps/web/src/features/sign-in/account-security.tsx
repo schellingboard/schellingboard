@@ -152,10 +152,12 @@ function Protection({
         {state.authProtected
           ? canResetByMail
             ? t`Your name is protected: switching to it requires your password or a single-use code emailed to you. Forgot your password? Reset it with an emailed link.`
-            : t`Your name is protected: switching to it requires your password. Forgot it? Ask an organizer for a new link, then set a new password here.`
+            : t`Your name is protected: switching to it requires your password. Forgot it? Ask an admin for a password link.`
           : canResetByMail
             ? t`Anyone can currently act under your name. Enable protection so switching to your name requires your password. We'll email you a link to set it.`
-            : t`Anyone can currently act under your name. Protect it so switching to your name requires your password.`}
+            : canSetDirectly
+              ? t`Anyone can currently act under your name. Protect it so switching to your name requires your password.`
+              : t`Anyone can currently act under your name. Ask an admin for a password link to protect it.`}
       </p>
       {done && (
         <p role="status" className="text-sm text-success-fg">
@@ -177,14 +179,6 @@ function Protection({
                     onClick={() => void sendLink()}
                   >
                     <Trans>Forgot your password?</Trans>
-                  </Button>
-                )}
-                {canSetDirectly && (
-                  <Button
-                    variant="quiet"
-                    onClick={() => openProtectionForm("first")}
-                  >
-                    <Trans>Set a new password</Trans>
                   </Button>
                 )}
                 <Button
@@ -221,7 +215,7 @@ function Protection({
         <form onSubmit={(e) => void submit(e)} className={SECTION}>
           <p className="text-sm text-fg-muted">
             {mode === "first"
-              ? t`Choose a password. You are signed in with your personal link, so the old one is not needed.`
+              ? t`Choose a password. Switching to your name will then require it.`
               : mode === "password"
                 ? t`Enter your current password and choose a new one.`
                 : t`Enter your current password to turn off protection. This also removes your password.`}

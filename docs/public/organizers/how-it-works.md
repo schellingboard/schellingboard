@@ -129,7 +129,7 @@ below are simply unavailable. When it is configured, these are the only messages
 | Email                 | Sent to                                                                  | Opt-out                         |
 | --------------------- | ------------------------------------------------------------------------ | ------------------------------- |
 | **Login code**        | Someone protecting their name or signing in with a code                  | None — it's requested on demand |
-| **Set your password** | Someone who asked to set or reset their password                         | None — it's requested on demand |
+| **Set your password** | Someone who asked for it, or whom a site admin sends a password link     | None — it's requested on demand |
 | **Security changed**  | A protected attendee whose password changed or protection was turned off | None                            |
 | **Join link**         | Guests an organizer mails links to, or makes a new link for              | None                            |
 | **Session moved**     | Hosts and RSVP'd attendees, when a session's time or location changes    | Per-attendee, in their settings |

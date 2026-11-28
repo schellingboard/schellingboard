@@ -31,9 +31,9 @@ export const IDEMPOTENCY_EXEMPT_PATHS = [
 ];
 
 // A replay stores the response body, so a route whose answer holds a secret
-// (the join-link token) must not be remembered.
+// (a join or password link token) must not be remembered.
 const IDEMPOTENCY_EXEMPT_PATTERN =
-  /^(\/api\/v1)?\/admin\/events\/[^/]+\/guests\/[^/]+\/join-link$/;
+  /^(\/api\/v1)?\/admin\/(events\/[^/]+\/guests\/[^/]+\/join-link|guests\/[^/]+\/password-link)$/;
 
 export const isIdempotencyExempt = (path: string) =>
   IDEMPOTENCY_EXEMPT_PATHS.includes(path) ||

@@ -21,6 +21,10 @@ import {
   pageOf,
   tableHandlers,
 } from "../../ui/list-paging";
+import {
+  MakeSiteAdminDialog,
+  PasswordLinkDialog,
+} from "./password-link-dialog";
 import { useRowMode } from "./row-mode";
 import { shown, useJumpWithin } from "./use-section-save";
 
@@ -344,6 +348,8 @@ function GuestRow({
 }) {
   const { mode, close, edit, remove: startDelete } = useRowMode();
   const [sent, setSent] = useState(false);
+  const [linking, setLinking] = useState(false);
+  const [promoting, setPromoting] = useState(false);
   const remove = useFormMutation({
     call: (key) => calls.remove(guest.id, key),
     explainRefusals: true,
@@ -352,8 +358,8 @@ function GuestRow({
     call: (key) => calls.sendTestEmail(guest.id, key),
     explainRefusals: true,
   });
-  const role = useFormMutation({
-    call: (key) => calls.setSiteAdmin(guest.id, !guest.siteAdmin, key),
+  const revoke = useFormMutation({
+    call: (key) => calls.setSiteAdmin(guest.id, false, key),
     explainRefusals: true,
   });
 
@@ -385,14 +391,14 @@ function GuestRow({
   const confirmDelete = async () => {
     if ((await remove.submit())?.ok) onChanged();
   };
-  const toggleRole = async () => {
-    if ((await role.submit())?.ok) onChanged();
+  const revokeRole = async () => {
+    if ((await revoke.submit())?.ok) onChanged();
   };
   const memberOf = events.filter((e) => guest.eventIds.includes(e.id));
   const worn = labels.filter(
     (l) => l.guestIds.includes(guest.id) && guest.eventIds.includes(l.eventId)
   );
-  const error = email.error ?? remove.error ?? role.error;
+  const error = email.error ?? remove.error ?? revoke.error;
 
   return (
     <div>
@@ -468,10 +474,15 @@ function GuestRow({
                   ? t`Sent!`
                   : t`Send test email`}
             </Button>
+            <Button variant="quiet" onClick={() => setLinking(true)}>
+              <Trans>Copy password link</Trans>
+            </Button>
             <Button
               variant="quiet"
-              disabled={role.pending}
-              onClick={() => void toggleRole()}
+              disabled={revoke.pending}
+              onClick={() =>
+                guest.siteAdmin ? void revokeRole() : setPromoting(true)
+              }
             >
               {guest.siteAdmin ? t`Remove site admin` : t`Make site admin`}
             </Button>
@@ -485,6 +496,22 @@ function GuestRow({
         <p role="alert" className="text-sm text-danger-fg">
           {error}
         </p>
+      )}
+      {linking && (
+        <PasswordLinkDialog
+          guest={guest}
+          calls={calls}
+          onClose={() => setLinking(false)}
+        />
+      )}
+      {promoting && (
+        <MakeSiteAdminDialog
+          guest={guest}
+          calls={calls}
+          emailEnabled={emailEnabled}
+          onChanged={onChanged}
+          onClose={() => setPromoting(false)}
+        />
       )}
     </div>
   );

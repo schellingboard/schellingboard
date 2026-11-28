@@ -89,7 +89,7 @@ describe("a personal join link", () => {
   );
 
   it(
-    "also signs in a guest who holds a password set before the link",
+    "does not sign in a guest who has a password, however new the link",
     { tags: ["003-US6"] },
     async () => {
       const event = await createEvent();
@@ -103,7 +103,8 @@ describe("a personal join link", () => {
 
       const res = await post("/auth/join", { token });
 
-      expect(await field(res, "joined")).toBe(true);
+      expect(await field(res, "joined")).toBe(false);
+      expect(res.headers.get("set-cookie")).toBeNull();
     }
   );
 

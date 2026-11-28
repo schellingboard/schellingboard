@@ -24,6 +24,8 @@ export interface LoginMail {
     validMinutes: number;
   }): Promise<void>;
   sendResetLink(input: {
+    /** Unasked for by its recipient, so the mail says who sent it. */
+    fromAdmin?: boolean;
     guestId: string;
     name: string;
     email: string;

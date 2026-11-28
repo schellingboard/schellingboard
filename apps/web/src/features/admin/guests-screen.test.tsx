@@ -315,20 +315,138 @@ describe("the admin users screen", { tags: ["016-US1"] }, () => {
 });
 
 describe("the site-admin role", { tags: ["016-US4"] }, () => {
-  it("grants the role to a user", async () => {
-    const { calls, region, onChanged } = setup([guest("g1", "Alice")]);
+  const roleHandler = (call: FakeCall) =>
+    call.path.endsWith("/password-link")
+      ? Response.json({ token: "tk" }, { status: 201 })
+      : call.path.endsWith("/password-link/mail")
+        ? new Response(null, { status: 204 })
+        : Response.json(guest("g1", "Alice", { siteAdmin: true }));
 
+  const askToMakeAdmin = async (region: HTMLElement) => {
     await userEvent.click(
       within(region).getByRole("button", { name: "Make site admin" })
     );
+    return screen.getByRole("dialog", { name: "Make Alice a site admin?" });
+  };
+
+  const press = (within_: HTMLElement, name: string) =>
+    userEvent.click(within(within_).getByRole("button", { name }));
+
+  it("grants the role to a user with a password after a confirmation", async () => {
+    const { calls, region, onChanged } = setup([guest("g1", "Alice")], {
+      handler: roleHandler,
+    });
+    const dialog = await askToMakeAdmin(region);
+    expect(calls).toEqual([]);
+
+    await press(dialog, "Make site admin");
 
     await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({
       method: "PUT",
       path: "/api/v1/admin/guests/g1/site-admin",
-      body: { siteAdmin: true },
+      body: { siteAdmin: true, resetPassword: false },
     });
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
+
+  it("resets the password on request, then offers a link", async () => {
+    const { calls, region } = setup([guest("g1", "Alice")], {
+      handler: roleHandler,
+    });
+    const dialog = await askToMakeAdmin(region);
+    expect(
+      within(dialog).getByText(/not sure that Alice set the password/)
+    ).toBeTruthy();
+
+    await press(dialog, "Reset password");
+
+    await within(dialog).findByRole("button", { name: "Copy password link" });
+    expect(calls[0]).toMatchObject({
+      body: { siteAdmin: true, resetPassword: true },
+    });
+    await press(dialog, "Send password link");
+    expect(
+      await within(dialog).findByText("A password link was sent to Alice.")
+    ).toBeTruthy();
+  });
+
+  it("mails a link to a new site admin without a password", async () => {
+    const { calls, region } = setup(
+      [guest("g1", "Alice", { hasPassword: false })],
+      { handler: roleHandler }
+    );
+    const dialog = await askToMakeAdmin(region);
+
+    await press(dialog, "Send password link");
+
+    await within(dialog).findByText("A password link was sent to Alice.");
+    expect(calls.map((c) => c.path)).toEqual([
+      "/api/v1/admin/guests/g1/site-admin",
+      "/api/v1/admin/guests/g1/password-link/mail",
+    ]);
+  });
+
+  it.each([
+    ["has no email", { email: "" }, true],
+    ["cannot get email from this site", {}, false],
+  ])(
+    "offers only a copied link when the user %s",
+    async (_, extra, emailEnabled) => {
+      const { calls, region } = setup(
+        [guest("g1", "Alice", { hasPassword: false, ...extra })],
+        { handler: roleHandler, emailEnabled }
+      );
+      const dialog = await askToMakeAdmin(region);
+      expect(
+        within(dialog).queryByRole("button", { name: "Send password link" })
+      ).toBeNull();
+
+      await press(dialog, "Copy password link");
+
+      const link = await within(dialog).findByRole<HTMLInputElement>(
+        "textbox",
+        { name: "Password link for Alice" }
+      );
+      expect(link.value).toBe(
+        `${window.location.origin}/auth/reset?guest=g1&token=tk`
+      );
+      expect(calls.map((c) => c.path)).toEqual([
+        "/api/v1/admin/guests/g1/site-admin",
+        "/api/v1/admin/guests/g1/password-link",
+      ]);
+    }
+  );
+
+  it(
+    "copies a password link for any user and says how to hand it over",
+    { tags: ["016-US6"] },
+    async () => {
+      const user = userEvent.setup();
+      const { region } = setup([guest("g1", "Alice")], {
+        handler: roleHandler,
+      });
+
+      await user.click(
+        within(region).getByRole("button", { name: "Copy password link" })
+      );
+
+      const dialog = await screen.findByRole("dialog", {
+        name: "Password link for Alice",
+      });
+      expect(
+        within(dialog).getByText(
+          "Send this link to Alice privately. It works once, for 24 hours. Anyone who opens it can set Alice's password."
+        )
+      ).toBeTruthy();
+      await user.click(
+        await within(dialog).findByRole("button", { name: "Copy link" })
+      );
+      expect(await navigator.clipboard.readText()).toContain("token=tk");
+      expect(within(dialog).getByText("Link copied")).toBeTruthy();
+    }
+  );
 
   it("marks a site admin and revokes the role", async () => {
     const { calls, region } = setup([

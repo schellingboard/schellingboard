@@ -325,8 +325,6 @@ export interface GuestsRepository {
   setAuthProtection(id: string, creds: GuestAuthCredentials): Promise<boolean>;
   /** The guest whose email or (lowercase) username is `identifier`, matched case-insensitively. */
   findLoginId(identifier: string): Promise<string | null>;
-  /** When the password last changed; null when unknown or never set. */
-  getPasswordSetAt(id: string): Promise<Date | null>;
   getSiteAdmin(id: string): Promise<boolean>;
   listSiteAdminIds(): Promise<string[]>;
   listPasswordIds(): Promise<string[]>;

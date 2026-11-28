@@ -100,7 +100,8 @@ Benefit and who breaks are given for each change. Since `/api/v1` is unreleased,
     `GET /site` so the SPA can hide what needs mail. `GET /me/credentials` gains `hasEmail` and
     `canSetPassword`; `POST /me/credentials/password` may now replace a password (409
     `auth.passwordSet` otherwise), but only for a join-link login where no mail can reset it. These
-    land in 5.0.0, before the policy applies.
+    land in 5.0.0, before the policy applies. (That exception is gone again:
+    [ADR 0017](0017-identity-and-roles.md) point 9.)
 
 ### What the unbuilt designs need
 

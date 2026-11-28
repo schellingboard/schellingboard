@@ -49,7 +49,7 @@ const resetPassword = createRoute({
   path: "/auth/reset",
   tags: ["auth"],
   description:
-    "Sets the password the emailed link allows and protects the name; signs no one in. Other browsers' sessions of the guest end (all of them when the name was already protected). `auth.credentialWrong` (403) for a wrong, expired or used token; `password.invalid` (400).",
+    "Sets the password a password link allows (emailed by the guest's request, or handed out by an admin) and protects the name; signs no one in. Other browsers' sessions of the guest end (all of them when the guest had a password). `auth.credentialWrong` (403) for a wrong, expired or used token; `password.invalid` (400).",
   request: { body: body(resetBodySchema) },
   responses: { 204: noContent("The password is set"), ...problemDefault },
 });
@@ -94,7 +94,7 @@ const join = createRoute({
   path: "/auth/join",
   tags: ["auth"],
   description:
-    "Exchanges a personal join link. While its guest set no password since the link was made, signs the browser in as them (verified), joins the event and sets the guest cookie. Afterwards it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link.",
+    "Exchanges a personal join link. While its guest has no password and is no site admin, signs the browser in as them (verified), joins the event and sets the guest cookie. Otherwise it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link.",
   request: { body: body(joinBodySchema) },
   responses: {
     200: json(joinResultSchema, "The guest and event the link names"),

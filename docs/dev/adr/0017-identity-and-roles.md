@@ -27,10 +27,12 @@ amends [ADR 0016](0016-remaining-screen-families.md) point 4.
    rows.
 3. **Old cookies are not honoured.** The `open.` and `verified.` values read as no identity, so the
    upgrade signs everyone out once. The release notes say so; organizers upgrade between events.
-4. **Credentials:** password, emailed login code, reset link, join link. Email is optional per
-   person, since a deployment need not send mail. A person may hold an optional unique `username`;
-   password sign-in takes the email or the username. The password hash stays scrypt (`node:crypto`,
-   no native module);
+4. **Credentials:** password, emailed login code, password link, join link. A password (reset) link
+   sets one person's password once and signs no one in: the person asks for it by email (30 min), or
+   an admin mails or copies it (24 h). A new one ends the previous. Email is optional per person,
+   since a deployment need not send mail. A person may hold an optional unique `username`; password
+   sign-in takes the email or the username. The password hash stays scrypt (`node:crypto`, no native
+   module);
    [05](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/05-security.md)
    says argon2id and is updated. The stored format (`scrypt$salt$key`) holds no cost parameters; it
    will carry N/r/p so cost can rise later. Passkeys and API tokens wait for a later plan.
@@ -54,9 +56,11 @@ amends [ADR 0016](0016-remaining-screen-families.md) point 4.
    them, so a link session of a site admin is a normal attendee session. (The sign-in proxy gives
    the role by its own setting, [ADR 0024](0024-sign-in-through-a-proxy.md).) The role protects the
    name, and a site admin cannot remove the protection. **A site admin's password changes only
-   through a reset link or with the old password:** no session sets a first one or replaces it.
-   Changes an admin makes record which admin. The `organizer` participation role waits for a later
-   plan; what an organizer may do per event is a product question of its own.
+   through a password link or with the old password:** no session sets a first one or replaces it.
+   While granting the role, an admin can reset the password in the same step: it is removed and the
+   person's sessions end, so a password of unknown origin never gives admin rights. Changes an admin
+   makes record which admin. The `organizer` participation role waits for a later plan; what an
+   organizer may do per event is a product question of its own.
 8. **Admin bootstrap.** `ADMIN_PASSWORD` and the admin cookie go; the admin UI is always on. While
    no site admin exists, the server logs a single-use bootstrap link at start (hashed, 24 h; a new
    start replaces it), and a script prints a new one for recovery. The bootstrap page signs the
@@ -64,13 +68,14 @@ amends [ADR 0016](0016-remaining-screen-families.md) point 4.
    session counts as a password sign-in. A set `ADMIN_PASSWORD` only logs a deprecation warning. The
    admin users screen grants and revokes the role, never for the last one.
 9. **Join links** are personal: one per guest per event, with no expiry. A link signs its person in
-   (verified) and joins the event while that person has set no password since the link was made.
-   After that it asks for a sign-in as that person, then joins the event. An admin makes a new link
-   for one person (to copy into a messenger) or mails new links to all or selected participants with
-   an email; a new link ends the person's previous one for that event, and the person is emailed
-   that a new link exists, so a scam to get someone's link is noticed. A new link is also the
-   recovery when a person without email forgets the password. `/join/{token}` in the SPA exchanges
-   the token, replaces the history entry and opens the event. A QR sheet waits.
+   (verified) and joins the event while that person has no password and is no site admin. Otherwise
+   it asks for a sign-in as that person, then joins the event. An admin makes a new link for one
+   person (to copy into a messenger) or mails new links to all or selected participants with an
+   email; a new link ends the person's previous one for that event, and the person is emailed that a
+   new link exists, so a scam to get someone's link is noticed. A join link never replaces a
+   password: only the old password or a password link does, so recovery without email is a password
+   link from an admin. `/join/{token}` in the SPA exchanges the token, replaces the history entry
+   and opens the event. A QR sheet waits.
 10. **Acting: identity mode** is a column on events, `open` (picking a name is enough) or
     `verified`. Existing events migrate to `open` (behaviour unchanged); new events default to
     `verified` (product decision, 08). A person is protected if they chose it, are a site admin, or

@@ -65,8 +65,8 @@ export function GuestLoginForm({
       <p className="text-sm text-fg-muted">
         {emailEnabled === false
           ? guest
-            ? t`This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link.`
-            : t`Enter your password. Forgot it? Ask an organizer for a new link.`
+            ? t`This user has protected their account. Enter their password. Forgot it? Ask an admin for a password link.`
+            : t`Enter your password. Forgot it? Ask an admin for a password link.`
           : guest
             ? t`This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead.`
             : t`Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead.`}
