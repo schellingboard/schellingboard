@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, type ReactNode, useState } from "react";
 
 import type { AdminSettingsCalls } from "../../commands/admin-settings";
 import { useFormMutation } from "../../commands/use-form-mutation";
@@ -142,12 +142,14 @@ export function SettingsScreen({
   settings,
   calls,
   onSaved,
+  children,
 }: {
   status: "loading" | "ready" | "error";
   settings: AdminSettings;
   calls: AdminSettingsCalls;
   /** The settings are out of date: load them again, and the title in the admin header. */
   onSaved: () => void;
+  children?: ReactNode;
 }) {
   if (status === "error")
     return (
@@ -170,6 +172,7 @@ export function SettingsScreen({
       <section aria-label={t`Site settings`} className="space-y-4">
         <SettingsForm settings={settings} calls={calls} onSaved={onSaved} />
       </section>
+      {children}
     </div>
   );
 }

@@ -92,6 +92,11 @@
           "icon": "database-backup"
         },
         {
+          "title": "Sign-in through a proxy",
+          "path": "/self-hosting/proxy-sign-in/",
+          "icon": "shield-check"
+        },
+        {
           "title": "HTTP API",
           "path": "/self-hosting/api/",
           "icon": "braces"

@@ -38,6 +38,8 @@ The attendee guide is the page worth sharing with your attendees.
 - [Configuration](self-hosting/configuration.md) — every environment variable, plus how to set up
   email.
 - [Backup and restore](self-hosting/backup.md) — what to back up, without stopping the site.
+- [Sign-in through a proxy](self-hosting/proxy-sign-in.md) — oauth2-proxy and Authelia, so attendees
+  need no name or code.
 - [HTTP API](self-hosting/api.md) — scripting event setup and connecting other tools.
 
 SchellingBoard is open source (MIT). The code lives on

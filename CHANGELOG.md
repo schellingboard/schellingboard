@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - **Public demo**: try SchellingBoard with sample data at demo.schellingboard.org, reset daily.
+- **Sign in through a proxy**: sites behind an SSO proxy (oauth2-proxy, Authelia) can sign people in
+  by their email, with no name picker or code. Organizers set it up under Settings.
 
 ### Changed
 

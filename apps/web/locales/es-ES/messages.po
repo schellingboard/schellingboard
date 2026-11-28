@@ -879,6 +879,10 @@ msgstr "Un ritual que me mantiene cuerdo"
 msgid "A rule I always break"
 msgstr "Una regla que siempre rompo"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "A secret is set."
+msgstr "Hay un secreto definido."
+
 #: src/features/people/profile-form.tsx
 msgid "A sentence or two"
 msgstr "Una o dos frases"
@@ -1250,6 +1254,10 @@ msgstr "Ahora cualquiera puede actuar con tu nombre. Activa la protección para 
 #: src/features/sign-in/account-security.tsx
 msgid "Anyone can currently act under your name. Protect it so switching to your name requires your password."
 msgstr "Ahora cualquiera puede actuar con tu nombre. Protégelo para que cambiar a tu nombre requiera tu contraseña."
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Anyone who reaches the app without the proxy can send the header and become any person. Set a secret or proxy addresses, unless no other path to the app exists."
+msgstr "Quien llegue a la app sin pasar por el proxy puede enviar la cabecera y hacerse pasar por cualquier persona. Define un secreto o direcciones del proxy, salvo que no exista otra vía de acceso a la app."
 
 #: src/features/settings/settings-screen.tsx
 msgid "Appearance (this device)"
@@ -2118,9 +2126,17 @@ msgstr "Copiar enlace de {guestName}"
 msgid "Copy of {title}"
 msgstr "Copia de {title}"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Copy secret"
+msgstr "Copiar secreto"
+
 #: src/ui/copy-link-button.tsx
 msgid "Copy the address of this page, to share it or open it again later"
 msgstr "Copia la dirección de esta página para compartirla o volver a abrirla más tarde"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Copy the secret now. It is shown only once; the app keeps only a fingerprint."
+msgstr "Copia el secreto ahora. Solo se muestra una vez; la app guarda únicamente una huella."
 
 #: src/features/meetings/meeting-request-fields.tsx
 msgid "Could not ask {name} for {slotLabel} on {dayLabel}. {error}"
@@ -2161,6 +2177,10 @@ msgstr "No se pudo cancelar el 1 a 1."
 #: src/ui/copy-link-button.tsx
 msgid "Could not copy the link"
 msgstr "No se pudo copiar el enlace"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Could not copy the secret"
+msgstr "No se pudo copiar el secreto"
 
 #: src/commands/session-mark.ts
 msgid "Could not hide {session}."
@@ -2223,6 +2243,10 @@ msgstr "No se pudieron cargar los nombres. Recarga la página para volver a inte
 #: src/app/admin-pages.tsx
 msgid "Could not load the proposals."
 msgstr "No se pudieron cargar las propuestas."
+
+#: src/app/admin-pages.tsx
+msgid "Could not load the proxy sign-in settings."
+msgstr "No se pudieron cargar los ajustes del inicio de sesión mediante proxy."
 
 #: src/features/admin/event-sessions.tsx
 msgid "Could not load the RSVPs."
@@ -3288,6 +3312,10 @@ msgstr "Él/Ella/Elle/etc."
 msgid "He/They"
 msgstr "Él/Elle"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Header with the email"
+msgstr "Cabecera con el correo electrónico"
+
 #: src/features/admin/stats-text.ts
 msgid "Headline numbers"
 msgstr "Cifras principales"
@@ -3528,6 +3556,10 @@ msgstr "Icono"
 #: src/features/admin/events-screen.tsx
 msgid "Identity"
 msgstr "Identidad"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "If a sign-in proxy (oauth2-proxy, Authelia, and similar) sits in front of this site, people it has signed in act as the person with the email it sends. They pick no name."
+msgstr "Si un proxy de inicio de sesión (oauth2-proxy, Authelia y similares) está delante de este sitio, las personas que ha autenticado actúan como la persona con el correo que envía. No eligen ningún nombre."
 
 #: src/features/people/prompt-text.ts
 msgid "If I had a second career, it would be"
@@ -3931,6 +3963,10 @@ msgstr "Se busca coanfitrión: {cohostNote}"
 #: src/features/admin/join-links.tsx
 msgid "Mail new links to all guests"
 msgstr "Enviar nuevos enlaces a todos los invitados"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Make secret"
+msgstr "Crear secreto"
 
 #: src/features/admin/guests-screen.tsx
 msgid "Make site admin"
@@ -4437,6 +4473,10 @@ msgstr "Aún no hay propuestas"
 msgid "No RSVPs."
 msgstr "Sin confirmaciones."
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "No secret is set."
+msgstr "No hay ningún secreto definido."
+
 #: src/features/schedule/day-agenda.tsx
 msgid "No sessions"
 msgstr "Sin sesiones"
@@ -4573,6 +4613,10 @@ msgstr "Ahora"
 msgid "Now · {at}"
 msgstr "Ahora · {at}"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Off: a site admin behind the proxy is a normal person and signs in with a password to administer."
+msgstr "Desactivado: un administrador del sitio detrás del proxy es una persona normal y inicia sesión con contraseña para administrar."
+
 #: src/features/people/prompt-text.ts
 msgid "Offering"
 msgstr "Ofrezco"
@@ -4604,6 +4648,10 @@ msgstr "Un punto por sesión con recuento declarado: sus confirmaciones (horizon
 #: src/features/admin/stats-figures.tsx
 msgid "One dot per session: how many other sessions ran at the same time (across) against its RSVPs (up). A falling trend means crowded slots were weaker."
 msgstr "Un punto por sesión: cuántas otras sesiones coincidieron en el tiempo (horizontal) frente a sus confirmaciones (vertical). Una tendencia a la baja significa que las franjas concurridas fueron más débiles."
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "One IP address or range (10.0.0.0/8) per line. Empty means no address check."
+msgstr "Una dirección IP o rango (10.0.0.0/8) por línea. Vacío significa sin comprobación de dirección."
 
 #: src/features/admin/stats-figures.tsx
 msgid "One row per person with RSVPs: sessions, days, hours booked, back-to-back pairs, overlapping pairs (double bookings) and the median gap."
@@ -5141,6 +5189,14 @@ msgstr "La protección de tu nombre se acaba de desactivar: cualquiera puede act
 msgid "Protection turned off"
 msgstr "Protección desactivada"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Proxy addresses"
+msgstr "Direcciones del proxy"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Proxy sign-in saved."
+msgstr "Inicio de sesión mediante proxy guardado."
+
 #: src/ui/label-badge.tsx
 msgid "Purple"
 msgstr "Morado"
@@ -5224,6 +5280,10 @@ msgstr "Quitar mapa actual"
 msgid "Remove RSVP {name}"
 msgstr "Quitar confirmación de {name}"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Remove secret"
+msgstr "Quitar secreto"
+
 #: src/ui/data-table.tsx
 msgid "Remove selected"
 msgstr "Quitar seleccionados"
@@ -5239,6 +5299,10 @@ msgstr "¿Quitar este comentario? Su autor no recibe aviso."
 #: src/features/admin/event-sessions.tsx
 msgid "Remove?"
 msgstr "¿Quitar?"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Replace secret"
+msgstr "Reemplazar secreto"
 
 #: src/features/admin/stats-text.ts
 msgid "Replies"
@@ -5439,6 +5503,10 @@ msgstr "Guardar reuniones"
 msgid "Save phases"
 msgstr "Guardar fases"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Save proxy sign-in"
+msgstr "Guardar inicio de sesión mediante proxy"
+
 #: src/features/admin/settings-screen.tsx
 msgid "Save settings"
 msgstr "Guardar ajustes"
@@ -5467,6 +5535,7 @@ msgstr "¡Guardado!"
 #: src/features/admin/event-sessions.tsx
 #: src/features/admin/guests-screen.tsx
 #: src/features/admin/locations-screen.tsx
+#: src/features/admin/proxy-sign-in-card.tsx
 #: src/features/admin/settings-screen.tsx
 #: src/features/comments/comments-section.tsx
 #: src/features/meetings/availability-form.tsx
@@ -5603,6 +5672,18 @@ msgstr "Buscar…"
 #: src/features/admin/stats-text.ts
 msgid "Second quarter"
 msgstr "Segundo cuarto"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Secret"
+msgstr "Secreto"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Secret copied"
+msgstr "Secreto copiado"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Secret removed."
+msgstr "Secreto eliminado."
 
 #. placeholder {0}: selection.rowLabel(row)
 #: src/ui/data-table.tsx
@@ -5979,6 +6060,10 @@ msgstr "Iniciar sesión"
 msgid "Sign in as {name}"
 msgstr "Iniciar sesión como {name}"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Sign in through a proxy"
+msgstr "Iniciar sesión mediante proxy"
+
 #: src/features/sign-in/account-security.tsx
 msgid "Sign out"
 msgstr "Cerrar sesión"
@@ -5988,9 +6073,17 @@ msgstr "Cerrar sesión"
 msgid "Sign out {device}"
 msgstr "Cerrar sesión de {device}"
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Sign out address"
+msgstr "Dirección de cierre de sesión"
+
 #: src/features/sign-in/account-security.tsx
 msgid "Sign out unknown browser"
 msgstr "Cerrar sesión del navegador desconocido"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Sign-in through a proxy"
+msgstr "Inicio de sesión mediante proxy"
 
 #: src/features/people/contact-labels.ts
 msgid "Signal"
@@ -6008,6 +6101,10 @@ msgstr "Desde {0}"
 #: src/features/admin/guests-screen.tsx
 msgid "Site admin"
 msgstr "Administrador del sitio"
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Site admins sign in through the proxy too"
+msgstr "Los administradores del sitio también inician sesión mediante el proxy"
 
 #: src/features/admin/settings-screen.tsx
 msgid "Site settings"
@@ -6466,6 +6563,10 @@ msgstr "Las columnas previstas salen del modelo de asistencia, ajustado con un e
 #: src/commands/failure-message.ts
 msgid "The proposal phase is over."
 msgstr "La fase de propuestas ha terminado."
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "The proxy sends the secret in the X-SchellingBoard-Proxy-Secret header. Requests without it are not signed in."
+msgstr "El proxy envía el secreto en la cabecera X-SchellingBoard-Proxy-Secret. Las solicitudes sin él no inician sesión."
 
 #: src/features/people/prompt-text.ts
 msgid "The rabbit hole I fell down recently"
@@ -7290,6 +7391,10 @@ msgstr "Dónde viven los miembros. Un lugar aparece solo cuando al menos 3 miemb
 msgid "Where people met. Places people typed themselves are counted as Other."
 msgstr "Dónde se encontró la gente. Los lugares que la gente escribió ella misma cuentan como Otro."
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Where Sign out leads. Empty hides Sign out."
+msgstr "Adónde lleva «Cerrar sesión». Vacío oculta «Cerrar sesión»."
+
 #: src/features/meetings/meeting-request-fields.tsx
 msgid "Where to meet"
 msgstr "Dónde quedar"
@@ -7625,6 +7730,18 @@ msgstr "Puede que tu solicitud para volver a mostrar {session} no se haya guarda
 #: src/commands/session-mark.ts
 msgid "Your request to show the session again might not have been saved."
 msgstr "Puede que tu solicitud para volver a mostrar la sesión no se haya guardado."
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Your request to this page carried no {header} header. Check that the proxy sends it."
+msgstr "Tu solicitud a esta página no incluía la cabecera {header}. Comprueba que el proxy la envía."
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Your request to this page carried the header and was trusted."
+msgstr "Tu solicitud a esta página incluía la cabecera y se consideró de confianza."
+
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "Your request to this page carried the header, but it did not pass the secret or address check, so it is ignored."
+msgstr "Tu solicitud a esta página incluía la cabecera, pero no superó la comprobación del secreto o de la dirección, así que se ignora."
 
 #: src/commands/vote.ts
 msgid "Your request to vote on {proposal} might not have been saved."

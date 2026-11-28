@@ -14,6 +14,7 @@ import { adminEventCalls } from "../commands/admin-events";
 import { adminGuestCalls } from "../commands/admin-guests";
 import { adminLabelCalls } from "../commands/admin-labels";
 import { adminLocationCalls } from "../commands/admin-locations";
+import { adminProxySignInCalls } from "../commands/admin-proxy-sign-in";
 import { adminSettingsCalls } from "../commands/admin-settings";
 import { EventConfigTab } from "../features/admin/event-config";
 import { EventGuestsManager } from "../features/admin/event-guests";
@@ -28,6 +29,7 @@ import { UserImportScreen } from "../features/admin/guest-import";
 import { AdminGuestsScreen } from "../features/admin/guests-screen";
 import { LocationAvailabilityManager } from "../features/admin/location-availability";
 import { LocationsScreen } from "../features/admin/locations-screen";
+import { ProxySignInCard } from "../features/admin/proxy-sign-in-card";
 import { SettingsScreen } from "../features/admin/settings-screen";
 import { defaultStatsEvent } from "../features/admin/stats-event";
 import { formatDayLabel } from "../features/schedule/day-label";
@@ -41,6 +43,7 @@ import { createAdminLabelsQuery } from "../queries/admin-labels";
 import { createAdminLocationsQuery } from "../queries/admin-locations";
 import { createAdminMeetingPointsQuery } from "../queries/admin-meeting-points";
 import { createAdminProposalsQuery } from "../queries/admin-proposals";
+import { createProxySignInQuery } from "../queries/admin-proxy-sign-in";
 import {
   createAdminSessionsQuery,
   loadSessionRsvpGuests,
@@ -196,7 +199,9 @@ const NO_SETTINGS = { title: "", description: "", mapImageUrl: "" };
 export function AdminSettingsPage({ api }: { api: Api }) {
   const [state, load] = useQuery(() => createAdminSettingsQuery({ api }));
   const reloadGate = useReloadAdminGate();
+  const [proxy, loadProxy] = useQuery(() => createProxySignInQuery({ api }));
   const calls = useMemo(() => adminSettingsCalls(api), [api]);
+  const proxyCalls = useMemo(() => adminProxySignInCalls(api), [api]);
   return (
     <SettingsScreen
       status={state.status}
@@ -206,7 +211,20 @@ export function AdminSettingsPage({ api }: { api: Api }) {
         load();
         reloadGate();
       }}
-    />
+    >
+      {proxy.status === "ready" && (
+        <ProxySignInCard
+          settings={proxy.settings}
+          calls={proxyCalls}
+          onChanged={loadProxy}
+        />
+      )}
+      {proxy.status === "error" && (
+        <p role="alert" className="text-sm text-danger-fg">
+          <Trans>Could not load the proxy sign-in settings.</Trans>
+        </p>
+      )}
+    </SettingsScreen>
   );
 }
 
