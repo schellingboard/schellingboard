@@ -19,7 +19,7 @@ services:
     # compose file but not a workflow's `services:` image (dependabot-core#5819).
     # Tag *and* digest: the digest is the actual pin, the tag is what Dependabot
     # compares versions against (a digest on its own tells it nothing).
-    image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    image: axllent/mailpit:v1.34.0@sha256:23a2ef85bc50853ab3093645d1d64679afd8887e89da5e48a88940c172591a4e
     # CI sets neither variable and hardcodes these defaults in the MAILPIT_API_URL
     # and SMTP_URL of the ci, ci-e2e and release workflows — change a default
     # here and change them too.
