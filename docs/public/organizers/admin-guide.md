@@ -22,7 +22,11 @@ recorded under their name.
 
 - **The first site admin**: while the site has none, the server logs a one-time link at start (valid
   24 hours). Open it, choose your name or enter a name and email, and set a username and password.
-  To get a new link later, set `SB_BOOTSTRAP_LINK=1` for one start.
+  To get a new link later, set `SB_BOOTSTRAP_LINK=1` for one start. A person the
+  [sign-in proxy](../self-hosting/proxy-sign-in.md) identifies sees only a note and a button, and
+  becomes the site admin themselves, with no username or password. This works only while **Site
+  admins sign in through the proxy too** is on; otherwise the link is refused and kept, and you set
+  `SB_DISABLE_PROXY_SIGN_IN=1` to use the form.
 - **Make site admin / Remove site admin**: on the Users page, per user. The last site admin cannot
   be removed. A site admin who has not set a password yet is marked "No password yet" and signs in
   with a reset link.

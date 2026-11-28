@@ -145,7 +145,11 @@ way back is two environment variables:
    password and name rules apply as usual. With `SITE_PASSWORD` empty, the site is open to everyone
    until you unset the variable.
 2. If no site admin can sign in, also set `SB_BOOTSTRAP_LINK=1` for that start. The app logs a link
-   that makes its visitor a site admin.
+   that makes its visitor a site admin. With the first variable set, the proxy does not identify
+   anyone, so the link shows the usual form: choose or add yourself, then set a username and
+   password. Without it, a person the proxy identifies sees only a button and becomes the admin
+   themselves, but only while **Site admins sign in through the proxy too** is on. Otherwise the
+   link is refused and kept: use the first variable and the form.
 3. Sign in as a site admin and open **Admin → Settings**. The card says the settings are not in
    effect.
 4. Fix the settings: the header, the addresses, or **Replace secret** and give the new one to the

@@ -3969,7 +3969,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409). */
+    /** @description Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. A person the sign-in proxy identifies becomes the site admin themselves, with no other field and no cookie. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409). */
     post: {
       parameters: {
         query?: never;
@@ -3986,8 +3986,8 @@ export interface paths {
             guestId?: string;
             name?: string;
             email?: string;
-            username: string;
-            password: string;
+            username?: string;
+            password?: string;
           };
         };
       };

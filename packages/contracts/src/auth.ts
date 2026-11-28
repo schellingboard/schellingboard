@@ -149,12 +149,17 @@ export const bootstrapBodySchema = z
       .describe("An existing guest to make the site admin"),
     name: z.string().trim().min(1).max(200).optional(),
     email: z.string().trim().min(1).max(200).optional(),
-    username: usernameSchema,
-    password: newPasswordSchema,
+    username: usernameSchema.optional(),
+    password: newPasswordSchema.optional(),
   })
-  .refine(bootstrapTarget, {
-    message: "Send either guestId, or name (and optionally email)",
-  });
+  .refine(
+    (body) =>
+      (body.username === undefined && body.password === undefined) ||
+      bootstrapTarget(body),
+    {
+      message: "Send either guestId, or name (and optionally email)",
+    }
+  );
 
 export const usernameResultSchema = z.object({
   username: z.string().nullable(),
