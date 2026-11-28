@@ -291,7 +291,7 @@ describe("guests without an email", () => {
         { newPassword: "another long password" },
         asGuest(await verifiedGuestValue(guest.id, "link"))
       );
-      expect(res.status).toBe(409);
+      expect(res.status).toBe(403);
     }
   );
 

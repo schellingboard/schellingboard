@@ -173,7 +173,7 @@ export const bootstrapAdmin = (deps: PeopleDeps) => {
       session: await start(actor, {
         guestId: done.value,
         level: "verified",
-        via: "code",
+        via: "password",
         device: input.device,
       }),
     });

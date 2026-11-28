@@ -1,3 +1,5 @@
+import { givesAdminRights } from "@schellingboard/domain/auth";
+
 import { getRepositories } from "@/db/container";
 import {
   hashSessionToken,
@@ -34,6 +36,7 @@ const lookupSession: SessionLookup = async (token) => {
     via: row.via,
     siteAdmin:
       row.assurance === "verified" &&
+      givesAdminRights(row.via) &&
       (await getRepositories().guests.getSiteAdmin(row.guestId)),
   };
 };

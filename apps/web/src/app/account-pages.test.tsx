@@ -225,6 +225,28 @@ describe("the sign-in pages", { tags: ["003-US4"] }, () => {
     await waitFor(() => expect(hardNavigate).toHaveBeenCalledWith(target));
   });
 
+  it(
+    "asks a site admin whose session gives no rights for the password",
+    { tags: ["016-US4"] },
+    async () => {
+      await open({
+        handler: (call) =>
+          call.path === "/api/v1/me/identity"
+            ? Response.json({ guestId: "bo", adminNeedsSignIn: true })
+            : withBo(call),
+        path: "/auth/login?redirect=%2Fadmin",
+        identity: "bo",
+      });
+
+      expect(
+        await screen.findByText("Sign in with your password to use admin.")
+      ).toBeTruthy();
+      expect(
+        screen.getByRole("heading", { name: "Log in as Bo" })
+      ).toBeTruthy();
+    }
+  );
+
   it("says a login link naming nobody is invalid", async () => {
     await open({
       handler: withBo,

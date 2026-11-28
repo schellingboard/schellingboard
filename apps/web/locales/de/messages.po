@@ -6111,6 +6111,10 @@ msgstr "Als {name} anmelden"
 msgid "Sign in through a proxy"
 msgstr "Über einen Proxy anmelden"
 
+#: src/app/account-pages.tsx
+msgid "Sign in with your password to use admin."
+msgstr "Melde dich mit deinem Passwort an, um die Verwaltung zu nutzen."
+
 #: src/features/sign-in/account-security.tsx
 msgid "Sign out"
 msgstr "Abmelden"

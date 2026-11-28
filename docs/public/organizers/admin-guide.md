@@ -20,6 +20,10 @@ There is no shared admin password any more; a server that still sets `ADMIN_PASS
 warning, and the setting does nothing. A site admin's name is protected, and changes they make are
 recorded under their name.
 
+A join link never gives admin rights. A site admin signed in by one acts as an attendee, and
+`/admin` asks them to sign in with their password. A site admin's password changes only with the old
+one or through a reset link; they cannot set one without it.
+
 - **The first site admin**: while the site has none, the server logs a one-time link at start (valid
   24 hours). Open it, choose your name or enter a name and email, and set a username and password.
   To get a new link later, set `SB_BOOTSTRAP_LINK=1` for one start. A person the

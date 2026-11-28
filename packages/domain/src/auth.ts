@@ -32,6 +32,11 @@ export function assuranceRequired(
 /** How a login session began; only a join link may replace a forgotten password. */
 export type LoginVia = "name" | "password" | "code" | "link";
 
+/** An allowlist, so that a new way to sign in gives no admin rights by default. */
+const ADMIN_LOGINS: readonly LoginVia[] = ["password", "code"];
+
+export const givesAdminRights = (via: LoginVia) => ADMIN_LOGINS.includes(via);
+
 export type LoginSession = {
   /** sha256 of the cookie's token; the token itself is never stored. */
   id: string;

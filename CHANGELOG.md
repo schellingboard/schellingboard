@@ -31,6 +31,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Choosing your name on a phone**: the name list now fills the screen, so the keyboard no longer
   covers the matching names.
 
+### Security
+
+- **Join links never give admin rights**
+  ([#1682](https://github.com/schellingboard/schellingboard/issues/1682)): a site admin signed in by
+  one must log in with a password or emailed code, and cannot set a password there.
+
 ## [5.3.0] - 2026-11-22
 
 ### Added

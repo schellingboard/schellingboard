@@ -223,18 +223,14 @@ async function confirmedPassword(
 /**
  * A forgotten password is replaced without the old one only where no mail can
  * reset it, and only by a join-link login: a stolen password or code session
- * must not take the name over, and site admins sign in with credentials.
+ * must not take the name over.
  */
 function mayReplacePassword(
   { loginMail }: PeopleDeps,
   actor: Actor,
   hasEmail: boolean
 ): boolean {
-  return (
-    actor.guest?.via === "link" &&
-    actor.guest.siteAdmin !== true &&
-    !(hasEmail && loginMail.configured())
-  );
+  return actor.guest?.via === "link" && !(hasEmail && loginMail.configured());
 }
 
 /** Sets a password for a verified session; see `mayReplacePassword` for replacing one. */
@@ -255,6 +251,12 @@ export const setFirstPassword = (deps: PeopleDeps) => {
       );
     const passwordHash = await hashUserPassword(newPassword);
     const stored = await deps.uow.run(async (tx) => {
+      // Else whoever holds a forwarded link could set it and become admin.
+      if (await tx.guests.getSiteAdmin(guestId))
+        return forbidden(
+          "siteAdmin.passwordLink",
+          "A site admin's password changes only through a reset link or with the old password"
+        );
       const guest = await tx.guests.findById(guestId);
       const hasPassword = (await tx.guests.getAuthCredentials(guestId))
         ?.passwordHash;
@@ -408,6 +410,7 @@ export const getCredentials =
       hasEmail,
       canSetPassword:
         actor.guest?.level === "verified" &&
+        !(await deps.repos.guests.getSiteAdmin(acting.value)) &&
         (!creds?.passwordHash || mayReplacePassword(deps, actor, hasEmail)),
     });
   };

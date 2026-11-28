@@ -48,16 +48,21 @@ amends [ADR 0016](0016-remaining-screen-families.md) point 4.
    place (session fixation). A reset link changes nothing until the new password is set, so a
    request for someone else's address locks no one out. Setting or resetting a password revokes the
    person's other rows.
-7. **Roles:** `siteAdmin` on the guest. The actor is admin only through a verified session of a site
-   admin. The role protects the name, and a site admin cannot remove the protection. Changes an
-   admin makes record which admin. The `organizer` participation role waits for a later plan; what
-   an organizer may do per event is a product question of its own.
+7. **Roles:** `siteAdmin` on the guest. The actor is admin only through a session of a site admin
+   that a password or an emailed code made. This is an allowlist, so a later sign-in method is not
+   admin by default. **Links never give admin rights:** join links do not expire and people forward
+   them, so a link session of a site admin is a normal attendee session. (The sign-in proxy gives
+   the role by its own setting, [ADR 0024](0024-sign-in-through-a-proxy.md).) The role protects the
+   name, and a site admin cannot remove the protection. **A site admin's password changes only
+   through a reset link or with the old password:** no session sets a first one or replaces it.
+   Changes an admin makes record which admin. The `organizer` participation role waits for a later
+   plan; what an organizer may do per event is a product question of its own.
 8. **Admin bootstrap.** `ADMIN_PASSWORD` and the admin cookie go; the admin UI is always on. While
    no site admin exists, the server logs a single-use bootstrap link at start (hashed, 24 h; a new
    start replaces it), and a script prints a new one for recovery. The bootstrap page signs the
-   visitor in as a chosen or new guest, asks for a username and a password, and grants the role. A
-   set `ADMIN_PASSWORD` only logs a deprecation warning. The admin users screen grants and revokes
-   the role, never for the last one.
+   visitor in as a chosen or new guest, asks for a username and a password, and grants the role. The
+   session counts as a password sign-in. A set `ADMIN_PASSWORD` only logs a deprecation warning. The
+   admin users screen grants and revokes the role, never for the last one.
 9. **Join links** are personal: one per guest per event, with no expiry. A link signs its person in
    (verified) and joins the event while that person has set no password since the link was made.
    After that it asks for a sign-in as that person, then joins the event. An admin makes a new link

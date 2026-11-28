@@ -148,12 +148,15 @@ export function LoginScreen({
   calls,
   guest,
   code,
+  notice,
   onSignedIn,
 }: {
   calls: SignInCalls;
   /** `undefined`: a plain sign-in; `null`: the link names nobody. */
   guest: { id: string; name: string } | null | undefined;
   code?: string;
+  /** Why the person is asked to sign in. */
+  notice?: string;
   onSignedIn: (guestId: string) => void;
 }) {
   const guestName = guest?.name ?? "";
@@ -171,6 +174,7 @@ export function LoginScreen({
           <h1 className="text-2xl font-bold">
             {guest ? t`Log in as ${guestName}` : t`Log in`}
           </h1>
+          {notice && <p role="status">{notice}</p>}
           <GuestLoginForm
             calls={calls}
             guest={guest}
