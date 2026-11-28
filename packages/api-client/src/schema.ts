@@ -5511,6 +5511,8 @@ export interface paths {
               | "UserGroupIcon"
               | "WrenchIcon"
               | null;
+            /** @description People who sign in through the proxy join this event. Omitted: unchanged on edit, off on create */
+            proxyJoins?: boolean;
             /**
              * @description open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create
              * @enum {string}
@@ -5681,6 +5683,8 @@ export interface paths {
               | "UserGroupIcon"
               | "WrenchIcon"
               | null;
+            /** @description People who sign in through the proxy join this event. Omitted: unchanged on edit, off on create */
+            proxyJoins?: boolean;
             /**
              * @description open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create
              * @enum {string}
@@ -8734,6 +8738,7 @@ export interface components {
       slotIncrementMinutes: number;
       rsvpCapacityHardLimit: boolean;
       icon: string | null;
+      proxyJoins: boolean;
       /** @enum {string} */
       identityMode: "open" | "verified";
       /** @enum {string} */
@@ -8928,6 +8933,7 @@ export interface components {
       slotIncrementMinutes: number;
       rsvpCapacityHardLimit: boolean;
       icon: string | null;
+      proxyJoins: boolean;
       /** @enum {string} */
       identityMode: "open" | "verified";
       /** @enum {string} */

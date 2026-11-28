@@ -35,8 +35,14 @@ the value of the **Header with the name** (for example `Remote-Name` for Autheli
 `X-Forwarded-Preferred-Username` for oauth2-proxy), else the part of the email before the `@`. On
 the first visit a **Your name** window shows it, and the person must press **Save** (changing the
 name if they like) before going on. Everyone the proxy lets in then becomes a guest, so the proxy's
-own access rules decide who may join. A new person is in no event until an organizer adds them, so
-they see no name menu (and no profile or log out) until then.
+own access rules decide who may join.
+
+## Events the proxy people join
+
+A person is in no event until they join one, and sees no name menu (profile, log out) until then. In
+an event's settings, tick **People who sign in through the proxy join this event**. Everyone the
+proxy signs in, new or existing, then becomes a member at their next request. A member an organizer
+removes returns after the switch changes or the server restarts.
 
 The proxy must also remove any name header the client sends. The name is read as UTF-8.
 

@@ -4916,6 +4916,19 @@ msgstr "Personen, die Sessions zugesagt haben, die sich überschneiden. Ein Zeic
 msgid "People who sent requests, people who got them, and people with at least one accepted meeting."
 msgstr "Personen, die Anfragen gesendet haben, Personen, die welche erhalten haben, und Personen mit mindestens einem angenommenen Treffen."
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "People who sign in through the proxy join no event yet. Turn this on in an event's settings."
+msgstr "Personen, die sich über den Proxy anmelden, nehmen noch an keiner Veranstaltung teil. Schalte das in den Einstellungen einer Veranstaltung ein."
+
+#. placeholder {0}: joinedEvents.join(", ")
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "People who sign in through the proxy join these events: {0}. Change this in each event's settings."
+msgstr "Personen, die sich über den Proxy anmelden, nehmen an diesen Veranstaltungen teil: {0}. Ändere das in den Einstellungen der jeweiligen Veranstaltung."
+
+#: src/features/admin/event-config.tsx
+msgid "People who sign in through the proxy join this event"
+msgstr "Personen, die sich über den Proxy anmelden, nehmen an dieser Veranstaltung teil"
+
 #: src/features/admin/stats-text.ts
 msgid "People with RSVPs"
 msgstr "Personen mit Zusagen"

@@ -148,6 +148,7 @@ export type EventInput = {
   breakMinutes: string;
   slotIncrementMinutes: string;
   rsvpCapacityHardLimit?: boolean;
+  proxyJoins?: boolean;
   icon?: string;
 };
 

@@ -236,6 +236,9 @@ export const events = sqliteTable(
       .notNull()
       .default(false),
     icon: text("icon"),
+    proxyJoins: integer("proxy_joins", { mode: "boolean" })
+      .notNull()
+      .default(false),
     identityMode: text("identity_mode")
       .$type<IdentityMode>()
       .notNull()

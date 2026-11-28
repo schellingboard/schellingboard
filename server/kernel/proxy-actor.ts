@@ -4,6 +4,7 @@ import { getRepositories } from "@/db/container";
 
 import type { Actor } from "./actor";
 import { makePerson } from "./make-person";
+import { joinProxyEvents } from "./proxy-join";
 import { inspectProxyRequest, type ProxyRequest } from "./proxy-sign-in";
 import { unitOfWork } from "./unit-of-work";
 
@@ -64,6 +65,10 @@ export async function readProxyIdentity(
       )
     ).guest;
   }
+  if (guest && request?.trusted && trustedOrigin)
+    await joinProxyEvents(guest.id).catch((error) =>
+      console.error("A proxy person could not join the events:", error)
+    );
   return {
     request,
     guestId: guest?.id ?? null,

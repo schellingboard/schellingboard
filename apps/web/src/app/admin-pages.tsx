@@ -200,6 +200,7 @@ export function AdminSettingsPage({ api }: { api: Api }) {
   const [state, load] = useQuery(() => createAdminSettingsQuery({ api }));
   const reloadGate = useReloadAdminGate();
   const [proxy, loadProxy] = useQuery(() => createProxySignInQuery({ api }));
+  const [events] = useQuery(() => createAdminEventsQuery({ api }));
   const calls = useMemo(() => adminSettingsCalls(api), [api]);
   const proxyCalls = useMemo(() => adminProxySignInCalls(api), [api]);
   return (
@@ -217,6 +218,11 @@ export function AdminSettingsPage({ api }: { api: Api }) {
           settings={proxy.settings}
           calls={proxyCalls}
           onChanged={loadProxy}
+          joinedEvents={
+            events.status === "ready"
+              ? events.events.filter((e) => e.proxyJoins).map((e) => e.name)
+              : undefined
+          }
         />
       )}
       {proxy.status === "error" && (

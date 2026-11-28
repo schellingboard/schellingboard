@@ -26,6 +26,7 @@ function makeEvent(overrides: Partial<Event>): Event {
     slotIncrementMinutes: 30,
     timezone: "UTC",
     rsvpCapacityHardLimit: false,
+    proxyJoins: false,
     identityMode: "open",
     readAccess: "public",
     meetingsEnabled: false,

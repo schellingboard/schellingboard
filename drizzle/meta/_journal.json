@@ -498,6 +498,13 @@
       "when": 1795619481618,
       "tag": "0070_proxy_new_people",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "6",
+      "when": 1795622904146,
+      "tag": "0071_event_proxy_joins",
+      "breakpoints": true
     }
   ]
 }

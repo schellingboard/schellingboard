@@ -4916,6 +4916,19 @@ msgstr "Pessoas que confirmaram presença em sessões que se sobrepõem. Sinal d
 msgid "People who sent requests, people who got them, and people with at least one accepted meeting."
 msgstr "Pessoas que enviaram pedidos, pessoas que os receberam e pessoas com pelo menos uma reunião aceite."
 
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "People who sign in through the proxy join no event yet. Turn this on in an event's settings."
+msgstr "As pessoas que iniciam sessão através do proxy ainda não entram em nenhum evento. Ative isto nas definições de um evento."
+
+#. placeholder {0}: joinedEvents.join(", ")
+#: src/features/admin/proxy-sign-in-card.tsx
+msgid "People who sign in through the proxy join these events: {0}. Change this in each event's settings."
+msgstr "As pessoas que iniciam sessão através do proxy entram nestes eventos: {0}. Altere isto nas definições de cada evento."
+
+#: src/features/admin/event-config.tsx
+msgid "People who sign in through the proxy join this event"
+msgstr "As pessoas que iniciam sessão através do proxy entram neste evento"
+
 #: src/features/admin/stats-text.ts
 msgid "People with RSVPs"
 msgstr "Pessoas com confirmações"

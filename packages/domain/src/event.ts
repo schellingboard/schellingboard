@@ -39,6 +39,7 @@ export type Event = {
   /** When true, a session's capacity (> 0) rejects further RSVPs once reached. */
   rsvpCapacityHardLimit: boolean;
   icon?: string | null;
+  proxyJoins: boolean;
   identityMode: IdentityMode;
   readAccess: ReadAccess;
   /** Whether attendees can book 1-on-1 meetings with each other. */

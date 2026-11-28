@@ -28,6 +28,7 @@ export function toEventView(e: Event): z.input<typeof eventViewSchema> {
     slotIncrementMinutes: e.slotIncrementMinutes,
     rsvpCapacityHardLimit: e.rsvpCapacityHardLimit,
     icon: e.icon ?? null,
+    proxyJoins: e.proxyJoins,
     identityMode: e.identityMode,
     readAccess: e.readAccess,
     meetingsEnabled: e.meetingsEnabled,

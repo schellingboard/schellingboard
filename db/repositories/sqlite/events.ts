@@ -63,6 +63,7 @@ function rowToEvent(row: EventSelectRow): StoredEvent {
     timezone: row.timezone,
     rsvpCapacityHardLimit: row.rsvpCapacityHardLimit,
     icon: row.icon ?? undefined,
+    proxyJoins: row.proxyJoins,
     identityMode: row.identityMode,
     readAccess: row.readAccess,
     linkToken: row.linkToken,
@@ -141,6 +142,7 @@ export class SqliteEventsRepository implements EventsRepository {
         timezone: data.timezone,
         rsvpCapacityHardLimit: data.rsvpCapacityHardLimit,
         icon: data.icon ?? null,
+        ...(data.proxyJoins !== undefined && { proxyJoins: data.proxyJoins }),
         ...(data.identityMode && { identityMode: data.identityMode }),
         ...(data.readAccess && { readAccess: data.readAccess }),
         ...(data.meetingsEnabled !== undefined && {
@@ -189,6 +191,7 @@ export class SqliteEventsRepository implements EventsRepository {
     if (patch.rsvpCapacityHardLimit !== undefined)
       set.rsvpCapacityHardLimit = patch.rsvpCapacityHardLimit;
     if ("icon" in patch) set.icon = patch.icon ?? null;
+    if (patch.proxyJoins !== undefined) set.proxyJoins = patch.proxyJoins;
     if (patch.identityMode !== undefined) set.identityMode = patch.identityMode;
     if (patch.readAccess !== undefined) set.readAccess = patch.readAccess;
     if (patch.linkToken !== undefined) set.linkToken = patch.linkToken;

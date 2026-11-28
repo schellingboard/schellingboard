@@ -60,6 +60,8 @@ identify attendees, so nobody picks a name or enters a code. Set the proxy up fi
   window. **Header with the name** (optional) gives the name; otherwise the part of the email before
   the `@` is used.
 
+The card lists the events that proxy people join. Switch an event on in its settings, see below.
+
 While the sign-in is on and neither a secret nor an address is set, the card shows a warning: anyone
 who reaches the app without the proxy can send the header and become any person. Under the card, a
 line tells you what your own request to the page carried (header missing, header trusted, or header
@@ -83,6 +85,9 @@ ignored), so a wrong setup is visible at once.
   are, with their personal join link, an emailed code or a password, and picking a name is not
   enough. _Open_: anyone can pick any name and act as that person. Existing events stay _Open_.
   Someone who takes part in any verified event needs proof in all of their events.
+- **People who sign in through the proxy join this event** — off by default. When on, everyone the
+  [proxy](#sign-in-through-a-proxy) signs in becomes a member, new and existing people alike. A
+  member you remove returns after the next change of this switch or server restart.
 - **Enforce session capacity as a hard limit** — when on, RSVPs are rejected once a session's
   capacity is reached; otherwise capacity is advisory only.
 - **Phases** — the three phase date ranges, see [How it works](how-it-works.md#the-three-phases).

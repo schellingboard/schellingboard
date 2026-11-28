@@ -19,6 +19,7 @@ import {
 
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
+import { forgetProxyJoins } from "@/server/kernel/proxy-join";
 import {
   conflict,
   type Failure,
@@ -53,6 +54,7 @@ export interface EventSettingsInput {
   slotIncrementMinutes: number;
   rsvpCapacityHardLimit?: boolean;
   icon?: string | null;
+  proxyJoins?: boolean;
   identityMode?: IdentityMode;
   readAccess?: ReadAccess;
 }
@@ -110,6 +112,7 @@ type EventSettings = Pick<
   identityMode?: IdentityMode;
   readAccess?: ReadAccess;
   proposalHelp?: string;
+  proxyJoins?: boolean;
 };
 
 function isKnownTimeZone(timeZone: string): boolean {
@@ -219,6 +222,7 @@ function parseSettings(
       slotIncrementMinutes,
       rsvpCapacityHardLimit,
       icon,
+      proxyJoins: input.proxyJoins,
       identityMode,
       readAccess,
     },
@@ -299,15 +303,15 @@ export const createEvent =
     }
 
     try {
-      return ok(
-        await repos.events.create({
-          ...parsed.data,
-          proposalHelp: parsed.data.proposalHelp ?? "",
-          identityMode: parsed.data.identityMode ?? "verified",
-          readAccess: parsed.data.readAccess ?? defaultReadAccess(),
-          ...phases,
-        })
-      );
+      const created = await repos.events.create({
+        ...parsed.data,
+        proposalHelp: parsed.data.proposalHelp ?? "",
+        identityMode: parsed.data.identityMode ?? "verified",
+        readAccess: parsed.data.readAccess ?? defaultReadAccess(),
+        ...phases,
+      });
+      if (created.proxyJoins) forgetProxyJoins();
+      return ok(created);
     } catch (e) {
       // A concurrent create can win the race between the findBySlug check
       // above and this insert.
@@ -332,7 +336,8 @@ export const updateEvent =
     const parsed = parseSettings(input);
     if (!("data" in parsed)) return parsed;
 
-    return uow.run(async (tx) => {
+    let switchChanged = false;
+    const result = await uow.run(async (tx) => {
       const existing = await tx.events.findById(input.id);
       if (!existing) return eventNotFound();
       if (existing.version !== input.expectedVersion)
@@ -367,6 +372,7 @@ export const updateEvent =
         ? await recordingModeLocks(tx, input.id, update, by)
         : await update();
       if (!updated) return eventChangedMeanwhile(tx, input.id);
+      switchChanged = updated.proxyJoins !== existing.proxyJoins;
 
       // 1-on-1 slots are this same grid, so a new increment re-reads what people
       // declared. A coarser grid is the dangerous direction: a surviving 10:00 row
@@ -378,6 +384,8 @@ export const updateEvent =
       tx.record(changes.eventChanged(updated, by));
       return ok(updated);
     });
+    if (switchChanged) forgetProxyJoins();
+    return result;
   };
 
 // A mode change moves the lock on every event the members take part in.

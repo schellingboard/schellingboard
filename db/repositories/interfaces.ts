@@ -159,8 +159,12 @@ export interface EventsRepository {
       | keyof EventMeetingSettings
       | "identityMode"
       | "readAccess"
+      | "proxyJoins"
     > &
-      Partial<EventMeetingSettings & Pick<Event, "identityMode" | "readAccess">>
+      Partial<
+        EventMeetingSettings &
+          Pick<Event, "identityMode" | "readAccess" | "proxyJoins">
+      >
   ): Promise<StoredEvent>;
   /**
    * Undefined, changing nothing, if the event is gone or not at

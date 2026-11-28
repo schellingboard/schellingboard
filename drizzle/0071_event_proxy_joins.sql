@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `proxy_joins` integer DEFAULT false NOT NULL;
