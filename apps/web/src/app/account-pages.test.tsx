@@ -253,6 +253,28 @@ describe("the settings page", { tags: ["013-US5"] }, () => {
     expect(screen.getByText(/Email me when/)).toBeTruthy();
   });
 
+  it("hides the account security section while a proxy fixes the identity", async () => {
+    const fixed = (siteAdmin: boolean) => (call: FakeCall) =>
+      call.path === "/api/v1/me/identity"
+        ? Response.json({
+            guestId: "al",
+            fixedBy: { logoutUrl: "", siteAdmin },
+          })
+        : answers(call);
+
+    await open({ handler: fixed(false), path: "/settings", identity: "al" });
+    await screen.findByText(/Email me when/);
+    expect(
+      screen.queryByRole("heading", { name: "Account security" })
+    ).toBeNull();
+    cleanup();
+
+    await open({ handler: fixed(true), path: "/settings", identity: "al" });
+    expect(
+      await screen.findByRole("heading", { name: "Account security" })
+    ).toBeTruthy();
+  });
+
   it("asks to select a name first, but keeps the device's appearance", async () => {
     await open({
       handler: (call) =>

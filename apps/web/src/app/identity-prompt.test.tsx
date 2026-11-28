@@ -10,7 +10,7 @@ afterEach(cleanup);
 
 const guests = [{ id: "g1", name: "Ada", authProtected: false }];
 
-function setup() {
+function setup(fixed?: { logoutUrl: string; siteAdmin: boolean }) {
   const then = vi.fn();
   const choose = vi.fn().mockResolvedValue({ ok: true });
   function Action() {
@@ -25,7 +25,8 @@ function setup() {
   render(
     <ViewerContext.Provider
       value={{
-        guestId: null,
+        guestId: fixed ? "g1" : null,
+        fixed,
         choose,
         signOut: vi.fn(),
         refresh: vi.fn(),
@@ -40,6 +41,15 @@ function setup() {
 }
 
 describe("IdentityPrompt", () => {
+  it("never opens the picker while a proxy fixes the identity", async () => {
+    const { then } = setup({ logoutUrl: "", siteAdmin: false });
+
+    await userEvent.click(screen.getByRole("button", { name: "Act" }));
+
+    expect(then).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("opens the name picker and continues once a name is chosen", async () => {
     const { then } = setup();
 

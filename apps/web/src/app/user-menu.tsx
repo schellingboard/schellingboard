@@ -53,6 +53,17 @@ export function UserMenu({
     hardReload();
   };
 
+  const leaveThroughProxy = async (url: string) => {
+    try {
+      await viewer.signOut();
+      await endSiteSession();
+    } catch {
+      // The proxy ends the sign-in either way; a leftover session is harmless.
+    }
+    hardNavigate(url);
+  };
+
+  if (!current && viewer.fixed) return null;
   if (!current) {
     return (
       <>
@@ -127,16 +138,34 @@ export function UserMenu({
           >
             {t`My comments`}
           </a>
-          <div className="my-1 h-px bg-surface-muted" />
-          <button
-            type="button"
-            role="menuitem"
-            disabled={loggingOut}
-            onClick={() => void logOut()}
-            className={`${item} disabled:opacity-50`}
-          >
-            {loggingOut ? t`Logging out...` : t`Log out`}
-          </button>
+          {(!viewer.fixed || viewer.fixed.logoutUrl) && (
+            <div className="my-1 h-px bg-surface-muted" />
+          )}
+          {viewer.fixed ? (
+            viewer.fixed.logoutUrl && (
+              <a
+                role="menuitem"
+                href={viewer.fixed.logoutUrl}
+                className={item}
+                onClick={(e) => {
+                  e.preventDefault();
+                  void leaveThroughProxy(viewer.fixed?.logoutUrl ?? "");
+                }}
+              >
+                {t`Log out`}
+              </a>
+            )
+          ) : (
+            <button
+              type="button"
+              role="menuitem"
+              disabled={loggingOut}
+              onClick={() => void logOut()}
+              className={`${item} disabled:opacity-50`}
+            >
+              {loggingOut ? t`Logging out...` : t`Log out`}
+            </button>
+          )}
           {logoutFailed && (
             <p role="alert" className="px-4 py-1 text-xs text-danger-fg">
               {t`Could not log out — try again`}

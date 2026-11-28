@@ -368,6 +368,7 @@ function Security({
   const state = useSyncExternalStore(query.subscribe, query.get);
   const calls = useMemo(() => signInCalls(api), [api]);
   const guest = entries.find((e) => e.id === viewer.guestId);
+  if (viewer.fixed && !viewer.fixed.siteAdmin) return null;
   if (viewer.guestId && !guest && !loaded)
     return <DirectoryWait failed={failed} />;
   return (

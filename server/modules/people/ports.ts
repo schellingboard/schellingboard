@@ -65,6 +65,7 @@ export interface PeopleDeps {
     | "loginSessions"
     | "sessions"
     | "sessionProposals"
+    | "settings"
   >;
   avatars: AvatarStore;
   loginMail: LoginMail;

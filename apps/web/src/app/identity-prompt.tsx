@@ -20,11 +20,12 @@ export function IdentityPrompt({
   const then = useRef<(() => void) | undefined>(undefined);
   const require = useCallback<RequireIdentity>(
     (next) => {
+      if (viewer.fixed) return next?.();
       if (guests === undefined) return;
       then.current = next;
       setOpen(true);
     },
-    [guests]
+    [guests, viewer.fixed]
   );
   return (
     <RequireIdentityProvider value={require}>

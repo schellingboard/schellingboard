@@ -39,6 +39,70 @@ function setup({
 describe("UserMenu", () => {
   beforeEach(() => vi.clearAllMocks());
 
+  describe("with an identity fixed by a proxy", () => {
+    const signOut = vi.fn().mockResolvedValue(undefined);
+    const open = async (logoutUrl: string) => {
+      render(
+        <UserMenu
+          viewer={{
+            guestId: "g1",
+            choose: vi.fn(),
+            signOut,
+            refresh: vi.fn(),
+            fixed: { logoutUrl, siteAdmin: false },
+          }}
+          guests={guests}
+        />
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Your name: Ada" })
+      );
+    };
+
+    it("sends Log out to the proxy's address", async () => {
+      await open("https://sso.example/logout");
+
+      expect(
+        screen.getByRole("menuitem", { name: "Log out" }).getAttribute("href")
+      ).toBe("https://sso.example/logout");
+      expect(screen.getByRole("menuitem", { name: "My profile" })).toBeTruthy();
+    });
+
+    it("ends the browser's own sessions, then goes to the proxy", async () => {
+      await open("https://sso.example/logout");
+
+      await userEvent.click(screen.getByRole("menuitem", { name: "Log out" }));
+
+      expect(signOut).toHaveBeenCalled();
+      expect(endSiteSession).toHaveBeenCalled();
+      expect(hardNavigate).toHaveBeenCalledWith("https://sso.example/logout");
+    });
+
+    it("never offers the name picker", () => {
+      render(
+        <UserMenu
+          viewer={{
+            guestId: "unknown",
+            choose: vi.fn(),
+            signOut: vi.fn(),
+            refresh: vi.fn(),
+            fixed: { logoutUrl: "", siteAdmin: false },
+          }}
+          guests={guests}
+        />
+      );
+
+      expect(screen.queryByRole("button", { name: "Your name" })).toBeNull();
+    });
+
+    it("hides Log out without an address", async () => {
+      await open("");
+
+      expect(screen.queryByRole("menuitem", { name: "Log out" })).toBeNull();
+      expect(screen.getByRole("menuitem", { name: "Settings" })).toBeTruthy();
+    });
+  });
+
   it("closes its menu on a click elsewhere, and on Escape", async () => {
     const { user } = setup({ guestId: "g1" });
     const opener = screen.getByRole("button", { name: "Your name: Ada" });
